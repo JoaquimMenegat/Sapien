@@ -121,6 +121,10 @@ npm run dist:win # gera instalador Windows (electron-builder)
     e donuts **por status** e **por formato**, com legenda. As cores dos gráficos são
     lidas das CSS variables do tema (`useThemeColors`), então adaptam a cada aparência.
     Referência visual: dashboards enviados pelo usuário — base limpa, dados coloridos.
+  - **Evolução (sessões):** bloco "Sua evolução (últimos 14 dias)" — cartões de ritmo
+    médio/sessões/páginas/minutos + **área de páginas/dia** e barras de **minutos/dia** e
+    **sessões/dia** (série diária das sessões, `sessions:daily` com CTE recursiva). Deixa
+    o usuário comparar os dias e ver o progresso.
   - **Metas:** `MetasView` — metas de **livros/ano, livros/mês, páginas/dia, minutos/dia**
     com progresso real (livros lidos + sessões de hoje), upsert por tipo, barra + selo
     "Concluída". `src/main/db/goals.ts`.

@@ -1,8 +1,10 @@
-import { useEffect, useMemo } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import {
   ResponsiveContainer,
   BarChart,
   Bar,
+  AreaChart,
+  Area,
   XAxis,
   YAxis,
   Tooltip,
@@ -12,7 +14,7 @@ import {
   Cell
 } from 'recharts'
 import { BarChart3 } from 'lucide-react'
-import type { Book, BookStatus } from '../../../../shared/types'
+import type { Book, BookStatus, DailyStat } from '../../../../shared/types'
 import { useBooks } from '../../store/books'
 import { useApp } from '../../store/app'
 import { STATUS_META, STATUS_ORDER, FORMAT_META, FORMAT_ORDER } from '../library/constants'
@@ -145,14 +147,48 @@ function Legend({ items }: { items: { name: string; value: number; color: string
   )
 }
 
+const DAYS = 14
+
+function dayLabel(day: string): string {
+  const [, m, d] = day.split('-')
+  return `${d}/${m}`
+}
+
 export function StatsView(): JSX.Element {
   const books = useBooks((s) => s.books)
   const load = useBooks((s) => s.load)
   const c = useThemeColors()
+  const [daily, setDaily] = useState<DailyStat[]>([])
+  const [pace, setPace] = useState<number | null>(null)
 
   useEffect(() => {
     void load()
+    void window.readdeck.sessions.daily(DAYS).then(setDaily)
+    void window.readdeck.sessions.pace().then(setPace)
   }, [load])
+
+  const series = useMemo(
+    () =>
+      daily.map((d) => ({
+        label: dayLabel(d.day),
+        pages: d.pages,
+        minutes: d.minutes,
+        sessions: d.sessions
+      })),
+    [daily]
+  )
+  const period = useMemo(
+    () =>
+      daily.reduce(
+        (a, d) => ({
+          sessions: a.sessions + d.sessions,
+          pages: a.pages + d.pages,
+          minutes: a.minutes + d.minutes
+        }),
+        { sessions: 0, pages: 0, minutes: 0 }
+      ),
+    [daily]
+  )
 
   const stats = useMemo(() => {
     const lido = books.filter((b) => b.status === 'lido')
@@ -267,6 +303,60 @@ export function StatsView(): JSX.Element {
               Defina o formato dos livros (físico, ebook…) para ver aqui.
             </p>
           )}
+        </div>
+      </div>
+
+      <div className="space-y-4">
+        <h2 className="font-serif text-lg font-semibold text-ink">
+          Sua evolução{' '}
+          <span className="text-sm font-normal text-ink-faint">· últimos {DAYS} dias</span>
+        </h2>
+
+        <div className="grid grid-cols-2 gap-3 lg:grid-cols-4">
+          <MetricCard label="Ritmo médio" value={pace ? `${pace} pág/h` : '—'} color="#f59e0b" />
+          <MetricCard label="Sessões" value={period.sessions} color="#3b82f6" />
+          <MetricCard label="Páginas" value={period.pages} color="#10b981" />
+          <MetricCard label="Minutos" value={period.minutes} color="#8b5cf6" />
+        </div>
+
+        <div className="card p-5">
+          <h3 className="mb-4 font-serif text-base font-semibold text-ink">Páginas por dia</h3>
+          <ResponsiveContainer width="100%" height={230}>
+            <AreaChart data={series} margin={{ top: 4, right: 8, left: -18, bottom: 0 }}>
+              <CartesianGrid vertical={false} stroke={c.edge} />
+              <XAxis dataKey="label" tick={{ fill: c.inkFaint, fontSize: 11 }} axisLine={{ stroke: c.edge }} tickLine={false} interval={1} />
+              <YAxis allowDecimals={false} tick={{ fill: c.inkFaint, fontSize: 11 }} axisLine={false} tickLine={false} width={28} />
+              <Tooltip contentStyle={{ background: c.surface, border: `1px solid ${c.edge}`, borderRadius: 12, color: c.ink, fontSize: 13 }} labelStyle={{ color: c.ink }} />
+              <Area name="Páginas" dataKey="pages" stroke={c.accent} strokeWidth={2} fill={c.accent} fillOpacity={0.15} />
+            </AreaChart>
+          </ResponsiveContainer>
+        </div>
+
+        <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
+          <div className="card p-5">
+            <h3 className="mb-4 font-serif text-base font-semibold text-ink">Minutos por dia</h3>
+            <ResponsiveContainer width="100%" height={200}>
+              <BarChart data={series} margin={{ top: 4, right: 8, left: -18, bottom: 0 }}>
+                <CartesianGrid vertical={false} stroke={c.edge} />
+                <XAxis dataKey="label" tick={{ fill: c.inkFaint, fontSize: 11 }} axisLine={{ stroke: c.edge }} tickLine={false} interval={2} />
+                <YAxis allowDecimals={false} tick={{ fill: c.inkFaint, fontSize: 11 }} axisLine={false} tickLine={false} width={28} />
+                <Tooltip cursor={{ fill: c.edge, opacity: 0.4 }} contentStyle={{ background: c.surface, border: `1px solid ${c.edge}`, borderRadius: 12, color: c.ink, fontSize: 13 }} labelStyle={{ color: c.ink }} />
+                <Bar name="Minutos" dataKey="minutes" fill="#8b5cf6" radius={[5, 5, 0, 0]} maxBarSize={22} />
+              </BarChart>
+            </ResponsiveContainer>
+          </div>
+          <div className="card p-5">
+            <h3 className="mb-4 font-serif text-base font-semibold text-ink">Sessões por dia</h3>
+            <ResponsiveContainer width="100%" height={200}>
+              <BarChart data={series} margin={{ top: 4, right: 8, left: -18, bottom: 0 }}>
+                <CartesianGrid vertical={false} stroke={c.edge} />
+                <XAxis dataKey="label" tick={{ fill: c.inkFaint, fontSize: 11 }} axisLine={{ stroke: c.edge }} tickLine={false} interval={2} />
+                <YAxis allowDecimals={false} tick={{ fill: c.inkFaint, fontSize: 11 }} axisLine={false} tickLine={false} width={28} />
+                <Tooltip cursor={{ fill: c.edge, opacity: 0.4 }} contentStyle={{ background: c.surface, border: `1px solid ${c.edge}`, borderRadius: 12, color: c.ink, fontSize: 13 }} labelStyle={{ color: c.ink }} />
+                <Bar name="Sessões" dataKey="sessions" fill="#3b82f6" radius={[5, 5, 0, 0]} maxBarSize={22} />
+              </BarChart>
+            </ResponsiveContainer>
+          </div>
         </div>
       </div>
     </div>

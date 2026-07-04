@@ -7,7 +7,8 @@ import type {
   BookDraft,
   ReadingSession,
   SessionWithBook,
-  TodayStats
+  TodayStats,
+  DailyStat
 } from '../../shared/types'
 
 const todayStr = (): string => new Date().toISOString().slice(0, 10)
@@ -60,6 +61,25 @@ export function computePace(): number | null {
   const hours = row.mins / 60
   if (hours <= 0) return null
   return Math.round(row.pages / hours)
+}
+
+export function sessionsDaily(days: number): DailyStat[] {
+  const n = Math.max(1, Math.min(90, Math.round(days)))
+  // CTE recursiva gera a série de dias; LEFT JOIN preenche zeros nos dias vazios.
+  return all<DailyStat>(
+    `WITH RECURSIVE d(day) AS (
+       SELECT date('now', ?)
+       UNION ALL SELECT date(day, '+1 day') FROM d WHERE day < date('now')
+     )
+     SELECT d.day AS day,
+            COUNT(s.id) AS sessions,
+            COALESCE(SUM(s.pages_read), 0) AS pages,
+            COALESCE(SUM(s.duration_min), 0) AS minutes
+     FROM d LEFT JOIN reading_sessions s ON date(s.started_at) = d.day
+     GROUP BY d.day
+     ORDER BY d.day`,
+    [`-${n - 1} days`]
+  )
 }
 
 export function todayStats(): TodayStats {

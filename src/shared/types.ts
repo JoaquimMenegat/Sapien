@@ -223,6 +223,14 @@ export interface TodayStats {
   minutes: number
 }
 
+// Estatística de um dia (para gráficos de evolução).
+export interface DailyStat {
+  day: string // 'YYYY-MM-DD'
+  sessions: number
+  pages: number
+  minutes: number
+}
+
 // Sessão com o título do livro embutido (para listagens).
 export interface SessionWithBook extends ReadingSession {
   book_title: string
@@ -234,6 +242,8 @@ export interface SessionsApi {
   /** Ritmo medido em páginas/hora a partir das sessões (null se não houver dados). */
   pace(): Promise<number | null>
   today(): Promise<TodayStats>
+  /** Série dos últimos N dias (preenchendo dias sem sessão com zero). */
+  daily(days: number): Promise<DailyStat[]>
 }
 
 // Superfície da API exposta ao renderer via preload (window.readdeck).
