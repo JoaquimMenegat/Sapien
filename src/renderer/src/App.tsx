@@ -1,8 +1,8 @@
-import { useEffect, useState } from 'react'
+import { useEffect } from 'react'
 import { Sidebar } from './components/Sidebar'
 import { LoginScreen } from './components/LoginScreen'
+import { LibraryView } from './components/library/LibraryView'
 import { useApp, type Section } from './store/app'
-import type { AppHealth } from '../../shared/types'
 
 const SECTION_TITLES: Record<Section, string> = {
   biblioteca: 'Biblioteca',
@@ -11,48 +11,6 @@ const SECTION_TITLES: Record<Section, string> = {
   metas: 'Metas',
   estatisticas: 'Estatísticas',
   notas: 'Notas'
-}
-
-function HealthCard(): JSX.Element {
-  const [health, setHealth] = useState<AppHealth | null>(null)
-  const [error, setError] = useState<string | null>(null)
-
-  useEffect(() => {
-    window.readdeck
-      .health()
-      .then(setHealth)
-      .catch((e) => setError(String(e)))
-  }, [])
-
-  return (
-    <div className="card max-w-xl p-5">
-      <div className="mb-3 flex items-center gap-2">
-        <span
-          className={`inline-block h-2.5 w-2.5 rounded-full ${
-            health?.ok ? 'bg-emerald-500' : 'bg-amber-500'
-          }`}
-        />
-        <h2 className="text-sm font-semibold text-ink">
-          {health?.ok ? 'Banco de dados conectado' : 'Conectando ao banco...'}
-        </h2>
-      </div>
-
-      {error && <p className="text-sm text-red-500">Erro: {error}</p>}
-
-      {health && (
-        <dl className="grid grid-cols-[auto_1fr] gap-x-4 gap-y-1.5 text-sm">
-          <dt className="text-ink-faint">Versão</dt>
-          <dd className="font-medium text-ink">ReadDeck {health.appVersion}</dd>
-          <dt className="text-ink-faint">Livros no acervo</dt>
-          <dd className="font-medium text-ink">{health.bookCount}</dd>
-          <dt className="text-ink-faint">Arquivo do banco</dt>
-          <dd className="truncate font-mono text-xs text-ink-soft" title={health.dbPath}>
-            {health.dbPath}
-          </dd>
-        </dl>
-      )}
-    </div>
-  )
 }
 
 function Placeholder({ section }: { section: Section }): JSX.Element {
@@ -66,7 +24,6 @@ function Placeholder({ section }: { section: Section }): JSX.Element {
 
 function MainLayout(): JSX.Element {
   const section = useApp((s) => s.section)
-  const name = useApp((s) => s.auth?.account?.name?.trim())
 
   return (
     <div className="flex h-screen w-screen overflow-hidden">
@@ -78,25 +35,8 @@ function MainLayout(): JSX.Element {
           </h1>
         </header>
 
-        <div className="space-y-6 px-8 py-8">
-          {section === 'biblioteca' ? (
-            <>
-              <div className="space-y-3">
-                <h2 className="font-serif text-3xl font-semibold tracking-tight text-ink">
-                  {name ? `Olá, ${name}.` : 'Sua estante, do seu jeito.'}
-                </h2>
-                <p className="max-w-2xl text-[15px] leading-relaxed text-ink-soft">
-                  Bem-vindo ao ReadDeck — seu gerenciador de leituras. A fundação está pronta:
-                  janela, banco de dados local, login por e-mail e temas. Nas próximas fases entram
-                  o cadastro de livros via Google Books, o leitor ativo, o Pomodoro, as metas e as
-                  notas.
-                </p>
-              </div>
-              <HealthCard />
-            </>
-          ) : (
-            <Placeholder section={section} />
-          )}
+        <div className="px-8 py-6">
+          {section === 'biblioteca' ? <LibraryView /> : <Placeholder section={section} />}
         </div>
       </main>
     </div>

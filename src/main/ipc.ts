@@ -5,7 +5,17 @@ import { ipcMain, app } from 'electron'
 import { get, getDbPath } from './db/index'
 import { getSetting, setSetting } from './db/settings'
 import { hasAccount, getAccountInfo, createAccount, verifyLogin } from './db/account'
-import type { AppHealth, AuthStatus, AuthResult } from '../shared/types'
+import { listBooks, getBook, createBook, updateBook, deleteBook } from './db/books'
+import { searchGoogleBooks } from './googleBooks'
+import type {
+  AppHealth,
+  AuthStatus,
+  AuthResult,
+  Book,
+  BookDraft,
+  BookStatus,
+  GoogleBookResult
+} from '../shared/types'
 
 // Estado de sessão: vive só em memória. Ao reabrir o app, exige login de novo.
 let loggedIn = false
@@ -55,4 +65,16 @@ export function registerIpcHandlers(): void {
   ipcMain.handle('account:logout', (): void => {
     loggedIn = false
   })
+
+  // --- Livros ---
+  ipcMain.handle('books:list', (_e, status?: BookStatus | 'all'): Book[] => listBooks(status))
+  ipcMain.handle('books:get', (_e, id: number): Book | null => getBook(id))
+  ipcMain.handle('books:create', (_e, draft: BookDraft): Book => createBook(draft))
+  ipcMain.handle('books:update', (_e, id: number, patch: Partial<BookDraft>): Book =>
+    updateBook(id, patch)
+  )
+  ipcMain.handle('books:delete', (_e, id: number): void => deleteBook(id))
+  ipcMain.handle('books:search', (_e, query: string): Promise<GoogleBookResult[]> =>
+    searchGoogleBooks(query)
+  )
 }

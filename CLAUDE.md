@@ -89,10 +89,28 @@ npm run dist:win # gera instalador Windows (electron-builder)
 - [x] **Extra (a pedido do usuário).** Sistema de temas com seletor ao vivo
   (Literary claro/escuro + Modern Dark) e **login por e-mail** local/offline (scrypt),
   com tela de login/cadastro e gating do app.
-- [ ] **Fase 1 — Biblioteca.** Cadastro via Google Books, 5 status, visualizações
-  grade/lista/tabela, abas por status.
+- [x] **Fase 1 — Biblioteca.** Cadastro via Google Books (busca no main process),
+  5 status, visualizações grade/lista/tabela, abas por status com contadores.
+  **Registro editável**: busca mostra múltiplos resultados/edições; ao escolher (ou
+  "adicionar manualmente"), cai num formulário onde todo campo é editável. Detalhe do
+  livro permite editar/mudar status/excluir. Nota: Google Books é API pública sem chave
+  (limite por IP → 429 em uso intenso; tratado com retry+mensagem; chave opcional é
+  melhoria futura).
 - [ ] **Fase 2 — Leitura ativa.** Progresso página/%, quanto falta em páginas e tempo.
 - [ ] **Fase 3 — Pomodoro + sessões.**
-- [ ] **Fase 4 — Metas, cronograma, estatísticas.**
+- [ ] **Fase 4 — Metas, cronograma, estatísticas.** Gráficos **vivos e coloridos**
+  (donuts, barras empilhadas, linha+barra) — referência visual nas telas de dashboard
+  enviadas pelo usuário. Base continua limpa (Notion); os dados é que ganham cor.
 - [ ] **Fase 5 — Notas e trechos.**
 - [ ] **Fase 6 — Acabamento e empacotamento.**
+
+### Requisitos adicionais (feedback do usuário)
+
+- [ ] **Personalização avançada.** Expandir o sistema de temas: escolher **cor de
+  acento** (paletas vivas), **estilo de animação** (ex.: sem/sutil/rico, respeitando
+  `prefers-reduced-motion`) e **estilo dos gráficos**. Vira um painel de Configurações.
+- [ ] **Busca com IA.** Seção de descoberta onde o usuário faz perguntas em linguagem
+  natural: recomendações ("ideias de distopia + avaliações do mercado") e sínteses
+  ("o que 1984 fala em síntese"). **Feature online** (a primeira do app) — requer chave
+  de API de um provedor de IA. Preferência: **Claude API (Anthropic)**; consultar a
+  skill `claude-api` na implementação. Chave guardada localmente em settings.

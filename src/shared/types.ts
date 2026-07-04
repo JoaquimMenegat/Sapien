@@ -41,6 +41,48 @@ export interface Book {
   updated_at: string
 }
 
+// Payload para criar/editar um livro (sem id/timestamps, todos opcionais menos título).
+export interface BookDraft {
+  title: string
+  subtitle?: string | null
+  authors?: string | null
+  cover_url?: string | null
+  isbn?: string | null
+  total_pages?: number | null
+  current_page?: number
+  synopsis?: string | null
+  publisher?: string | null
+  language?: string | null
+  format?: BookFormat | null
+  genres?: string | null
+  status?: BookStatus
+  rating?: number | null
+  public_rating?: number | null
+  ratings_count?: number | null
+  started_at?: string | null
+  finished_at?: string | null
+  verdict?: string | null
+  google_books_id?: string | null
+}
+
+// Resultado normalizado da API do Google Books (uma edição encontrada).
+export interface GoogleBookResult {
+  google_books_id: string
+  title: string
+  subtitle: string | null
+  authors: string | null
+  publisher: string | null
+  published_date: string | null
+  synopsis: string | null
+  total_pages: number | null
+  genres: string | null
+  cover_url: string | null
+  isbn: string | null
+  language: string | null
+  public_rating: number | null
+  ratings_count: number | null
+}
+
 export interface ReadingSession {
   id: number
   book_id: number
@@ -100,10 +142,20 @@ export interface AccountApi {
   logout(): Promise<void>
 }
 
+export interface BooksApi {
+  list(status?: BookStatus | 'all'): Promise<Book[]>
+  get(id: number): Promise<Book | null>
+  create(draft: BookDraft): Promise<Book>
+  update(id: number, patch: Partial<BookDraft>): Promise<Book>
+  remove(id: number): Promise<void>
+  search(query: string): Promise<GoogleBookResult[]>
+}
+
 // Superfície da API exposta ao renderer via preload (window.readdeck).
 export interface ReadDeckApi {
   health(): Promise<AppHealth>
   getSetting(key: string): Promise<string | null>
   setSetting(key: string, value: string): Promise<void>
   account: AccountApi
+  books: BooksApi
 }
