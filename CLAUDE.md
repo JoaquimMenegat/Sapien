@@ -34,10 +34,16 @@ preenchimento automático (Google Books) e foco em UI fluida estilo Notion.
   `moderndark` (estética "Linear": quase-preto + índigo, com iluminação ambiente). O
   usuário troca ao vivo pelo `AppearancePicker`. Preferência persistida em settings.
 - **Login local por e-mail (offline).** Uma conta por instalação, guardada na tabela
-  `settings` (`account.email/name/hash`). Senha nunca em texto: hash com **scrypt**
-  (crypto nativo do Node, sem dependência). Sessão vive em memória no main — reabrir o
-  app exige login. Sem nuvem; sync entre dispositivos ficaria para uma fase futura com
-  backend. Ver `src/main/db/account.ts`.
+  `settings` (`account.email/name/hash/picture/provider`). Senha nunca em texto: hash com
+  **scrypt** (crypto nativo do Node, sem dependência). Sessão vive em memória no main —
+  reabrir o app exige login. Ver `src/main/db/account.ts`. Também há **"Entrar com Google"**
+  (OAuth desktop loopback+PKCE, `src/main/googleAuth.ts`) — feature online que usa as
+  credenciais do próprio usuário (Client ID/Secret em settings) e cria conta sem senha; e
+  **perfil** editável (foto local/Google + nome) no painel Personalização.
+- **Nome do produto: "Sapien"** (era ReadDeck). `productName` = Sapien; `name` interno e a
+  ponte `window.readdeck` continuam `readdeck`. **userData fixado** em `%APPDATA%\Sapien`
+  via `app.setPath` no `main/index.ts` (productName mudava o `app.getName()` e movia a
+  pasta — o pin garante que renomear nunca mais perca os dados). Repo/pasta ainda `ReadDeck`.
 
 ## Estrutura
 
