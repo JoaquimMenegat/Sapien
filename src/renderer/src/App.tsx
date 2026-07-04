@@ -5,6 +5,7 @@ import { LibraryView } from './components/library/LibraryView'
 import { FindBookView } from './components/ai/FindBookView'
 import { GenresView } from './components/genres/GenresView'
 import { ReadingView } from './components/reading/ReadingView'
+import { StatsView } from './components/stats/StatsView'
 import { useApp, type Section } from './store/app'
 
 const SECTION_TITLES: Record<Section, string> = {
@@ -49,6 +50,8 @@ function MainLayout(): JSX.Element {
             <GenresView />
           ) : section === 'lendo' ? (
             <ReadingView />
+          ) : section === 'estatisticas' ? (
+            <StatsView />
           ) : (
             <Placeholder section={section} />
           )}

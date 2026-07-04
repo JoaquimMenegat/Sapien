@@ -110,9 +110,13 @@ npm run dist:win # gera instalador Windows (electron-builder)
   ritmo (pág/h, editável, salvo em `reading.pace`). Atualização rápida da página atual e
   botão "Concluir" ao chegar no total. Ritmo vira medido automaticamente na Fase 3.
 - [ ] **Fase 3 — Pomodoro + sessões.**
-- [ ] **Fase 4 — Metas, cronograma, estatísticas.** Gráficos **vivos e coloridos**
-  (donuts, barras empilhadas, linha+barra) — referência visual nas telas de dashboard
-  enviadas pelo usuário. Base continua limpa (Notion); os dados é que ganham cor.
+- [~] **Fase 4 — Metas, cronograma, estatísticas.**
+  - **Estatísticas (feito):** `StatsView` com **Recharts** — cartões de métrica coloridos
+    (acervo, lidos, páginas lidas, nota média), barras "livros lidos por mês" (12 meses)
+    e donuts **por status** e **por formato**, com legenda. As cores dos gráficos são
+    lidas das CSS variables do tema (`useThemeColors`), então adaptam a cada aparência.
+    Referência visual: dashboards enviados pelo usuário — base limpa, dados coloridos.
+  - Faltam: **metas** de leitura (livros/mês, páginas/dia…) e **cronograma**.
 - [ ] **Fase 5 — Notas e trechos.**
 - [ ] **Fase 6 — Acabamento e empacotamento.**
 
