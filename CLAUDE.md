@@ -90,12 +90,17 @@ npm run dist:win # gera instalador Windows (electron-builder)
   (Literary claro/escuro + Modern Dark) e **login por e-mail** local/offline (scrypt),
   com tela de login/cadastro e gating do app.
 - [x] **Fase 1 — Biblioteca.** Cadastro via Google Books (busca no main process),
-  5 status, visualizações grade/lista/tabela, abas por status com contadores.
+  6 status (wishlist/fila/lendo/pausado/lido/**abandonado**), visualizações
+  grade/lista/tabela, abas por status com contadores. Progresso no card e no detalhe
+  mostra **barra + % + páginas lidas/total** (ReadingProgress).
   **Registro editável**: busca mostra múltiplos resultados/edições; ao escolher (ou
   "adicionar manualmente"), cai num formulário onde todo campo é editável. Detalhe do
   livro permite editar/mudar status/excluir.
-  - **Busca com fallback:** tenta Google Books (timeout 5s) e cai na **Open Library**
-    (`bookSearch.ts`) — resolve o 429/limite por IP do Google sem depender de chave.
+  - **Busca combinada:** consulta Google Books (timeout 5s) **e** Open Library em
+    paralelo (`bookSearch.ts`), junta, dedup por ISBN e ordena priorizando edições em
+    português e com dados completos (capa/páginas/sinopse). Mais edições p/ escolher e
+    resiliente ao 429 do Google. Amazon não tem API pública gratuita (só PA-API com
+    conta de afiliado) — fica como opção futura.
   - **Capa local:** botão "Escolher capa" copia a imagem para `userData/covers` e serve
     via protocolo `readdeck-cover://` (`covers.ts`).
   - **Mover de prateleira rápido:** `StatusPicker` (chips) no detalhe do livro salva o

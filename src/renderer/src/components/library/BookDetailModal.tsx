@@ -4,7 +4,7 @@ import type { Book, BookDraft, BookStatus } from '../../../../shared/types'
 import { useBooks } from '../../store/books'
 import { Modal } from '../ui/Modal'
 import { BookForm } from './BookForm'
-import { StatusPicker } from './BookBits'
+import { StatusPicker, ReadingProgress } from './BookBits'
 
 const today = (): string => new Date().toISOString().slice(0, 10)
 
@@ -82,6 +82,10 @@ export function BookDetailModal({
               </button>
             )}
           </div>
+
+          {b.total_pages ? (
+            <ReadingProgress current={b.current_page} total={b.total_pages} className="max-w-xs" />
+          ) : null}
 
           <div className="border-t border-edge pt-4">
             <BookForm

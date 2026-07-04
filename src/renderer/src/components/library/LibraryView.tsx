@@ -3,21 +3,16 @@ import { LayoutGrid, List as ListIcon, Table2, Plus, BookMarked } from 'lucide-r
 import type { Book } from '../../../../shared/types'
 import { useBooks, type StatusFilter, type ViewMode } from '../../store/books'
 import { STATUS_ORDER, STATUS_META, FORMAT_META } from './constants'
-import { BookCover, StatusBadge, StarRating } from './BookBits'
+import { BookCover, StatusBadge, StarRating, ReadingProgress } from './BookBits'
 import { AddBookModal } from './AddBookModal'
 import { BookDetailModal } from './BookDetailModal'
+
+// Status em que faz sentido mostrar o progresso de leitura.
+const IN_PROGRESS: Book['status'][] = ['lendo', 'pausado', 'abandonado']
 
 function progress(b: Book): number {
   if (!b.total_pages || b.total_pages <= 0) return 0
   return Math.min(100, Math.round((b.current_page / b.total_pages) * 100))
-}
-
-function ProgressBar({ value }: { value: number }): JSX.Element {
-  return (
-    <div className="h-1.5 w-full overflow-hidden rounded-full bg-ink/[0.08]">
-      <div className="h-full rounded-full bg-accent" style={{ width: `${value}%` }} />
-    </div>
-  )
 }
 
 const VIEWS: { id: ViewMode; icon: typeof LayoutGrid; label: string }[] = [
@@ -124,7 +119,9 @@ export function LibraryView(): JSX.Element {
                 <p className="truncate text-sm font-medium text-ink">{b.title}</p>
                 {b.authors && <p className="truncate text-xs text-ink-faint">{b.authors}</p>}
                 <StatusBadge status={b.status} />
-                {b.status === 'lendo' && b.total_pages ? <ProgressBar value={progress(b)} /> : null}
+                {IN_PROGRESS.includes(b.status) && b.total_pages ? (
+                  <ReadingProgress current={b.current_page} total={b.total_pages} className="pt-0.5" />
+                ) : null}
               </div>
             </button>
           ))}

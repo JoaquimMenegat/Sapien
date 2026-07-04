@@ -1,16 +1,24 @@
 // Tipos compartilhados entre o processo main (Node) e o renderer (React).
 // Mantidos aqui para uma única fonte de verdade sobre o modelo de dados.
 
-export type BookStatus = 'wishlist' | 'fila' | 'lendo' | 'pausado' | 'lido'
+export type BookStatus = 'wishlist' | 'fila' | 'lendo' | 'pausado' | 'lido' | 'abandonado'
 
-export const BOOK_STATUSES: BookStatus[] = ['wishlist', 'fila', 'lendo', 'pausado', 'lido']
+export const BOOK_STATUSES: BookStatus[] = [
+  'wishlist',
+  'fila',
+  'lendo',
+  'pausado',
+  'lido',
+  'abandonado'
+]
 
 export const STATUS_LABELS: Record<BookStatus, string> = {
   wishlist: 'Na wishlist',
   fila: 'Na fila',
   lendo: 'Lendo',
   pausado: 'Pausado',
-  lido: 'Lido'
+  lido: 'Lido',
+  abandonado: 'Abandonado'
 }
 
 export type BookFormat = 'fisico' | 'ebook' | 'audiolivro' | 'kindle'

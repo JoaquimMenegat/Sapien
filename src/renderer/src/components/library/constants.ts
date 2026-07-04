@@ -10,10 +10,11 @@ export const STATUS_META: Record<
   fila: { label: 'Na fila', dot: 'bg-amber-500', text: 'text-amber-600 dark:text-amber-400', soft: 'bg-amber-500/10' },
   lendo: { label: 'Lendo', dot: 'bg-sky-500', text: 'text-sky-600 dark:text-sky-400', soft: 'bg-sky-500/10' },
   pausado: { label: 'Pausado', dot: 'bg-violet-500', text: 'text-violet-600 dark:text-violet-400', soft: 'bg-violet-500/10' },
-  lido: { label: 'Lido', dot: 'bg-emerald-500', text: 'text-emerald-600 dark:text-emerald-400', soft: 'bg-emerald-500/10' }
+  lido: { label: 'Lido', dot: 'bg-emerald-500', text: 'text-emerald-600 dark:text-emerald-400', soft: 'bg-emerald-500/10' },
+  abandonado: { label: 'Abandonado', dot: 'bg-stone-500', text: 'text-stone-600 dark:text-stone-400', soft: 'bg-stone-500/10' }
 }
 
-export const STATUS_ORDER: BookStatus[] = ['wishlist', 'fila', 'lendo', 'pausado', 'lido']
+export const STATUS_ORDER: BookStatus[] = ['wishlist', 'fila', 'lendo', 'pausado', 'lido', 'abandonado']
 
 export const FORMAT_META: Record<BookFormat, string> = {
   fisico: 'Físico',

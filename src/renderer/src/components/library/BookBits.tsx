@@ -31,6 +31,33 @@ export function BookCover({
   )
 }
 
+// Progresso de leitura: barra + porcentagem + páginas lidas/total.
+export function ReadingProgress({
+  current,
+  total,
+  className = ''
+}: {
+  current: number
+  total: number | null
+  className?: string
+}): JSX.Element | null {
+  if (!total || total <= 0) return null
+  const pct = Math.min(100, Math.round((current / total) * 100))
+  return (
+    <div className={`space-y-1 ${className}`}>
+      <div className="h-1.5 w-full overflow-hidden rounded-full bg-ink/[0.08]">
+        <div className="h-full rounded-full bg-accent transition-all" style={{ width: `${pct}%` }} />
+      </div>
+      <div className="flex justify-between text-xs text-ink-faint">
+        <span className="font-medium text-ink-soft">{pct}%</span>
+        <span>
+          {current}/{total} páginas
+        </span>
+      </div>
+    </div>
+  )
+}
+
 // Seletor rápido de prateleira: linha de chips clicáveis (muda o status na hora).
 export function StatusPicker({
   value,
