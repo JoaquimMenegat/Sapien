@@ -4,7 +4,15 @@
 import { ipcMain, app } from 'electron'
 import { get, getDbPath } from './db/index'
 import { getSetting, setSetting } from './db/settings'
-import { hasAccount, getAccountInfo, createAccount, verifyLogin } from './db/account'
+import {
+  hasAccount,
+  getAccountInfo,
+  createAccount,
+  verifyLogin,
+  upsertGoogleAccount,
+  updateProfile
+} from './db/account'
+import { googleConfigured, setGoogleConfig, googleSignIn } from './googleAuth'
 import { listBooks, getBook, createBook, updateBook, deleteBook } from './db/books'
 import { searchBooks } from './bookSearch'
 import { pickCover } from './covers'
@@ -41,7 +49,8 @@ function currentStatus(): AuthStatus {
   return {
     hasAccount: hasAccount(),
     loggedIn,
-    account: loggedIn ? getAccountInfo() : null
+    // Devolve o perfil mesmo antes do login, para a tela escolher o método (senha/Google).
+    account: hasAccount() ? getAccountInfo() : null
   }
 }
 
@@ -81,6 +90,23 @@ export function registerIpcHandlers(): void {
 
   ipcMain.handle('account:logout', (): void => {
     loggedIn = false
+  })
+
+  ipcMain.handle('account:updateProfile', (_e, name: string, picture: string | null): AuthResult =>
+    updateProfile(name, picture)
+  )
+  ipcMain.handle('account:pickAvatar', (): Promise<string | null> => pickCover())
+
+  ipcMain.handle('account:googleConfig', () => ({ configured: googleConfigured() }))
+  ipcMain.handle('account:setGoogleConfig', (_e, clientId: string, clientSecret: string): void =>
+    setGoogleConfig(clientId, clientSecret)
+  )
+  ipcMain.handle('account:googleSignIn', async (): Promise<AuthResult> => {
+    const r = await googleSignIn()
+    if (!r.ok || !r.email) return { ok: false, error: r.error ?? 'Falha no login com Google.' }
+    const res = upsertGoogleAccount(r.email, r.name ?? '', r.picture ?? '')
+    if (res.ok) loggedIn = true
+    return res
   })
 
   // --- Livros ---

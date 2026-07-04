@@ -11,7 +11,13 @@ const api: ReadDeckApi = {
     status: () => ipcRenderer.invoke('account:status'),
     signup: (email, name, password) => ipcRenderer.invoke('account:signup', email, name, password),
     login: (email, password) => ipcRenderer.invoke('account:login', email, password),
-    logout: () => ipcRenderer.invoke('account:logout')
+    logout: () => ipcRenderer.invoke('account:logout'),
+    updateProfile: (name, picture) => ipcRenderer.invoke('account:updateProfile', name, picture),
+    pickAvatar: () => ipcRenderer.invoke('account:pickAvatar'),
+    googleConfig: () => ipcRenderer.invoke('account:googleConfig'),
+    setGoogleConfig: (clientId, clientSecret) =>
+      ipcRenderer.invoke('account:setGoogleConfig', clientId, clientSecret),
+    googleSignIn: () => ipcRenderer.invoke('account:googleSignIn')
   },
   books: {
     list: (status) => ipcRenderer.invoke('books:list', status),

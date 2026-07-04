@@ -69,9 +69,17 @@ export function Sidebar(): JSX.Element {
         </button>
 
         <div className="flex items-center gap-2 pt-0.5">
-          <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-accent/15 text-xs font-semibold uppercase text-accent">
-            {displayName.slice(0, 2)}
-          </div>
+          {account?.picture ? (
+            <img
+              src={account.picture}
+              alt=""
+              className="h-8 w-8 shrink-0 rounded-full border border-edge object-cover"
+            />
+          ) : (
+            <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-accent/15 text-xs font-semibold uppercase text-accent">
+              {displayName.slice(0, 2)}
+            </div>
+          )}
           <div className="min-w-0 flex-1">
             <p className="truncate text-sm font-medium text-ink">{displayName}</p>
             <p className="truncate text-xs text-ink-faint">{account?.email}</p>

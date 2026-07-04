@@ -32,14 +32,18 @@ function isValidEmail(email: string): boolean {
 }
 
 export function hasAccount(): boolean {
-  return !!getSetting('account.hash')
+  return !!getSetting('account.email')
 }
 
 export function getAccountInfo(): AccountInfo | null {
   const email = getSetting('account.email')
-  const name = getSetting('account.name')
   if (!email) return null
-  return { email, name: name ?? '' }
+  return {
+    email,
+    name: getSetting('account.name') ?? '',
+    picture: getSetting('account.picture') || null,
+    provider: getSetting('account.provider') === 'google' ? 'google' : 'local'
+  }
 }
 
 export function createAccount(email: string, name: string, password: string): AuthResult {
@@ -56,14 +60,36 @@ export function createAccount(email: string, name: string, password: string): Au
   setSetting('account.email', normEmail)
   setSetting('account.name', name.trim())
   setSetting('account.hash', hashPassword(password))
-  return { ok: true, account: { email: normEmail, name: name.trim() } }
+  setSetting('account.provider', 'local')
+  return { ok: true, account: getAccountInfo() ?? undefined }
+}
+
+// Cria/atualiza a conta a partir de um login com Google (sem senha local).
+export function upsertGoogleAccount(email: string, name: string, picture: string): AuthResult {
+  const normEmail = normalizeEmail(email)
+  if (!isValidEmail(normEmail)) return { ok: false, error: 'E-mail do Google inválido.' }
+  setSetting('account.email', normEmail)
+  setSetting('account.name', (name || normEmail.split('@')[0]).trim())
+  setSetting('account.picture', picture || '')
+  setSetting('account.provider', 'google')
+  return { ok: true, account: getAccountInfo() ?? undefined }
+}
+
+export function updateProfile(name: string, picture: string | null): AuthResult {
+  if (!hasAccount()) return { ok: false, error: 'Nenhuma conta.' }
+  if (name.trim()) setSetting('account.name', name.trim())
+  setSetting('account.picture', picture ?? '')
+  return { ok: true, account: getAccountInfo() ?? undefined }
 }
 
 export function verifyLogin(email: string, password: string): AuthResult {
   const stored = getSetting('account.hash')
   const storedEmail = getSetting('account.email')
-  if (!stored || !storedEmail) {
+  if (!storedEmail) {
     return { ok: false, error: 'Nenhuma conta cadastrada.' }
+  }
+  if (!stored) {
+    return { ok: false, error: 'Esta conta entra com o Google.' }
   }
   if (normalizeEmail(email) !== storedEmail) {
     return { ok: false, error: 'E-mail ou senha incorretos.' }

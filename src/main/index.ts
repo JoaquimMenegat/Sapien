@@ -7,6 +7,10 @@ import { registerCoverScheme, registerCoverProtocol, ensureCoversDir } from './c
 // Precisa acontecer antes do app ficar pronto.
 registerCoverScheme()
 
+// Fixa a pasta de dados em %APPDATA%/Sapien, independente de name/productName —
+// assim renomear o app nunca "perde" os dados do usuário.
+app.setPath('userData', join(app.getPath('appData'), 'Sapien'))
+
 function createWindow(): void {
   const mainWindow = new BrowserWindow({
     width: 1200,

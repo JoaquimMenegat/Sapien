@@ -85,6 +85,8 @@ interface AppState {
   signup: (email: string, name: string, password: string) => Promise<AuthResult>
   login: (email: string, password: string) => Promise<AuthResult>
   logout: () => Promise<void>
+  googleSignIn: () => Promise<AuthResult>
+  updateProfile: (name: string, picture: string | null) => Promise<AuthResult>
 }
 
 export const useApp = create<AppState>((set, get) => ({
@@ -144,5 +146,15 @@ export const useApp = create<AppState>((set, get) => ({
   logout: async () => {
     await window.readdeck.account.logout()
     await get().refreshAuth()
+  },
+  googleSignIn: async () => {
+    const res = await window.readdeck.account.googleSignIn()
+    if (res.ok) await get().refreshAuth()
+    return res
+  },
+  updateProfile: async (name, picture) => {
+    const res = await window.readdeck.account.updateProfile(name, picture)
+    if (res.ok) await get().refreshAuth()
+    return res
   }
 }))

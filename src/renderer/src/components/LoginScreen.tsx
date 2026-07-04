@@ -1,32 +1,100 @@
-import { useState, type FormEvent } from 'react'
-import { Library, Mail, Lock, User, ArrowRight } from 'lucide-react'
+import { useEffect, useState, type FormEvent } from 'react'
+import { Library, Mail, Lock, User, ArrowRight, LogIn, KeyRound, ExternalLink } from 'lucide-react'
 import { useApp } from '../store/app'
+import { cleanErrorMessage } from '../lib/errors'
 import { AppearancePicker } from './AppearancePicker'
 
+function GoogleConfigPanel({ onDone }: { onDone: () => void }): JSX.Element {
+  const [clientId, setClientId] = useState('')
+  const [secret, setSecret] = useState('')
+  const [saving, setSaving] = useState(false)
+
+  async function save(e: FormEvent): Promise<void> {
+    e.preventDefault()
+    if (!clientId.trim() || !secret.trim()) return
+    setSaving(true)
+    await window.readdeck.account.setGoogleConfig(clientId.trim(), secret.trim())
+    setSaving(false)
+    onDone()
+  }
+
+  return (
+    <form onSubmit={save} className="mt-3 space-y-2.5 rounded-xl border border-edge bg-surface p-3.5 text-left">
+      <p className="text-xs text-ink-soft">
+        Cole as credenciais de um cliente OAuth do tipo <b>App de desktop</b> criado em{' '}
+        <a href="https://console.cloud.google.com/apis/credentials" className="text-accent hover:underline">
+          console.cloud.google.com <ExternalLink size={10} className="inline" />
+        </a>
+        .
+      </p>
+      <input
+        value={clientId}
+        onChange={(e) => setClientId(e.target.value)}
+        placeholder="Client ID (…apps.googleusercontent.com)"
+        className="field font-mono text-xs"
+      />
+      <input
+        type="password"
+        value={secret}
+        onChange={(e) => setSecret(e.target.value)}
+        placeholder="Client secret"
+        className="field font-mono text-xs"
+      />
+      <button type="submit" disabled={saving} className="btn-primary w-full py-2 text-sm">
+        {saving ? 'Salvando…' : 'Salvar credenciais'}
+      </button>
+    </form>
+  )
+}
+
 export function LoginScreen(): JSX.Element {
+  const account = useApp((s) => s.auth?.account ?? null)
   const hasAccount = useApp((s) => s.auth?.hasAccount ?? false)
   const signup = useApp((s) => s.signup)
   const login = useApp((s) => s.login)
+  const googleSignIn = useApp((s) => s.googleSignIn)
 
   const isSignup = !hasAccount
+  const googleOnly = account?.provider === 'google'
+
   const [email, setEmail] = useState('')
   const [name, setName] = useState('')
   const [password, setPassword] = useState('')
   const [error, setError] = useState<string | null>(null)
   const [busy, setBusy] = useState(false)
 
+  const [googleReady, setGoogleReady] = useState(false)
+  const [showCfg, setShowCfg] = useState(false)
+  const [googleBusy, setGoogleBusy] = useState(false)
+
+  useEffect(() => {
+    void window.readdeck.account.googleConfig().then((c) => setGoogleReady(c.configured))
+  }, [])
+
   async function handleSubmit(e: FormEvent): Promise<void> {
     e.preventDefault()
     setError(null)
     setBusy(true)
-    const res = isSignup
-      ? await signup(email, name, password)
-      : await login(email, password)
+    const res = isSignup ? await signup(email, name, password) : await login(email, password)
     if (!res.ok) {
       setError(res.error ?? 'Não foi possível continuar.')
       setBusy(false)
     }
-    // Em caso de sucesso, o refreshAuth troca a tela; não precisa resetar busy.
+  }
+
+  async function handleGoogle(): Promise<void> {
+    setError(null)
+    if (!googleReady) {
+      setShowCfg(true)
+      return
+    }
+    setGoogleBusy(true)
+    const res = await googleSignIn()
+    if (!res.ok) {
+      setError(cleanErrorMessage(res.error ?? 'Falha no login com Google.'))
+      setGoogleBusy(false)
+    }
+    // Sucesso: refreshAuth troca a tela.
   }
 
   return (
@@ -35,90 +103,85 @@ export function LoginScreen(): JSX.Element {
         <AppearancePicker />
       </div>
 
-      <div className="w-full max-w-sm">
-        <div className="mb-8 text-center">
-          <div className="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-2xl bg-accent text-white shadow-lg">
-            <Library size={24} />
-          </div>
-          <h1 className="font-serif text-3xl font-semibold tracking-tight text-ink">Sapien</h1>
-          <p className="mt-1.5 text-sm text-ink-soft">
-            {isSignup
+      <div className="w-full max-w-sm text-center">
+        <div className="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-2xl bg-accent text-white shadow-lg">
+          <Library size={24} />
+        </div>
+        <h1 className="font-serif text-3xl font-semibold tracking-tight text-ink">Sapien</h1>
+        <p className="mt-1.5 text-sm text-ink-soft">
+          {googleOnly
+            ? `Bem-vindo de volta, ${account?.name?.split(' ')[0] || ''}.`
+            : isSignup
               ? 'Crie sua conta para começar sua estante.'
               : 'Bem-vindo de volta à sua estante.'}
-          </p>
-        </div>
+        </p>
 
-        <form onSubmit={handleSubmit} className="card space-y-4 p-6">
-          <label className="block">
-            <span className="mb-1.5 block text-xs font-medium text-ink-soft">E-mail</span>
-            <div className="relative">
-              <Mail
-                size={16}
-                className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-ink-faint"
-              />
-              <input
-                type="email"
-                required
-                autoFocus
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                placeholder="voce@exemplo.com"
-                className="field pl-9"
-              />
-            </div>
-          </label>
-
-          {isSignup && (
+        {!googleOnly && (
+          <form onSubmit={handleSubmit} className="card mt-6 space-y-4 p-6 text-left">
             <label className="block">
-              <span className="mb-1.5 block text-xs font-medium text-ink-soft">Nome</span>
+              <span className="mb-1.5 block text-xs font-medium text-ink-soft">E-mail</span>
               <div className="relative">
-                <User
-                  size={16}
-                  className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-ink-faint"
-                />
-                <input
-                  type="text"
-                  required
-                  value={name}
-                  onChange={(e) => setName(e.target.value)}
-                  placeholder="Como quer ser chamado(a)"
-                  className="field pl-9"
-                />
+                <Mail size={16} className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-ink-faint" />
+                <input type="email" required value={email} onChange={(e) => setEmail(e.target.value)} placeholder="voce@exemplo.com" className="field pl-9" />
               </div>
             </label>
-          )}
 
-          <label className="block">
-            <span className="mb-1.5 block text-xs font-medium text-ink-soft">Senha</span>
-            <div className="relative">
-              <Lock
-                size={16}
-                className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-ink-faint"
-              />
-              <input
-                type="password"
-                required
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                placeholder={isSignup ? 'Mínimo 6 caracteres' : 'Sua senha'}
-                className="field pl-9"
-              />
+            {isSignup && (
+              <label className="block">
+                <span className="mb-1.5 block text-xs font-medium text-ink-soft">Nome</span>
+                <div className="relative">
+                  <User size={16} className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-ink-faint" />
+                  <input type="text" required value={name} onChange={(e) => setName(e.target.value)} placeholder="Como quer ser chamado(a)" className="field pl-9" />
+                </div>
+              </label>
+            )}
+
+            <label className="block">
+              <span className="mb-1.5 block text-xs font-medium text-ink-soft">Senha</span>
+              <div className="relative">
+                <Lock size={16} className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-ink-faint" />
+                <input type="password" required value={password} onChange={(e) => setPassword(e.target.value)} placeholder={isSignup ? 'Mínimo 6 caracteres' : 'Sua senha'} className="field pl-9" />
+              </div>
+            </label>
+
+            <button type="submit" disabled={busy} className="btn-primary w-full">
+              {busy ? 'Aguarde...' : isSignup ? 'Criar conta' : 'Entrar'}
+              {!busy && <ArrowRight size={16} />}
+            </button>
+          </form>
+        )}
+
+        {/* Entrar com Google */}
+        <div className={googleOnly ? 'card mt-6 p-6' : 'mt-3'}>
+          {!googleOnly && (
+            <div className="mb-3 flex items-center gap-3 text-xs text-ink-faint">
+              <span className="h-px flex-1 bg-edge" /> ou <span className="h-px flex-1 bg-edge" />
             </div>
-          </label>
-
-          {error && (
-            <p className="rounded-lg bg-red-500/10 px-3 py-2 text-sm text-red-500">{error}</p>
           )}
-
-          <button type="submit" disabled={busy} className="btn-primary w-full">
-            {busy ? 'Aguarde...' : isSignup ? 'Criar conta' : 'Entrar'}
-            {!busy && <ArrowRight size={16} />}
+          {googleOnly && account?.picture && (
+            <img src={account.picture} alt="" className="mx-auto mb-3 h-14 w-14 rounded-full border border-edge object-cover" />
+          )}
+          <button onClick={handleGoogle} disabled={googleBusy} className="btn-ghost w-full">
+            {googleBusy ? (
+              'Abrindo o navegador…'
+            ) : (
+              <>
+                {googleReady ? <LogIn size={16} /> : <KeyRound size={16} />}
+                {googleReady ? 'Entrar com Google' : 'Configurar login com Google'}
+              </>
+            )}
           </button>
-        </form>
+          {showCfg && <GoogleConfigPanel onDone={() => { setGoogleReady(true); setShowCfg(false) }} />}
+          {googleBusy && (
+            <p className="mt-2 text-xs text-ink-faint">Conclua o login na aba que abriu e volte aqui.</p>
+          )}
+        </div>
 
-        <p className="mt-5 text-center text-xs leading-relaxed text-ink-faint">
-          Sua conta fica só neste computador — nada é enviado para a nuvem.
-          <br />A senha é guardada com hash seguro (scrypt).
+        {error && <p className="mt-3 text-sm text-red-500">{error}</p>}
+
+        <p className="mt-5 text-xs leading-relaxed text-ink-faint">
+          Seus dados ficam neste computador. O login com Google é opcional e usa suas próprias
+          credenciais.
         </p>
       </div>
     </div>
