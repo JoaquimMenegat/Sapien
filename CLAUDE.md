@@ -105,7 +105,10 @@ npm run dist:win # gera instalador Windows (electron-builder)
     via protocolo `readdeck-cover://` (`covers.ts`).
   - **Mover de prateleira rápido:** `StatusPicker` (chips) no detalhe do livro salva o
     status na hora (e seta início/conclusão ao ir p/ Lendo/Lido).
-- [ ] **Fase 2 — Leitura ativa.** Progresso página/%, quanto falta em páginas e tempo.
+- [x] **Fase 2 — Leitura ativa.** Seção "Lendo agora" (`ReadingView.tsx`): livros em
+  leitura com barra + %/páginas, **quanto falta** em páginas e **tempo estimado** pelo
+  ritmo (pág/h, editável, salvo em `reading.pace`). Atualização rápida da página atual e
+  botão "Concluir" ao chegar no total. Ritmo vira medido automaticamente na Fase 3.
 - [ ] **Fase 3 — Pomodoro + sessões.**
 - [ ] **Fase 4 — Metas, cronograma, estatísticas.** Gráficos **vivos e coloridos**
   (donuts, barras empilhadas, linha+barra) — referência visual nas telas de dashboard
