@@ -11,7 +11,7 @@ function createWindow(): void {
     minHeight: 600,
     show: false,
     autoHideMenuBar: true,
-    backgroundColor: '#050506',
+    backgroundColor: '#1a1917',
     title: 'ReadDeck',
     webPreferences: {
       preload: join(__dirname, '../preload/index.js'),

@@ -45,7 +45,7 @@ export const useApp = create<AppState>((set, get) => ({
   section: 'biblioteca',
   setSection: (section) => set({ section }),
 
-  appearance: 'moderndark',
+  appearance: 'literary-dark',
   setAppearance: (appearance) => {
     applyAppearance(appearance)
     void window.readdeck.setSetting('appearance', appearance)
@@ -53,7 +53,7 @@ export const useApp = create<AppState>((set, get) => ({
   },
   initAppearance: async () => {
     const saved = (await window.readdeck.getSetting('appearance')) as Appearance | null
-    const appearance: Appearance = saved ?? 'moderndark'
+    const appearance: Appearance = saved ?? 'literary-dark'
     applyAppearance(appearance)
     set({ appearance })
   },
