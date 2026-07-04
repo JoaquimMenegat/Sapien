@@ -109,7 +109,12 @@ npm run dist:win # gera instalador Windows (electron-builder)
   leitura com barra + %/páginas, **quanto falta** em páginas e **tempo estimado** pelo
   ritmo (pág/h, editável, salvo em `reading.pace`). Atualização rápida da página atual e
   botão "Concluir" ao chegar no total. Ritmo vira medido automaticamente na Fase 3.
-- [ ] **Fase 3 — Pomodoro + sessões.**
+- [x] **Fase 3 — Pomodoro + sessões.** `PomodoroView`: timer circular configurável
+  (foco/pausa, salvos em settings), seletor de livro, e ao encerrar o foco abre o
+  registro (livro + páginas lidas + duração). A sessão (`reading_sessions`) **avança o
+  progresso do livro** e alimenta o **ritmo medido** (pág/h) — que a "Lendo agora" passa a
+  usar no lugar do manual. Cartões de hoje (sessões/páginas/minutos/ritmo) + sessões
+  recentes. `src/main/db/sessions.ts`.
 - [~] **Fase 4 — Metas, cronograma, estatísticas.**
   - **Estatísticas (feito):** `StatsView` com **Recharts** — cartões de métrica coloridos
     (acervo, lidos, páginas lidas, nota média), barras "livros lidos por mês" (12 meses)

@@ -27,6 +27,13 @@ const api: ReadDeckApi = {
     setKey: (key) => ipcRenderer.invoke('ai:setKey', key),
     setModel: (model) => ipcRenderer.invoke('ai:setModel', model),
     chat: (messages) => ipcRenderer.invoke('ai:chat', messages)
+  },
+  sessions: {
+    create: (bookId, durationMin, pagesRead) =>
+      ipcRenderer.invoke('sessions:create', bookId, durationMin, pagesRead),
+    recent: (limit) => ipcRenderer.invoke('sessions:recent', limit),
+    pace: () => ipcRenderer.invoke('sessions:pace'),
+    today: () => ipcRenderer.invoke('sessions:today')
   }
 }
 

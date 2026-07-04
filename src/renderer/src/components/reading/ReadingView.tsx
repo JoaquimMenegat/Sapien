@@ -105,6 +105,7 @@ export function ReadingView(): JSX.Element {
   const books = useBooks((s) => s.books)
   const load = useBooks((s) => s.load)
   const [pace, setPace] = useState(40)
+  const [measured, setMeasured] = useState<number | null>(null)
 
   useEffect(() => {
     void load()
@@ -112,7 +113,10 @@ export function ReadingView(): JSX.Element {
       const n = v ? parseInt(v, 10) : NaN
       if (Number.isFinite(n) && n > 0) setPace(n)
     })
+    void window.readdeck.sessions.pace().then(setMeasured)
   }, [load])
+
+  const effPace = measured ?? pace
 
   function onPace(v: string): void {
     const n = Math.max(1, parseInt(v, 10) || 0)
@@ -128,18 +132,30 @@ export function ReadingView(): JSX.Element {
         <p className="max-w-xl text-[15px] leading-relaxed text-ink-soft">
           Seus livros em andamento, com quanto falta em páginas e tempo estimado.
         </p>
-        <label className="inline-flex items-center gap-2 rounded-lg border border-edge bg-surface px-3 py-1.5 text-sm">
-          <Gauge size={15} className="text-ink-faint" />
-          <span className="text-ink-soft">Ritmo</span>
-          <input
-            type="number"
-            min={1}
-            value={pace}
-            onChange={(e) => onPace(e.target.value)}
-            className="w-14 bg-transparent text-right font-semibold text-ink outline-none"
-          />
-          <span className="text-ink-faint">pág/h</span>
-        </label>
+        {measured != null ? (
+          <span
+            className="inline-flex items-center gap-2 rounded-lg border border-edge bg-surface px-3 py-1.5 text-sm"
+            title="Medido a partir das suas sessões de leitura"
+          >
+            <Gauge size={15} className="text-ink-faint" />
+            <span className="text-ink-soft">Ritmo medido</span>
+            <span className="font-semibold text-ink">{measured}</span>
+            <span className="text-ink-faint">pág/h</span>
+          </span>
+        ) : (
+          <label className="inline-flex items-center gap-2 rounded-lg border border-edge bg-surface px-3 py-1.5 text-sm">
+            <Gauge size={15} className="text-ink-faint" />
+            <span className="text-ink-soft">Ritmo</span>
+            <input
+              type="number"
+              min={1}
+              value={pace}
+              onChange={(e) => onPace(e.target.value)}
+              className="w-14 bg-transparent text-right font-semibold text-ink outline-none"
+            />
+            <span className="text-ink-faint">pág/h</span>
+          </label>
+        )}
       </div>
 
       {reading.length === 0 ? (
@@ -153,14 +169,15 @@ export function ReadingView(): JSX.Element {
       ) : (
         <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
           {reading.map((b) => (
-            <ReadingCard key={b.id} book={b} pace={pace} />
+            <ReadingCard key={b.id} book={b} pace={effPace} />
           ))}
         </div>
       )}
 
       <p className="text-xs text-ink-faint">
-        O tempo é estimado pelo seu ritmo. Quando o Pomodoro (Fase 3) estiver pronto, o ritmo passa
-        a ser medido automaticamente pelas suas sessões.
+        {measured != null
+          ? 'O ritmo é medido automaticamente pelas suas sessões do Pomodoro.'
+          : 'O tempo é estimado pelo ritmo que você definir. Registre sessões no Pomodoro para o ritmo ser medido automaticamente.'}
       </p>
     </div>
   )

@@ -9,6 +9,7 @@ import { listBooks, getBook, createBook, updateBook, deleteBook } from './db/boo
 import { searchBooks } from './bookSearch'
 import { pickCover } from './covers'
 import { aiStatus, chatAboutBooks } from './ai'
+import { createSession, recentSessions, computePace, todayStats } from './db/sessions'
 import type {
   AppHealth,
   AuthStatus,
@@ -19,7 +20,10 @@ import type {
   GoogleBookResult,
   AiStatus,
   AiResult,
-  ChatMessage
+  ChatMessage,
+  ReadingSession,
+  SessionWithBook,
+  TodayStats
 } from '../shared/types'
 
 // Estado de sessão: vive só em memória. Ao reabrir o app, exige login de novo.
@@ -91,4 +95,16 @@ export function registerIpcHandlers(): void {
   ipcMain.handle('ai:chat', (_e, messages: ChatMessage[]): Promise<AiResult> =>
     chatAboutBooks(messages)
   )
+
+  // --- Sessões de leitura (Pomodoro) ---
+  ipcMain.handle(
+    'sessions:create',
+    (_e, bookId: number, durationMin: number, pagesRead: number): ReadingSession =>
+      createSession(bookId, durationMin, pagesRead)
+  )
+  ipcMain.handle('sessions:recent', (_e, limit?: number): SessionWithBook[] =>
+    recentSessions(limit)
+  )
+  ipcMain.handle('sessions:pace', (): number | null => computePace())
+  ipcMain.handle('sessions:today', (): TodayStats => todayStats())
 }

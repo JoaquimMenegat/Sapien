@@ -192,6 +192,27 @@ export interface AiApi {
   chat(messages: ChatMessage[]): Promise<AiResult>
 }
 
+// --- Pomodoro / sessões de leitura ---
+
+export interface TodayStats {
+  sessions: number
+  pages: number
+  minutes: number
+}
+
+// Sessão com o título do livro embutido (para listagens).
+export interface SessionWithBook extends ReadingSession {
+  book_title: string
+}
+
+export interface SessionsApi {
+  create(bookId: number, durationMin: number, pagesRead: number): Promise<ReadingSession>
+  recent(limit?: number): Promise<SessionWithBook[]>
+  /** Ritmo medido em páginas/hora a partir das sessões (null se não houver dados). */
+  pace(): Promise<number | null>
+  today(): Promise<TodayStats>
+}
+
 // Superfície da API exposta ao renderer via preload (window.readdeck).
 export interface ReadDeckApi {
   health(): Promise<AppHealth>
@@ -200,4 +221,5 @@ export interface ReadDeckApi {
   account: AccountApi
   books: BooksApi
   ai: AiApi
+  sessions: SessionsApi
 }
