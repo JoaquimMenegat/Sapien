@@ -25,12 +25,53 @@
   src: url('./fonts/Lora-Italic.ttf') format('truetype');
 }
 
+/* ============================================================
+   TEMAS (aparências). Cada bloco só redefine as CSS variables;
+   os componentes usam tokens semânticos (bg-canvas, text-ink...).
+   Valores são triplos RGB separados por espaço (p/ <alpha-value>).
+   ============================================================ */
 @layer base {
-  :root {
+  /* Literary — claro (padrão) */
+  :root,
+  [data-style='literary'] {
     color-scheme: light;
+    --c-canvas: 250 249 246;
+    --c-surface: 242 240 235;
+    --c-elevated: 255 255 255;
+    --c-edge: 232 230 224;
+    --c-ink: 56 56 56;
+    --c-ink-soft: 107 105 96;
+    --c-ink-faint: 154 150 139;
+    --c-accent: 218 119 86;
+    --c-accent-hover: 201 101 68;
   }
-  html.dark {
+
+  /* Literary — escuro (papel escuro quente) */
+  [data-style='literary'].dark {
     color-scheme: dark;
+    --c-canvas: 26 25 23;
+    --c-surface: 36 34 30;
+    --c-elevated: 42 40 35;
+    --c-edge: 52 49 43;
+    --c-ink: 236 233 226;
+    --c-ink-soft: 168 163 150;
+    --c-ink-faint: 122 118 108;
+    --c-accent: 218 119 86;
+    --c-accent-hover: 201 101 68;
+  }
+
+  /* Modern Dark — estética "Linear": quase-preto + índigo */
+  [data-style='moderndark'] {
+    color-scheme: dark;
+    --c-canvas: 5 5 6;
+    --c-surface: 18 18 22;
+    --c-elevated: 26 26 31;
+    --c-edge: 42 42 51;
+    --c-ink: 237 237 239;
+    --c-ink-soft: 138 143 152;
+    --c-ink-faint: 100 104 112;
+    --c-accent: 94 106 210;
+    --c-accent-hover: 104 114 217;
   }
 
   html,
@@ -41,16 +82,12 @@
   }
 
   body {
-    @apply bg-canvas-light text-ink antialiased;
+    @apply bg-canvas text-ink antialiased;
     font-feature-settings: 'cv11', 'ss01';
   }
-  html.dark body {
-    @apply bg-canvas-dark text-ink-dark;
-  }
 
-  /* Seleção e scrollbar com o acento de argila, "on-brand". */
   ::selection {
-    background: theme('colors.clay.DEFAULT');
+    background: rgb(var(--c-accent));
     color: #fff;
   }
   ::-webkit-scrollbar {
@@ -58,41 +95,76 @@
     height: 10px;
   }
   ::-webkit-scrollbar-thumb {
-    @apply bg-black/10 rounded-full;
+    @apply bg-ink/10 rounded-full;
     border: 3px solid transparent;
     background-clip: content-box;
   }
-  html.dark ::-webkit-scrollbar-thumb {
-    @apply bg-white/10;
-    border: 3px solid transparent;
-    background-clip: content-box;
+
+  /* Iluminação ambiente do Modern Dark: pools de luz índigo, muito borradas. */
+  [data-style='moderndark'] body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    pointer-events: none;
+    z-index: 0;
+    background:
+      radial-gradient(60% 50% at 50% -10%, rgba(94, 106, 210, 0.22), transparent 70%),
+      radial-gradient(40% 40% at 12% 20%, rgba(129, 94, 210, 0.14), transparent 70%),
+      radial-gradient(45% 45% at 92% 85%, rgba(74, 108, 220, 0.12), transparent 70%);
+  }
+  [data-style='moderndark'] #root {
+    position: relative;
+    z-index: 1;
   }
 }
 
 @layer components {
-  /* Item de navegação lateral — tile plano, hover quente. */
+  /* Item de navegação lateral — overlay sutil que funciona em qualquer tema. */
   .sidebar-item {
     @apply flex items-center gap-2.5 px-3 py-1.5 rounded-lg text-sm font-medium
            text-ink-soft transition-colors cursor-pointer select-none
-           hover:bg-black/[0.04];
-  }
-  html.dark .sidebar-item {
-    @apply text-ink-faint hover:bg-white/[0.05];
+           hover:bg-ink/[0.06];
   }
   .sidebar-item.active {
-    @apply bg-black/[0.06] text-ink;
-  }
-  html.dark .sidebar-item.active {
-    @apply bg-white/[0.08] text-ink-dark;
+    @apply bg-ink/[0.08] text-ink;
   }
 
-  /* Chip/pílula de sugestão — borda fina, cantos arredondados, estilo Claude. */
+  /* Chip/pílula de sugestão. */
   .chip {
-    @apply inline-flex items-center gap-2 rounded-full border border-edge-light
-           bg-canvas-light px-3.5 py-1.5 text-sm font-medium text-ink-soft
-           transition-colors hover:bg-surface-light;
+    @apply inline-flex items-center gap-2 rounded-full border border-edge
+           bg-surface px-3.5 py-1.5 text-sm font-medium text-ink-soft
+           transition-colors hover:bg-ink/[0.05];
   }
-  html.dark .chip {
-    @apply border-edge-dark bg-surface-dark text-ink-faint hover:bg-white/[0.04];
+
+  /* Cartão padrão — usado no health card, formulários, etc. */
+  .card {
+    @apply rounded-2xl border border-edge bg-surface;
+  }
+
+  /* Campo de formulário. */
+  .field {
+    @apply w-full rounded-lg border border-edge bg-elevated px-3.5 py-2.5 text-[15px]
+           text-ink placeholder:text-ink-faint outline-none transition
+           focus:border-accent focus:ring-2 focus:ring-accent/30;
+  }
+
+  /* Botão primário (acento). Ganha brilho no Modern Dark. */
+  .btn-primary {
+    @apply inline-flex items-center justify-center gap-2 rounded-lg bg-accent px-4 py-2.5
+           text-sm font-semibold text-white transition
+           hover:bg-accent-hover active:scale-[0.98] disabled:opacity-60;
+  }
+  [data-style='moderndark'] .btn-primary {
+    box-shadow:
+      0 0 0 1px rgba(94, 106, 210, 0.5),
+      0 4px 16px rgba(94, 106, 210, 0.35),
+      inset 0 1px 0 0 rgba(255, 255, 255, 0.2);
+  }
+
+  /* Botão secundário/fantasma. */
+  .btn-ghost {
+    @apply inline-flex items-center justify-center gap-2 rounded-lg border border-edge
+           bg-transparent px-4 py-2.5 text-sm font-medium text-ink-soft transition
+           hover:bg-ink/[0.05] hover:text-ink;
   }
 }

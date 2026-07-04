@@ -5,7 +5,6 @@ module.exports = {
   theme: {
     extend: {
       fontFamily: {
-        // UI/utilitário: grotesca limpa. Display/títulos: serifada literária (Lora).
         sans: [
           'Inter',
           'ui-sans-serif',
@@ -19,31 +18,22 @@ module.exports = {
         ],
         serif: ['Lora', 'Georgia', 'Cambria', 'Times New Roman', 'serif']
       },
+      // Tokens semânticos que leem CSS variables. Cada aparência (Literary claro,
+      // Literary escuro, Modern Dark) só redefine as variáveis — os componentes
+      // usam sempre bg-canvas, text-ink, bg-accent, etc.
       colors: {
-        // Paleta "Humanist Literary" (estética Claude): papel quente, tinta suave,
-        // um único acento de argila/terracota. Modo escuro também é quente, não frio.
-        canvas: {
-          light: '#faf9f6', // papel eggshell
-          dark: '#1a1917' // carvão quente
-        },
-        surface: {
-          light: '#f2f0eb', // fundos secundários / chips
-          dark: '#24221e'
-        },
-        edge: {
-          light: '#e8e6e0', // bordas delicadas e quentes
-          dark: '#34312b'
-        },
+        canvas: 'rgb(var(--c-canvas) / <alpha-value>)',
+        surface: 'rgb(var(--c-surface) / <alpha-value>)',
+        elevated: 'rgb(var(--c-elevated) / <alpha-value>)',
+        edge: 'rgb(var(--c-edge) / <alpha-value>)',
         ink: {
-          DEFAULT: '#383838', // tinta principal (claro)
-          soft: '#6b6960', // descrições, timestamps
-          faint: '#9a968b', // texto mais apagado
-          dark: '#ece9e2' // tinta principal (escuro)
+          DEFAULT: 'rgb(var(--c-ink) / <alpha-value>)',
+          soft: 'rgb(var(--c-ink-soft) / <alpha-value>)',
+          faint: 'rgb(var(--c-ink-faint) / <alpha-value>)'
         },
-        clay: {
-          DEFAULT: '#da7756', // acento primário (ações de submit)
-          hover: '#c96544',
-          soft: '#f4e6df'
+        accent: {
+          DEFAULT: 'rgb(var(--c-accent) / <alpha-value>)',
+          hover: 'rgb(var(--c-accent-hover) / <alpha-value>)'
         }
       },
       borderRadius: {

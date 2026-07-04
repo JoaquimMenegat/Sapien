@@ -74,9 +74,36 @@ export interface AppHealth {
   appVersion: string
 }
 
+// --- Conta / autenticação (local, offline) ---
+
+export interface AccountInfo {
+  email: string
+  name: string
+}
+
+export interface AuthStatus {
+  hasAccount: boolean // já existe uma conta cadastrada neste computador?
+  loggedIn: boolean // a sessão atual está autenticada?
+  account: AccountInfo | null
+}
+
+export interface AuthResult {
+  ok: boolean
+  error?: string
+  account?: AccountInfo
+}
+
+export interface AccountApi {
+  status(): Promise<AuthStatus>
+  signup(email: string, name: string, password: string): Promise<AuthResult>
+  login(email: string, password: string): Promise<AuthResult>
+  logout(): Promise<void>
+}
+
 // Superfície da API exposta ao renderer via preload (window.readdeck).
 export interface ReadDeckApi {
   health(): Promise<AppHealth>
   getSetting(key: string): Promise<string | null>
   setSetting(key: string, value: string): Promise<void>
+  account: AccountApi
 }

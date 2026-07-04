@@ -28,6 +28,16 @@ preenchimento automático (Google Books) e foco em UI fluida estilo Notion.
   no preload (`window.readdeck.*`). `contextIsolation: true`, `nodeIntegration: false`.
 - **Tipos compartilhados** ficam em `src/shared/types.ts` — fonte única de verdade do
   modelo de dados, importada por main, preload e renderer.
+- **Sistema de temas por CSS variables.** As cores são tokens semânticos (`bg-canvas`,
+  `text-ink`, `bg-accent`...) que leem CSS variables. Cada "aparência" só redefine as
+  variáveis: `literary-light`, `literary-dark` (papel quente, estética Claude) e
+  `moderndark` (estética "Linear": quase-preto + índigo, com iluminação ambiente). O
+  usuário troca ao vivo pelo `AppearancePicker`. Preferência persistida em settings.
+- **Login local por e-mail (offline).** Uma conta por instalação, guardada na tabela
+  `settings` (`account.email/name/hash`). Senha nunca em texto: hash com **scrypt**
+  (crypto nativo do Node, sem dependência). Sessão vive em memória no main — reabrir o
+  app exige login. Sem nuvem; sync entre dispositivos ficaria para uma fase futura com
+  backend. Ver `src/main/db/account.ts`.
 
 ## Estrutura
 
@@ -76,6 +86,9 @@ npm run dist:win # gera instalador Windows (electron-builder)
 
 - [x] **Fase 0 — Fundação.** Electron + React + Tailwind + sql.js rodando; janela abre,
   banco conecta e persiste, sidebar navegável e tema claro/escuro persistido.
+- [x] **Extra (a pedido do usuário).** Sistema de temas com seletor ao vivo
+  (Literary claro/escuro + Modern Dark) e **login por e-mail** local/offline (scrypt),
+  com tela de login/cadastro e gating do app.
 - [ ] **Fase 1 — Biblioteca.** Cadastro via Google Books, 5 status, visualizações
   grade/lista/tabela, abas por status.
 - [ ] **Fase 2 — Leitura ativa.** Progresso página/%, quanto falta em páginas e tempo.

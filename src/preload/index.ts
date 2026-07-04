@@ -6,7 +6,13 @@ import type { ReadDeckApi } from '../shared/types'
 const api: ReadDeckApi = {
   health: () => ipcRenderer.invoke('app:health'),
   getSetting: (key: string) => ipcRenderer.invoke('settings:get', key),
-  setSetting: (key: string, value: string) => ipcRenderer.invoke('settings:set', key, value)
+  setSetting: (key: string, value: string) => ipcRenderer.invoke('settings:set', key, value),
+  account: {
+    status: () => ipcRenderer.invoke('account:status'),
+    signup: (email, name, password) => ipcRenderer.invoke('account:signup', email, name, password),
+    login: (email, password) => ipcRenderer.invoke('account:login', email, password),
+    logout: () => ipcRenderer.invoke('account:logout')
+  }
 }
 
 if (process.contextIsolated) {
