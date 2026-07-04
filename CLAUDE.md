@@ -125,7 +125,9 @@ npm run dist:win # gera instalador Windows (electron-builder)
     com progresso real (livros lidos + sessões de hoje), upsert por tipo, barra + selo
     "Concluída". `src/main/db/goals.ts`.
   - **Cronograma** de leituras (planejar períodos) fica como melhoria futura opcional.
-- [ ] **Fase 5 — Notas e trechos.**
+- [x] **Fase 5 — Notas e trechos.** `NotasView`: por livro, registra **nota**, **trecho**
+  (citação, serifada em itálico com aspas) e **callout/destaque** (caixa âmbar), com
+  página opcional. Editar/excluir inline. `src/main/db/notes.ts`.
 - [ ] **Fase 6 — Acabamento e empacotamento.**
 
 ### Requisitos adicionais (feedback do usuário)

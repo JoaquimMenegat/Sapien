@@ -39,6 +39,13 @@ const api: ReadDeckApi = {
     list: () => ipcRenderer.invoke('goals:list'),
     set: (type, target) => ipcRenderer.invoke('goals:set', type, target),
     remove: (id) => ipcRenderer.invoke('goals:delete', id)
+  },
+  notes: {
+    list: (bookId) => ipcRenderer.invoke('notes:list', bookId),
+    create: (bookId, type, content, pageRef) =>
+      ipcRenderer.invoke('notes:create', bookId, type, content, pageRef),
+    update: (id, patch) => ipcRenderer.invoke('notes:update', id, patch),
+    remove: (id) => ipcRenderer.invoke('notes:delete', id)
   }
 }
 

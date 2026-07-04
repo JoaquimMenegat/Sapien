@@ -116,13 +116,28 @@ export interface GoalsApi {
   remove(id: number): Promise<void>
 }
 
+export type NoteType = 'nota' | 'trecho' | 'callout'
+
 export interface Note {
   id: number
   book_id: number
-  type: 'nota' | 'trecho' | 'callout'
+  type: NoteType
   content: string
   page_ref: number | null
   created_at: string
+}
+
+export interface NotePatch {
+  type?: NoteType
+  content?: string
+  page_ref?: number | null
+}
+
+export interface NotesApi {
+  list(bookId: number): Promise<Note[]>
+  create(bookId: number, type: NoteType, content: string, pageRef: number | null): Promise<Note>
+  update(id: number, patch: NotePatch): Promise<Note>
+  remove(id: number): Promise<void>
 }
 
 export interface AppHealth {
@@ -231,4 +246,5 @@ export interface ReadDeckApi {
   ai: AiApi
   sessions: SessionsApi
   goals: GoalsApi
+  notes: NotesApi
 }

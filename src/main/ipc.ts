@@ -11,6 +11,7 @@ import { pickCover } from './covers'
 import { aiStatus, chatAboutBooks } from './ai'
 import { createSession, recentSessions, computePace, todayStats } from './db/sessions'
 import { listGoals, setGoal, deleteGoal } from './db/goals'
+import { listNotes, createNote, updateNote, deleteNote } from './db/notes'
 import type {
   AppHealth,
   AuthStatus,
@@ -26,7 +27,10 @@ import type {
   SessionWithBook,
   TodayStats,
   Goal,
-  GoalType
+  GoalType,
+  Note,
+  NoteType,
+  NotePatch
 } from '../shared/types'
 
 // Estado de sessão: vive só em memória. Ao reabrir o app, exige login de novo.
@@ -115,4 +119,14 @@ export function registerIpcHandlers(): void {
   ipcMain.handle('goals:list', (): Goal[] => listGoals())
   ipcMain.handle('goals:set', (_e, type: GoalType, target: number): Goal => setGoal(type, target))
   ipcMain.handle('goals:delete', (_e, id: number): void => deleteGoal(id))
+
+  // --- Notas ---
+  ipcMain.handle('notes:list', (_e, bookId: number): Note[] => listNotes(bookId))
+  ipcMain.handle(
+    'notes:create',
+    (_e, bookId: number, type: NoteType, content: string, pageRef: number | null): Note =>
+      createNote(bookId, type, content, pageRef)
+  )
+  ipcMain.handle('notes:update', (_e, id: number, patch: NotePatch): Note => updateNote(id, patch))
+  ipcMain.handle('notes:delete', (_e, id: number): void => deleteNote(id))
 }
