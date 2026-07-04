@@ -1,0 +1,97 @@
+# Projeto: ReadDeck — Gerenciador de Leituras e Estudos (Desktop)
+
+## Objetivo
+Quero criar um aplicativo **desktop multiplataforma** (Windows, macOS e Linux) chamado
+**ReadDeck**, que funcione como um gerenciador completo de leituras. O foco é ser bonito,
+rápido e com o mínimo de trabalho manual possível.
+
+## Público e problema que estou resolvendo
+O usuário é um leitor que quer acompanhar suas leituras: o que já leu, o que está lendo,
+o que quer ler, e estatísticas por mês/ano. Estou me inspirando em dois apps, corrigindo
+os defeitos de cada um:
+- **Notion**: flexível, mas exige configuração e preenchimento manual constante, o que
+  toma tempo demais. Quero o oposto: os dados devem ser preenchidos automaticamente
+  sempre que possível.
+- **Skoob**: tem a ideia certa, mas a interface é feia, travada e mal otimizada. Quero
+  uma interface fluida, moderna e agradável, com a estética limpa do Notion.
+
+## Stack técnica
+- **Electron + React** para o app desktop, empacotável para **Windows, macOS e Linux**
+  (usar electron-builder para a distribuição).
+- **SQLite** (via better-sqlite3 ou similar) para armazenar os dados localmente no
+  computador do usuário — nada de nuvem por enquanto, tudo offline.
+- Estilização com **Tailwind CSS**.
+- Integração com a **API do Google Books** para buscar automaticamente capa, número de
+  páginas, sinopse, ISBN, autor e nota média/avaliações a partir do título ou ISBN.
+  Sempre permitir edição/preenchimento manual como alternativa quando a API não achar o
+  livro ou faltar algum dado.
+
+## Funcionalidades
+
+### 1. Biblioteca e gestão de livros
+- Cadastrar livros buscando pelo título ou ISBN (dados preenchidos automaticamente pela
+  API do Google Books; edição manual permitida).
+- Cada livro tem um **status**: Quero Ler (wishlist), Lendo Atualmente, Concluído.
+- Organização por tags/categorias/gêneros.
+- Registrar a **opinião pública** do livro (nota média e nº de avaliações vindos da API).
+
+### 2. Visualizações (o usuário alterna entre formatos)
+- Visão em **grade de capas**, visão em **lista** e visão em **tabela**.
+- Abas/filtros dedicados: **Wishlist**, **Lendo Atualmente**, **Concluídos**, **Todos**.
+
+### 3. Leitura ativa (livro em andamento)
+- Mostrar progresso em **porcentagem e em páginas** (ex.: "página 120 de 300 — 40%").
+- Calcular e exibir **quanto falta para terminar**, em páginas e em **tempo estimado**.
+  O tempo deve ser calculado a partir do ritmo de leitura do usuário (páginas por hora),
+  medido pelas sessões de leitura que ele já registrou.
+
+### 4. Pomodoro + registro de sessões
+- Um **timer Pomodoro** configurável (tempo de foco / pausa).
+- Ao terminar uma sessão de Pomodoro, abrir um registro onde o usuário informa: qual
+  **livro** leu na sessão e **quantas páginas** leu.
+- Esses registros alimentam automaticamente o progresso do livro e o cálculo de ritmo de
+  leitura (páginas por hora) usado na estimativa de tempo restante.
+
+### 5. Metas e cronograma
+- **Gestor de metas de leitura** (ex.: X livros no mês/ano, X páginas por dia).
+- **Cronograma de leituras** (planejar quais livros ler em quais períodos).
+- Registrar **quantos livros/páginas foram lidos por dia**, com histórico.
+- **Estatísticas e gráficos**: livros por mês/ano, páginas lidas, tempo de leitura,
+  progresso das metas.
+
+### 6. Notas e trechos
+- Para cada livro, o usuário pode registrar **notas** e **trechos/citações**.
+- Suporte a **callouts** (blocos destacados, estilo Notion) e formatação básica de texto.
+
+## Estética / UX
+- Interface limpa, moderna e minimalista, inspirada no **Notion**.
+- Rápida e fluida, sem travamentos.
+- Navegação lateral (sidebar) para alternar entre as seções.
+- Modo claro e escuro.
+
+## Modo de construção (importante — siga este processo)
+1. **Antes de escrever qualquer código**, proponha um plano completo: arquitetura do
+   projeto, modelo de dados (tabelas do SQLite e campos), estrutura de pastas e a ordem
+   de implementação em fases. Vou revisar e aprovar antes de você começar.
+2. Crie um arquivo **CLAUDE.md** na raiz registrando a stack, as decisões de projeto, os
+   padrões de código e o progresso — e mantenha-o atualizado ao fim de cada fase.
+3. **Inicialize um repositório Git** no começo e faça um commit ao final de cada fase,
+   para que cada etapa concluída seja um ponto seguro de retorno.
+4. Construa **em fases**, e ao fim de cada fase o app deve estar rodando e testável.
+   Ordem sugerida das fases:
+   - **Fase 0 — Fundação:** Electron + React + Tailwind + SQLite rodando; janela abre e
+     banco conecta.
+   - **Fase 1 — Biblioteca:** cadastro via Google Books, os três status e as três
+     visualizações (grade, lista, tabela).
+   - **Fase 2 — Leitura ativa:** progresso em página/porcentagem e cálculo do que falta.
+   - **Fase 3 — Pomodoro + sessões:** timer e registro que alimenta progresso e ritmo.
+   - **Fase 4 — Metas, cronograma e estatísticas:** gráficos e acompanhamento.
+   - **Fase 5 — Notas e trechos:** editor com callouts.
+   - **Fase 6 — Acabamento:** modo claro/escuro, empacotamento multiplataforma, polimento.
+5. Ao terminar cada fase, **pare e me avise** o que foi feito e como testar, antes de
+   seguir para a próxima.
+
+## Observação sobre multiplataforma
+Sei que o instalador final de cada sistema operacional precisa ser gerado no respectivo
+sistema (o instalador de macOS exige um Mac, etc.). Configure o electron-builder para os
+três, mas assuma que por enquanto vou gerar apenas a versão do meu sistema atual.
