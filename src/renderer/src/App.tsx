@@ -3,11 +3,13 @@ import { Sidebar } from './components/Sidebar'
 import { LoginScreen } from './components/LoginScreen'
 import { LibraryView } from './components/library/LibraryView'
 import { FindBookView } from './components/ai/FindBookView'
+import { GenresView } from './components/genres/GenresView'
 import { useApp, type Section } from './store/app'
 
 const SECTION_TITLES: Record<Section, string> = {
   biblioteca: 'Biblioteca',
   achar: 'Achar um livro',
+  generos: 'Gêneros',
   lendo: 'Lendo agora',
   pomodoro: 'Pomodoro',
   metas: 'Metas',
@@ -42,6 +44,8 @@ function MainLayout(): JSX.Element {
             <LibraryView />
           ) : section === 'achar' ? (
             <FindBookView />
+          ) : section === 'generos' ? (
+            <GenresView />
           ) : (
             <Placeholder section={section} />
           )}

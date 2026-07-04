@@ -127,3 +127,7 @@ npm run dist:win # gera instalador Windows (electron-builder)
 - [x] **Gêneros: seletor + criar próprios.** `GenrePicker` com ~30 gêneros sugeridos +
   criação livre; substitui o campo de texto. **Campo de sinopse removido** do formulário
   (a IA cobre "do que trata").
+- [x] **Seção "Gêneros" (dashboard).** Item na sidebar com visualização estilo dashboard
+  (ref. do usuário): por gênero, quantos livros — barras coloridas vivas + %, cartões de
+  métrica coloridos, toggle Lidos/Todos. Agregação client-side a partir de `useBooks`
+  (`GenresView.tsx`). Prévia do que a Fase 4 (Estatísticas) vai expandir.

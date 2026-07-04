@@ -4,6 +4,7 @@ import type { AuthStatus, AuthResult } from '../../../shared/types'
 export type Section =
   | 'biblioteca'
   | 'achar'
+  | 'generos'
   | 'lendo'
   | 'pomodoro'
   | 'metas'
