@@ -1,10 +1,20 @@
-import { Library, BookOpen, Timer, Target, BarChart3, NotebookPen, LogOut } from 'lucide-react'
+import {
+  Library,
+  BookOpen,
+  Timer,
+  Target,
+  BarChart3,
+  NotebookPen,
+  LogOut,
+  Sparkles
+} from 'lucide-react'
 import type { LucideIcon } from 'lucide-react'
 import { useApp, type Section } from '../store/app'
 import { AppearancePicker } from './AppearancePicker'
 
 const NAV: { id: Section; label: string; icon: LucideIcon }[] = [
   { id: 'biblioteca', label: 'Biblioteca', icon: Library },
+  { id: 'achar', label: 'Achar um livro', icon: Sparkles },
   { id: 'lendo', label: 'Lendo agora', icon: BookOpen },
   { id: 'pomodoro', label: 'Pomodoro', icon: Timer },
   { id: 'metas', label: 'Metas', icon: Target },

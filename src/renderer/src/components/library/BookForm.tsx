@@ -3,6 +3,7 @@ import { ImagePlus } from 'lucide-react'
 import type { BookDraft, BookStatus, BookFormat } from '../../../../shared/types'
 import { STATUS_ORDER, STATUS_META, FORMAT_ORDER, FORMAT_META, LANGUAGE_LABELS } from './constants'
 import { BookCover, StarInput } from './BookBits'
+import { GenrePicker } from './GenrePicker'
 
 interface Props {
   initial: Partial<BookDraft>
@@ -176,10 +177,6 @@ export function BookForm({ initial, submitLabel, busy, onSubmit, onCancel }: Pro
             className="field"
           />
         </div>
-        <div>
-          <span className={label}>Gêneros</span>
-          <input value={f.genres} onChange={(e) => set('genres', e.target.value)} className="field" />
-        </div>
       </div>
 
       <div>
@@ -188,13 +185,8 @@ export function BookForm({ initial, submitLabel, busy, onSubmit, onCancel }: Pro
       </div>
 
       <div>
-        <span className={label}>Sinopse</span>
-        <textarea
-          value={f.synopsis}
-          onChange={(e) => set('synopsis', e.target.value)}
-          rows={4}
-          className="field resize-y"
-        />
+        <span className={label}>Gêneros</span>
+        <GenrePicker value={f.genres} onChange={(v) => set('genres', v)} />
       </div>
 
       <div>

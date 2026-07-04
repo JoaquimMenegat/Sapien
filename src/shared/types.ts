@@ -161,6 +161,37 @@ export interface BooksApi {
   pickCover(): Promise<string | null>
 }
 
+// --- Agente de IA "Achar um livro" (Claude API) ---
+
+export interface ChatMessage {
+  role: 'user' | 'assistant'
+  content: string
+}
+
+export interface AiStatus {
+  hasKey: boolean
+  model: string
+}
+
+export interface AiResult {
+  ok: boolean
+  text?: string
+  error?: string
+}
+
+export const AI_MODELS: { id: string; label: string; hint: string }[] = [
+  { id: 'claude-opus-4-8', label: 'Claude Opus 4.8', hint: 'Mais capaz (padrão)' },
+  { id: 'claude-sonnet-5', label: 'Claude Sonnet 5', hint: 'Equilíbrio' },
+  { id: 'claude-haiku-4-5', label: 'Claude Haiku 4.5', hint: 'Rápido e barato' }
+]
+
+export interface AiApi {
+  status(): Promise<AiStatus>
+  setKey(key: string): Promise<void>
+  setModel(model: string): Promise<void>
+  chat(messages: ChatMessage[]): Promise<AiResult>
+}
+
 // Superfície da API exposta ao renderer via preload (window.readdeck).
 export interface ReadDeckApi {
   health(): Promise<AppHealth>
@@ -168,4 +199,5 @@ export interface ReadDeckApi {
   setSetting(key: string, value: string): Promise<void>
   account: AccountApi
   books: BooksApi
+  ai: AiApi
 }

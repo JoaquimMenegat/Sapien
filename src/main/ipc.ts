@@ -8,6 +8,7 @@ import { hasAccount, getAccountInfo, createAccount, verifyLogin } from './db/acc
 import { listBooks, getBook, createBook, updateBook, deleteBook } from './db/books'
 import { searchBooks } from './bookSearch'
 import { pickCover } from './covers'
+import { aiStatus, chatAboutBooks } from './ai'
 import type {
   AppHealth,
   AuthStatus,
@@ -15,7 +16,10 @@ import type {
   Book,
   BookDraft,
   BookStatus,
-  GoogleBookResult
+  GoogleBookResult,
+  AiStatus,
+  AiResult,
+  ChatMessage
 } from '../shared/types'
 
 // Estado de sessão: vive só em memória. Ao reabrir o app, exige login de novo.
@@ -79,4 +83,12 @@ export function registerIpcHandlers(): void {
     searchBooks(query)
   )
   ipcMain.handle('books:pickCover', (): Promise<string | null> => pickCover())
+
+  // --- IA "Achar um livro" ---
+  ipcMain.handle('ai:status', (): AiStatus => aiStatus())
+  ipcMain.handle('ai:setKey', (_e, key: string): void => setSetting('ai.apiKey', key.trim()))
+  ipcMain.handle('ai:setModel', (_e, model: string): void => setSetting('ai.model', model))
+  ipcMain.handle('ai:chat', (_e, messages: ChatMessage[]): Promise<AiResult> =>
+    chatAboutBooks(messages)
+  )
 }

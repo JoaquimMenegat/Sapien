@@ -118,8 +118,12 @@ npm run dist:win # gera instalador Windows (electron-builder)
 - [ ] **Personalização avançada.** Expandir o sistema de temas: escolher **cor de
   acento** (paletas vivas), **estilo de animação** (ex.: sem/sutil/rico, respeitando
   `prefers-reduced-motion`) e **estilo dos gráficos**. Vira um painel de Configurações.
-- [ ] **Busca com IA.** Seção de descoberta onde o usuário faz perguntas em linguagem
-  natural: recomendações ("ideias de distopia + avaliações do mercado") e sínteses
-  ("o que 1984 fala em síntese"). **Feature online** (a primeira do app) — requer chave
-  de API de um provedor de IA. Preferência: **Claude API (Anthropic)**; consultar a
-  skill `claude-api` na implementação. Chave guardada localmente em settings.
+- [x] **Agente "Achar um livro" (IA).** Seção na sidebar com chat que fala SÓ de livros
+  (recomendações por gênero, sínteses, avaliações). Usa a **Claude API** via SDK oficial
+  `@anthropic-ai/sdk` no processo main (`src/main/ai.ts`). Modelo padrão `claude-opus-4-8`,
+  selecionável (Opus 4.8 / Sonnet 5 / Haiku 4.5). Chave e modelo guardados em settings
+  (`ai.apiKey` / `ai.model`) — **feature online**, o usuário paga pelo uso. System prompt
+  restringe ao tema de livros.
+- [x] **Gêneros: seletor + criar próprios.** `GenrePicker` com ~30 gêneros sugeridos +
+  criação livre; substitui o campo de texto. **Campo de sinopse removido** do formulário
+  (a IA cobre "do que trata").

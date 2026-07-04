@@ -2,10 +2,12 @@ import { useEffect } from 'react'
 import { Sidebar } from './components/Sidebar'
 import { LoginScreen } from './components/LoginScreen'
 import { LibraryView } from './components/library/LibraryView'
+import { FindBookView } from './components/ai/FindBookView'
 import { useApp, type Section } from './store/app'
 
 const SECTION_TITLES: Record<Section, string> = {
   biblioteca: 'Biblioteca',
+  achar: 'Achar um livro',
   lendo: 'Lendo agora',
   pomodoro: 'Pomodoro',
   metas: 'Metas',
@@ -36,7 +38,13 @@ function MainLayout(): JSX.Element {
         </header>
 
         <div className="px-8 py-6">
-          {section === 'biblioteca' ? <LibraryView /> : <Placeholder section={section} />}
+          {section === 'biblioteca' ? (
+            <LibraryView />
+          ) : section === 'achar' ? (
+            <FindBookView />
+          ) : (
+            <Placeholder section={section} />
+          )}
         </div>
       </main>
     </div>

@@ -21,6 +21,12 @@ const api: ReadDeckApi = {
     remove: (id) => ipcRenderer.invoke('books:delete', id),
     search: (query) => ipcRenderer.invoke('books:search', query),
     pickCover: () => ipcRenderer.invoke('books:pickCover')
+  },
+  ai: {
+    status: () => ipcRenderer.invoke('ai:status'),
+    setKey: (key) => ipcRenderer.invoke('ai:setKey', key),
+    setModel: (model) => ipcRenderer.invoke('ai:setModel', model),
+    chat: (messages) => ipcRenderer.invoke('ai:chat', messages)
   }
 }
 
