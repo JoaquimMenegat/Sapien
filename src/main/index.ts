@@ -2,6 +2,10 @@ import { app, shell, BrowserWindow, dialog } from 'electron'
 import { join } from 'path'
 import { initDatabase, closeDatabase } from './db/index'
 import { registerIpcHandlers } from './ipc'
+import { registerCoverScheme, registerCoverProtocol, ensureCoversDir } from './covers'
+
+// Precisa acontecer antes do app ficar pronto.
+registerCoverScheme()
 
 function createWindow(): void {
   const mainWindow = new BrowserWindow({
@@ -48,6 +52,8 @@ app.whenReady().then(async () => {
     return
   }
 
+  ensureCoversDir()
+  registerCoverProtocol()
   registerIpcHandlers()
   createWindow()
 

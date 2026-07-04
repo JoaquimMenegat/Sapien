@@ -6,7 +6,8 @@ import { get, getDbPath } from './db/index'
 import { getSetting, setSetting } from './db/settings'
 import { hasAccount, getAccountInfo, createAccount, verifyLogin } from './db/account'
 import { listBooks, getBook, createBook, updateBook, deleteBook } from './db/books'
-import { searchGoogleBooks } from './googleBooks'
+import { searchBooks } from './bookSearch'
+import { pickCover } from './covers'
 import type {
   AppHealth,
   AuthStatus,
@@ -75,6 +76,7 @@ export function registerIpcHandlers(): void {
   )
   ipcMain.handle('books:delete', (_e, id: number): void => deleteBook(id))
   ipcMain.handle('books:search', (_e, query: string): Promise<GoogleBookResult[]> =>
-    searchGoogleBooks(query)
+    searchBooks(query)
   )
+  ipcMain.handle('books:pickCover', (): Promise<string | null> => pickCover())
 }

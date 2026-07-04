@@ -149,6 +149,8 @@ export interface BooksApi {
   update(id: number, patch: Partial<BookDraft>): Promise<Book>
   remove(id: number): Promise<void>
   search(query: string): Promise<GoogleBookResult[]>
+  /** Abre um seletor de arquivo e devolve a URL da capa copiada (ou null se cancelar). */
+  pickCover(): Promise<string | null>
 }
 
 // Superfície da API exposta ao renderer via preload (window.readdeck).

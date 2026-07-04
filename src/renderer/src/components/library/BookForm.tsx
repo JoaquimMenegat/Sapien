@@ -1,4 +1,5 @@
 import { useState, type FormEvent } from 'react'
+import { ImagePlus } from 'lucide-react'
 import type { BookDraft, BookStatus, BookFormat } from '../../../../shared/types'
 import { STATUS_ORDER, STATUS_META, FORMAT_ORDER, FORMAT_META, LANGUAGE_LABELS } from './constants'
 import { BookCover, StarInput } from './BookBits'
@@ -64,6 +65,11 @@ export function BookForm({ initial, submitLabel, busy, onSubmit, onCancel }: Pro
   const [f, setF] = useState<State>(() => toState(initial))
   const set = <K extends keyof State>(k: K, v: State[K]): void => setF((p) => ({ ...p, [k]: v }))
 
+  async function chooseCoverFile(): Promise<void> {
+    const url = await window.readdeck.books.pickCover()
+    if (url) set('cover_url', url)
+  }
+
   function handleSubmit(e: FormEvent): void {
     e.preventDefault()
     onSubmit({
@@ -93,11 +99,20 @@ export function BookForm({ initial, submitLabel, busy, onSubmit, onCancel }: Pro
   return (
     <form onSubmit={handleSubmit} className="space-y-4">
       <div className="flex gap-4">
-        <BookCover
-          url={f.cover_url || null}
-          title={f.title}
-          className="h-40 w-28 shrink-0 rounded-lg border border-edge"
-        />
+        <div className="flex shrink-0 flex-col items-center gap-2">
+          <BookCover
+            url={f.cover_url || null}
+            title={f.title}
+            className="h-40 w-28 rounded-lg border border-edge"
+          />
+          <button
+            type="button"
+            onClick={chooseCoverFile}
+            className="btn-ghost w-28 justify-center px-2 py-1.5 text-xs"
+          >
+            <ImagePlus size={14} /> Escolher capa
+          </button>
+        </div>
         <div className="flex-1 space-y-3">
           <div>
             <span className={label}>Título</span>

@@ -1,6 +1,6 @@
 import { BookOpen, Star } from 'lucide-react'
 import type { BookStatus } from '../../../../shared/types'
-import { STATUS_META } from './constants'
+import { STATUS_META, STATUS_ORDER } from './constants'
 
 export function BookCover({
   url,
@@ -27,6 +27,39 @@ export function BookCover({
       aria-label={`Sem capa para ${title}`}
     >
       <BookOpen size={22} />
+    </div>
+  )
+}
+
+// Seletor rápido de prateleira: linha de chips clicáveis (muda o status na hora).
+export function StatusPicker({
+  value,
+  onChange
+}: {
+  value: BookStatus
+  onChange: (s: BookStatus) => void
+}): JSX.Element {
+  return (
+    <div className="flex flex-wrap gap-1.5">
+      {STATUS_ORDER.map((s) => {
+        const meta = STATUS_META[s]
+        const active = s === value
+        return (
+          <button
+            key={s}
+            type="button"
+            onClick={() => onChange(s)}
+            className={`inline-flex items-center gap-1.5 rounded-full border px-2.5 py-1 text-xs font-medium transition-colors ${
+              active
+                ? `border-transparent ${meta.soft} ${meta.text}`
+                : 'border-edge text-ink-soft hover:bg-ink/[0.05]'
+            }`}
+          >
+            <span className={`h-1.5 w-1.5 rounded-full ${meta.dot}`} />
+            {meta.label}
+          </button>
+        )
+      })}
     </div>
   )
 }

@@ -19,7 +19,8 @@ const api: ReadDeckApi = {
     create: (draft) => ipcRenderer.invoke('books:create', draft),
     update: (id, patch) => ipcRenderer.invoke('books:update', id, patch),
     remove: (id) => ipcRenderer.invoke('books:delete', id),
-    search: (query) => ipcRenderer.invoke('books:search', query)
+    search: (query) => ipcRenderer.invoke('books:search', query),
+    pickCover: () => ipcRenderer.invoke('books:pickCover')
   }
 }
 

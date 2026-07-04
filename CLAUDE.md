@@ -93,9 +93,13 @@ npm run dist:win # gera instalador Windows (electron-builder)
   5 status, visualizações grade/lista/tabela, abas por status com contadores.
   **Registro editável**: busca mostra múltiplos resultados/edições; ao escolher (ou
   "adicionar manualmente"), cai num formulário onde todo campo é editável. Detalhe do
-  livro permite editar/mudar status/excluir. Nota: Google Books é API pública sem chave
-  (limite por IP → 429 em uso intenso; tratado com retry+mensagem; chave opcional é
-  melhoria futura).
+  livro permite editar/mudar status/excluir.
+  - **Busca com fallback:** tenta Google Books (timeout 5s) e cai na **Open Library**
+    (`bookSearch.ts`) — resolve o 429/limite por IP do Google sem depender de chave.
+  - **Capa local:** botão "Escolher capa" copia a imagem para `userData/covers` e serve
+    via protocolo `readdeck-cover://` (`covers.ts`).
+  - **Mover de prateleira rápido:** `StatusPicker` (chips) no detalhe do livro salva o
+    status na hora (e seta início/conclusão ao ir p/ Lendo/Lido).
 - [ ] **Fase 2 — Leitura ativa.** Progresso página/%, quanto falta em páginas e tempo.
 - [ ] **Fase 3 — Pomodoro + sessões.**
 - [ ] **Fase 4 — Metas, cronograma, estatísticas.** Gráficos **vivos e coloridos**

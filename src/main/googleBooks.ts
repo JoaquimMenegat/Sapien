@@ -71,26 +71,10 @@ export async function searchGoogleBooks(query: string): Promise<GoogleBookResult
 
   const url = `${ENDPOINT}?q=${encodeURIComponent(term)}&maxResults=20&printType=books&country=BR`
 
-  // Uma tentativa + um retry curto em caso de 429 (limite de taxa do IP).
-  for (let attempt = 1; attempt <= 2; attempt++) {
-    let res: Response
-    try {
-      res = await fetch(url)
-    } catch (err) {
-      throw new Error(`Sem conexão para buscar no Google Books (${String(err)}).`)
-    }
-    if (res.ok) {
-      const data = (await res.json()) as { items?: GVolume[] }
-      return (data.items ?? []).map(toResult)
-    }
-    if (res.status === 429 && attempt === 1) {
-      await new Promise((r) => setTimeout(r, 1500))
-      continue
-    }
-    if (res.status === 429) {
-      throw new Error('Muitas buscas em pouco tempo. Espere alguns segundos e tente de novo.')
-    }
-    throw new Error(`Google Books respondeu ${res.status}.`)
-  }
-  return []
+  // Timeout curto: se o Google demorar ou limitar (429), falha rápido para o
+  // orquestrador cair na Open Library, em vez de deixar o usuário esperando.
+  const res = await fetch(url, { signal: AbortSignal.timeout(5000) })
+  if (!res.ok) throw new Error(`Google Books respondeu ${res.status}.`)
+  const data = (await res.json()) as { items?: GVolume[] }
+  return (data.items ?? []).map(toResult)
 }

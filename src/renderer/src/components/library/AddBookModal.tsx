@@ -2,6 +2,7 @@ import { useState, type FormEvent } from 'react'
 import { Search, Plus, ArrowLeft, Loader2 } from 'lucide-react'
 import type { BookDraft, GoogleBookResult } from '../../../../shared/types'
 import { useBooks } from '../../store/books'
+import { cleanErrorMessage } from '../../lib/errors'
 import { Modal } from '../ui/Modal'
 import { BookForm } from './BookForm'
 import { BookCover } from './BookBits'
@@ -68,7 +69,7 @@ export function AddBookModal({
       setResults(res)
       setSearched(true)
     } catch (err) {
-      setError(String(err))
+      setError(cleanErrorMessage(err))
     } finally {
       setSearching(false)
     }
@@ -80,7 +81,7 @@ export function AddBookModal({
       await addBook(d)
       close()
     } catch (err) {
-      setError(String(err))
+      setError(cleanErrorMessage(err))
       setSaving(false)
     }
   }
