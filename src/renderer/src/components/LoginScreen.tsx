@@ -40,7 +40,7 @@ export function LoginScreen(): JSX.Element {
           <div className="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-2xl bg-accent text-white shadow-lg">
             <Library size={24} />
           </div>
-          <h1 className="font-serif text-3xl font-semibold tracking-tight text-ink">ReadDeck</h1>
+          <h1 className="font-serif text-3xl font-semibold tracking-tight text-ink">Sapien</h1>
           <p className="mt-1.5 text-sm text-ink-soft">
             {isSignup
               ? 'Crie sua conta para começar sua estante.'

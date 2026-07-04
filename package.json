@@ -1,7 +1,8 @@
 {
   "name": "readdeck",
+  "productName": "Sapien",
   "version": "0.1.0",
-  "description": "ReadDeck — gerenciador de leituras e estudos (desktop)",
+  "description": "Sapien — gerenciador de leituras (desktop)",
   "author": "Joaquim",
   "license": "MIT",
   "main": "./out/main/index.js",

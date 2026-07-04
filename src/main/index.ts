@@ -16,7 +16,7 @@ function createWindow(): void {
     show: false,
     autoHideMenuBar: true,
     backgroundColor: '#1a1917',
-    title: 'ReadDeck',
+    title: 'Sapien',
     webPreferences: {
       preload: join(__dirname, '../preload/index.js'),
       sandbox: false,
@@ -45,7 +45,7 @@ app.whenReady().then(async () => {
     await initDatabase()
   } catch (err) {
     dialog.showErrorBox(
-      'ReadDeck — falha ao abrir o banco de dados',
+      'Sapien — falha ao abrir o banco de dados',
       `Não foi possível inicializar o banco local.\n\n${String(err)}`
     )
     app.quit()

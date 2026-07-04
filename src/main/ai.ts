@@ -9,7 +9,7 @@ import type { ChatMessage, AiResult } from '../shared/types'
 
 export const DEFAULT_MODEL = 'claude-opus-4-8'
 
-const SYSTEM_PROMPT = `Você é o assistente literário do ReadDeck. Fale SOMENTE sobre livros e leitura:
+const SYSTEM_PROMPT = `Você é o assistente literário do Sapien. Fale SOMENTE sobre livros e leitura:
 - Recomendações por gênero, tema, autor ou "parecido com X".
 - Do que um livro trata (síntese/resumo, sem spoilers de reviravoltas, salvo se pedirem).
 - Avaliações e recepção geral do mercado (bem/mal recebido, prêmios, clássico ou não).

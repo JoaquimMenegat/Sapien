@@ -43,7 +43,7 @@ export function Sidebar(): JSX.Element {
           <Library size={16} />
         </div>
         <span className="font-serif text-[17px] font-semibold tracking-tight text-ink">
-          ReadDeck
+          Sapien
         </span>
       </div>
 
