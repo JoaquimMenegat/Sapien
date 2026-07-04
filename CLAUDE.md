@@ -115,13 +115,16 @@ npm run dist:win # gera instalador Windows (electron-builder)
   progresso do livro** e alimenta o **ritmo medido** (pág/h) — que a "Lendo agora" passa a
   usar no lugar do manual. Cartões de hoje (sessões/páginas/minutos/ritmo) + sessões
   recentes. `src/main/db/sessions.ts`.
-- [~] **Fase 4 — Metas, cronograma, estatísticas.**
-  - **Estatísticas (feito):** `StatsView` com **Recharts** — cartões de métrica coloridos
+- [x] **Fase 4 — Estatísticas e Metas.**
+  - **Estatísticas:** `StatsView` com **Recharts** — cartões de métrica coloridos
     (acervo, lidos, páginas lidas, nota média), barras "livros lidos por mês" (12 meses)
     e donuts **por status** e **por formato**, com legenda. As cores dos gráficos são
     lidas das CSS variables do tema (`useThemeColors`), então adaptam a cada aparência.
     Referência visual: dashboards enviados pelo usuário — base limpa, dados coloridos.
-  - Faltam: **metas** de leitura (livros/mês, páginas/dia…) e **cronograma**.
+  - **Metas:** `MetasView` — metas de **livros/ano, livros/mês, páginas/dia, minutos/dia**
+    com progresso real (livros lidos + sessões de hoje), upsert por tipo, barra + selo
+    "Concluída". `src/main/db/goals.ts`.
+  - **Cronograma** de leituras (planejar períodos) fica como melhoria futura opcional.
 - [ ] **Fase 5 — Notas e trechos.**
 - [ ] **Fase 6 — Acabamento e empacotamento.**
 

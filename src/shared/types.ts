@@ -100,12 +100,20 @@ export interface ReadingSession {
   pages_read: number
 }
 
+export type GoalType = 'livros_ano' | 'livros_mes' | 'paginas_dia' | 'minutos_dia'
+
 export interface Goal {
   id: number
   type: string
   target: number
   period: string | null
   created_at: string
+}
+
+export interface GoalsApi {
+  list(): Promise<Goal[]>
+  set(type: GoalType, target: number): Promise<Goal>
+  remove(id: number): Promise<void>
 }
 
 export interface Note {
@@ -222,4 +230,5 @@ export interface ReadDeckApi {
   books: BooksApi
   ai: AiApi
   sessions: SessionsApi
+  goals: GoalsApi
 }

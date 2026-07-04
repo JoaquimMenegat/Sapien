@@ -34,6 +34,11 @@ const api: ReadDeckApi = {
     recent: (limit) => ipcRenderer.invoke('sessions:recent', limit),
     pace: () => ipcRenderer.invoke('sessions:pace'),
     today: () => ipcRenderer.invoke('sessions:today')
+  },
+  goals: {
+    list: () => ipcRenderer.invoke('goals:list'),
+    set: (type, target) => ipcRenderer.invoke('goals:set', type, target),
+    remove: (id) => ipcRenderer.invoke('goals:delete', id)
   }
 }
 

@@ -7,6 +7,7 @@ import { GenresView } from './components/genres/GenresView'
 import { ReadingView } from './components/reading/ReadingView'
 import { StatsView } from './components/stats/StatsView'
 import { PomodoroView } from './components/pomodoro/PomodoroView'
+import { MetasView } from './components/goals/MetasView'
 import { useApp, type Section } from './store/app'
 
 const SECTION_TITLES: Record<Section, string> = {
@@ -55,6 +56,8 @@ function MainLayout(): JSX.Element {
             <StatsView />
           ) : section === 'pomodoro' ? (
             <PomodoroView />
+          ) : section === 'metas' ? (
+            <MetasView />
           ) : (
             <Placeholder section={section} />
           )}

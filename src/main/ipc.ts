@@ -10,6 +10,7 @@ import { searchBooks } from './bookSearch'
 import { pickCover } from './covers'
 import { aiStatus, chatAboutBooks } from './ai'
 import { createSession, recentSessions, computePace, todayStats } from './db/sessions'
+import { listGoals, setGoal, deleteGoal } from './db/goals'
 import type {
   AppHealth,
   AuthStatus,
@@ -23,7 +24,9 @@ import type {
   ChatMessage,
   ReadingSession,
   SessionWithBook,
-  TodayStats
+  TodayStats,
+  Goal,
+  GoalType
 } from '../shared/types'
 
 // Estado de sessão: vive só em memória. Ao reabrir o app, exige login de novo.
@@ -107,4 +110,9 @@ export function registerIpcHandlers(): void {
   )
   ipcMain.handle('sessions:pace', (): number | null => computePace())
   ipcMain.handle('sessions:today', (): TodayStats => todayStats())
+
+  // --- Metas ---
+  ipcMain.handle('goals:list', (): Goal[] => listGoals())
+  ipcMain.handle('goals:set', (_e, type: GoalType, target: number): Goal => setGoal(type, target))
+  ipcMain.handle('goals:delete', (_e, id: number): void => deleteGoal(id))
 }
