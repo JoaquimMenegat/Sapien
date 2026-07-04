@@ -1,3 +1,4 @@
+import { useState } from 'react'
 import {
   Library,
   BookOpen,
@@ -7,11 +8,13 @@ import {
   NotebookPen,
   LogOut,
   Sparkles,
-  Tags
+  Tags,
+  SlidersHorizontal
 } from 'lucide-react'
 import type { LucideIcon } from 'lucide-react'
 import { useApp, type Section } from '../store/app'
 import { AppearancePicker } from './AppearancePicker'
+import { SettingsModal } from './SettingsModal'
 
 const NAV: { id: Section; label: string; icon: LucideIcon }[] = [
   { id: 'biblioteca', label: 'Biblioteca', icon: Library },
@@ -29,6 +32,7 @@ export function Sidebar(): JSX.Element {
   const setSection = useApp((s) => s.setSection)
   const account = useApp((s) => s.auth?.account)
   const logout = useApp((s) => s.logout)
+  const [settingsOpen, setSettingsOpen] = useState(false)
 
   const displayName = account?.name?.trim() || account?.email?.split('@')[0] || 'Leitor(a)'
 
@@ -56,10 +60,15 @@ export function Sidebar(): JSX.Element {
         ))}
       </nav>
 
-      <div className="mt-auto space-y-3 border-t border-edge px-3 py-3">
+      <div className="mt-auto space-y-2.5 border-t border-edge px-3 py-3">
         <AppearancePicker />
 
-        <div className="flex items-center gap-2">
+        <button onClick={() => setSettingsOpen(true)} className="sidebar-item w-full">
+          <SlidersHorizontal size={16} />
+          <span>Personalização</span>
+        </button>
+
+        <div className="flex items-center gap-2 pt-0.5">
           <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-accent/15 text-xs font-semibold uppercase text-accent">
             {displayName.slice(0, 2)}
           </div>
@@ -77,6 +86,8 @@ export function Sidebar(): JSX.Element {
           </button>
         </div>
       </div>
+
+      <SettingsModal open={settingsOpen} onClose={() => setSettingsOpen(false)} />
     </aside>
   )
 }

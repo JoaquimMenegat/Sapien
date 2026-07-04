@@ -136,9 +136,12 @@ npm run dist:win # gera instalador Windows (electron-builder)
 
 ### Requisitos adicionais (feedback do usuário)
 
-- [ ] **Personalização avançada.** Expandir o sistema de temas: escolher **cor de
-  acento** (paletas vivas), **estilo de animação** (ex.: sem/sutil/rico, respeitando
-  `prefers-reduced-motion`) e **estilo dos gráficos**. Vira um painel de Configurações.
+- [x] **Personalização avançada.** Painel "Personalização" (`SettingsModal`, aberto pelo
+  rodapé da sidebar): escolher **aparência**, **cor de acento** (10 paletas vivas +
+  "padrão do tema" — sobrescreve `--c-accent`/`--c-accent-hover` inline no `<html>`) e
+  **estilo de animação** (sutil/rico/nenhuma, respeitando `prefers-reduced-motion`).
+  Persistido em settings (`ui.accent`/`ui.animation`). Estilo dos gráficos fica como
+  melhoria futura opcional.
 - [x] **Agente "Achar um livro" (IA).** Seção na sidebar com chat que fala SÓ de livros
   (recomendações por gênero, sínteses, avaliações). Usa a **Claude API** via SDK oficial
   `@anthropic-ai/sdk` no processo main (`src/main/ai.ts`). Modelo padrão `claude-opus-4-8`,

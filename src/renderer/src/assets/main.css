@@ -168,3 +168,35 @@
            hover:bg-ink/[0.05] hover:text-ink;
   }
 }
+
+/* ============================================================
+   Estilo de animação (Personalização).
+   ============================================================ */
+[data-anim='nenhuma'] *,
+[data-anim='nenhuma'] *::before,
+[data-anim='nenhuma'] *::after {
+  transition: none !important;
+  animation: none !important;
+}
+
+/* "Rico": cartões ganham uma leve elevação ao passar o mouse. */
+[data-anim='rico'] .card {
+  transition:
+    transform 0.2s ease,
+    box-shadow 0.2s ease;
+}
+[data-anim='rico'] .card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 10px 26px rgba(0, 0, 0, 0.14);
+}
+
+/* Acessibilidade: se o SO pede menos movimento, respeitamos. */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    transition: none !important;
+    animation: none !important;
+    scroll-behavior: auto !important;
+  }
+}
