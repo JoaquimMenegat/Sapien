@@ -67,10 +67,14 @@ export function PomodoroView(): JSX.Element {
   const [showRec, setShowRec] = useState(false)
   const [recBook, setRecBook] = useState<number | null>(null)
   const [recPages, setRecPages] = useState('')
-  const [recMin, setRecMin] = useState('')
+  const [recHours, setRecHours] = useState('')
+  const [recMins, setRecMins] = useState('')
   const [saving, setSaving] = useState(false)
 
   const tickRef = useRef<number | null>(null)
+
+  // No Pomodoro só faz sentido registrar sessões dos livros que estão em leitura.
+  const readingBooks = books.filter((b) => b.status === 'lendo')
 
   // Inicialização (uma vez).
   useEffect(() => {
@@ -90,10 +94,11 @@ export function PomodoroView(): JSX.Element {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
-  // Livro padrão = primeiro "lendo" (ou primeiro do acervo).
+  // Livro padrão = primeiro em leitura.
   useEffect(() => {
-    if (bookId == null && books.length) {
-      setBookId((books.find((b) => b.status === 'lendo') ?? books[0]).id)
+    if (bookId == null) {
+      const reading = books.filter((b) => b.status === 'lendo')
+      if (reading.length) setBookId(reading[0].id)
     }
   }, [books, bookId])
 
@@ -140,8 +145,10 @@ export function PomodoroView(): JSX.Element {
   }
 
   function openRecord(minutes: number): void {
+    const mins = Math.max(1, Math.round(minutes))
     setRecBook(bookId)
-    setRecMin(String(Math.max(1, Math.round(minutes))))
+    setRecHours(mins >= 60 ? String(Math.floor(mins / 60)) : '')
+    setRecMins(String(mins % 60))
     setRecPages(pace ? String(Math.max(1, Math.round((pace * minutes) / 60))) : '')
     setShowRec(true)
   }
@@ -151,8 +158,9 @@ export function PomodoroView(): JSX.Element {
   }
   async function saveSession(): Promise<void> {
     if (!recBook) return
+    const duration = (parseInt(recHours, 10) || 0) * 60 + (parseInt(recMins, 10) || 0)
     setSaving(true)
-    await addSession(recBook, parseInt(recMin, 10) || 0, parseInt(recPages, 10) || 0)
+    await addSession(recBook, duration, parseInt(recPages, 10) || 0)
     setSaving(false)
     setShowRec(false)
     switchMode('pausa')
@@ -222,14 +230,12 @@ export function PomodoroView(): JSX.Element {
               onChange={(e) => setBookId(e.target.value ? Number(e.target.value) : null)}
               className="field h-9 flex-1 py-1"
             >
-              {books.length === 0 && <option value="">Nenhum livro</option>}
-              {[...books]
-                .sort((a, b) => (a.status === 'lendo' ? -1 : 0) - (b.status === 'lendo' ? -1 : 0))
-                .map((b) => (
-                  <option key={b.id} value={b.id}>
-                    {b.title}
-                  </option>
-                ))}
+              {readingBooks.length === 0 && <option value="">Nenhum livro em leitura</option>}
+              {readingBooks.map((b) => (
+                <option key={b.id} value={b.id}>
+                  {b.title}
+                </option>
+              ))}
             </select>
           </label>
           <div className="flex items-center justify-end gap-3 text-ink-soft">
@@ -298,16 +304,15 @@ export function PomodoroView(): JSX.Element {
               onChange={(e) => setRecBook(e.target.value ? Number(e.target.value) : null)}
               className="field"
             >
-              {[...books]
-                .sort((a, b) => (a.status === 'lendo' ? -1 : 0) - (b.status === 'lendo' ? -1 : 0))
-                .map((b) => (
-                  <option key={b.id} value={b.id}>
-                    {b.title}
-                  </option>
-                ))}
+              {readingBooks.length === 0 && <option value="">Nenhum livro em leitura</option>}
+              {readingBooks.map((b) => (
+                <option key={b.id} value={b.id}>
+                  {b.title}
+                </option>
+              ))}
             </select>
           </div>
-          <div className="grid grid-cols-2 gap-3">
+          <div className="grid grid-cols-3 gap-3">
             <div>
               <span className="mb-1.5 block text-xs font-medium text-ink-soft">
                 Páginas lidas
@@ -323,13 +328,26 @@ export function PomodoroView(): JSX.Element {
             </div>
             <div>
               <span className="mb-1.5 flex items-center gap-1.5 text-xs font-medium text-ink-soft">
-                <Clock size={12} /> Duração (min)
+                <Clock size={12} /> Horas
               </span>
               <input
                 type="number"
-                min={1}
-                value={recMin}
-                onChange={(e) => setRecMin(e.target.value)}
+                min={0}
+                value={recHours}
+                onChange={(e) => setRecHours(e.target.value)}
+                placeholder="0"
+                className="field"
+              />
+            </div>
+            <div>
+              <span className="mb-1.5 block text-xs font-medium text-ink-soft">Minutos</span>
+              <input
+                type="number"
+                min={0}
+                max={59}
+                value={recMins}
+                onChange={(e) => setRecMins(e.target.value)}
+                placeholder="0"
                 className="field"
               />
             </div>

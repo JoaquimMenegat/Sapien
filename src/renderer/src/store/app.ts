@@ -20,11 +20,17 @@ export const APPEARANCES: { id: Appearance; label: string }[] = [
   { id: 'moderndark', label: 'Modern Dark' }
 ]
 
-function applyAppearance(appearance: Appearance): void {
+export function applyAppearance(appearance: Appearance): void {
   const root = document.documentElement
   const style = appearance === 'moderndark' ? 'moderndark' : 'literary'
   root.setAttribute('data-style', style)
   root.classList.toggle('dark', appearance !== 'literary-light')
+}
+
+// Aparência usada na tela de login/cadastro: sempre escura, independente da preferência.
+// Se o usuário já usa um tema escuro, mantemos o dele; se usa claro, cai no Literary escuro.
+export function loginAppearance(saved: Appearance): Appearance {
+  return saved === 'literary-light' ? 'literary-dark' : saved
 }
 
 // --- Personalização: cor de acento e estilo de animação ---
@@ -83,10 +89,10 @@ interface AppState {
   auth: AuthStatus | null
   authReady: boolean
   refreshAuth: () => Promise<void>
-  signup: (email: string, name: string, password: string) => Promise<AuthResult>
-  login: (email: string, password: string) => Promise<AuthResult>
+  signup: (email: string, name: string, password: string, remember?: boolean) => Promise<AuthResult>
+  login: (email: string, password: string, remember?: boolean) => Promise<AuthResult>
   logout: () => Promise<void>
-  googleSignIn: () => Promise<AuthResult>
+  googleSignIn: (remember?: boolean) => Promise<AuthResult>
   updateProfile: (name: string, picture: string | null) => Promise<AuthResult>
 }
 
@@ -134,13 +140,13 @@ export const useApp = create<AppState>((set, get) => ({
     const auth = await window.readdeck.account.status()
     set({ auth, authReady: true })
   },
-  signup: async (email, name, password) => {
-    const res = await window.readdeck.account.signup(email, name, password)
+  signup: async (email, name, password, remember) => {
+    const res = await window.readdeck.account.signup(email, name, password, remember)
     if (res.ok) await get().refreshAuth()
     return res
   },
-  login: async (email, password) => {
-    const res = await window.readdeck.account.login(email, password)
+  login: async (email, password, remember) => {
+    const res = await window.readdeck.account.login(email, password, remember)
     if (res.ok) await get().refreshAuth()
     return res
   },
@@ -148,8 +154,8 @@ export const useApp = create<AppState>((set, get) => ({
     await window.readdeck.account.logout()
     await get().refreshAuth()
   },
-  googleSignIn: async () => {
-    const res = await window.readdeck.account.googleSignIn()
+  googleSignIn: async (remember) => {
+    const res = await window.readdeck.account.googleSignIn(remember)
     if (res.ok) await get().refreshAuth()
     return res
   },

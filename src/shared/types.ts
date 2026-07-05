@@ -174,15 +174,15 @@ export interface GoogleConfig {
 
 export interface AccountApi {
   status(): Promise<AuthStatus>
-  signup(email: string, name: string, password: string): Promise<AuthResult>
-  login(email: string, password: string): Promise<AuthResult>
+  signup(email: string, name: string, password: string, remember?: boolean): Promise<AuthResult>
+  login(email: string, password: string, remember?: boolean): Promise<AuthResult>
   logout(): Promise<void>
   updateProfile(name: string, picture: string | null): Promise<AuthResult>
   /** Escolhe uma imagem local e devolve a URL (readdeck-cover://) para usar como avatar. */
   pickAvatar(): Promise<string | null>
   googleConfig(): Promise<GoogleConfig>
   setGoogleConfig(clientId: string, clientSecret: string): Promise<void>
-  googleSignIn(): Promise<AuthResult>
+  googleSignIn(remember?: boolean): Promise<AuthResult>
 }
 
 export interface BooksApi {

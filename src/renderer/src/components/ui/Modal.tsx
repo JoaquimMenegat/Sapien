@@ -23,11 +23,11 @@ export function Modal({ open, onClose, title, children, wide }: ModalProps): JSX
 
   return (
     <div
-      className="fixed inset-0 z-50 flex items-start justify-center overflow-y-auto bg-black/50 p-6 backdrop-blur-sm"
+      className="overlay-in fixed inset-0 z-50 flex items-start justify-center overflow-y-auto bg-black/50 p-6 backdrop-blur-sm"
       onMouseDown={onClose}
     >
       <div
-        className={`my-8 w-full ${wide ? 'max-w-3xl' : 'max-w-lg'} rounded-2xl border border-edge bg-canvas shadow-2xl`}
+        className={`modal-in my-8 w-full ${wide ? 'max-w-3xl' : 'max-w-lg'} rounded-2xl border border-edge bg-canvas shadow-2xl`}
         onMouseDown={(e) => e.stopPropagation()}
       >
         <div className="flex items-center justify-between border-b border-edge px-5 py-3.5">

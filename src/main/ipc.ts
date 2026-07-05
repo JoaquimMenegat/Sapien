@@ -42,8 +42,13 @@ import type {
   NotePatch
 } from '../shared/types'
 
-// Estado de sessão: vive só em memória. Ao reabrir o app, exige login de novo.
+// Estado de sessão em memória. Por padrão, reabrir o app exige login de novo — a menos
+// que o usuário tenha marcado "manter conectado" (persistido em settings/session.remember).
 let loggedIn = false
+
+function setRemember(remember: boolean): void {
+  setSetting('session.remember', remember ? 'true' : '')
+}
 
 function currentStatus(): AuthStatus {
   return {
@@ -55,6 +60,9 @@ function currentStatus(): AuthStatus {
 }
 
 export function registerIpcHandlers(): void {
+  // "Manter conectado": restaura a sessão ao abrir o app, se o usuário optou por isso.
+  loggedIn = getSetting('session.remember') === 'true' && hasAccount()
+
   ipcMain.handle('app:health', (): AppHealth => {
     const row = get<{ n: number }>('SELECT COUNT(*) AS n FROM books')
     return {
@@ -75,21 +83,31 @@ export function registerIpcHandlers(): void {
 
   ipcMain.handle(
     'account:signup',
-    (_e, email: string, name: string, password: string): AuthResult => {
+    (_e, email: string, name: string, password: string, remember?: boolean): AuthResult => {
       const res = createAccount(email, name, password)
-      if (res.ok) loggedIn = true
+      if (res.ok) {
+        loggedIn = true
+        setRemember(!!remember)
+      }
       return res
     }
   )
 
-  ipcMain.handle('account:login', (_e, email: string, password: string): AuthResult => {
-    const res = verifyLogin(email, password)
-    if (res.ok) loggedIn = true
-    return res
-  })
+  ipcMain.handle(
+    'account:login',
+    (_e, email: string, password: string, remember?: boolean): AuthResult => {
+      const res = verifyLogin(email, password)
+      if (res.ok) {
+        loggedIn = true
+        setRemember(!!remember)
+      }
+      return res
+    }
+  )
 
   ipcMain.handle('account:logout', (): void => {
     loggedIn = false
+    setRemember(false)
   })
 
   ipcMain.handle('account:updateProfile', (_e, name: string, picture: string | null): AuthResult =>
@@ -101,11 +119,14 @@ export function registerIpcHandlers(): void {
   ipcMain.handle('account:setGoogleConfig', (_e, clientId: string, clientSecret: string): void =>
     setGoogleConfig(clientId, clientSecret)
   )
-  ipcMain.handle('account:googleSignIn', async (): Promise<AuthResult> => {
+  ipcMain.handle('account:googleSignIn', async (_e, remember?: boolean): Promise<AuthResult> => {
     const r = await googleSignIn()
     if (!r.ok || !r.email) return { ok: false, error: r.error ?? 'Falha no login com Google.' }
     const res = upsertGoogleAccount(r.email, r.name ?? '', r.picture ?? '')
-    if (res.ok) loggedIn = true
+    if (res.ok) {
+      loggedIn = true
+      setRemember(!!remember)
+    }
     return res
   })
 

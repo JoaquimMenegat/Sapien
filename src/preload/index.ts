@@ -9,15 +9,17 @@ const api: ReadDeckApi = {
   setSetting: (key: string, value: string) => ipcRenderer.invoke('settings:set', key, value),
   account: {
     status: () => ipcRenderer.invoke('account:status'),
-    signup: (email, name, password) => ipcRenderer.invoke('account:signup', email, name, password),
-    login: (email, password) => ipcRenderer.invoke('account:login', email, password),
+    signup: (email, name, password, remember) =>
+      ipcRenderer.invoke('account:signup', email, name, password, remember),
+    login: (email, password, remember) =>
+      ipcRenderer.invoke('account:login', email, password, remember),
     logout: () => ipcRenderer.invoke('account:logout'),
     updateProfile: (name, picture) => ipcRenderer.invoke('account:updateProfile', name, picture),
     pickAvatar: () => ipcRenderer.invoke('account:pickAvatar'),
     googleConfig: () => ipcRenderer.invoke('account:googleConfig'),
     setGoogleConfig: (clientId, clientSecret) =>
       ipcRenderer.invoke('account:setGoogleConfig', clientId, clientSecret),
-    googleSignIn: () => ipcRenderer.invoke('account:googleSignIn')
+    googleSignIn: (remember) => ipcRenderer.invoke('account:googleSignIn', remember)
   },
   books: {
     list: (status) => ipcRenderer.invoke('books:list', status),

@@ -10,7 +10,7 @@ import { StatsView } from './components/stats/StatsView'
 import { PomodoroView } from './components/pomodoro/PomodoroView'
 import { MetasView } from './components/goals/MetasView'
 import { NotasView } from './components/notes/NotasView'
-import { useApp, type Section } from './store/app'
+import { useApp, applyAppearance, loginAppearance, type Section } from './store/app'
 
 const SECTION_TITLES: Record<Section, string> = {
   biblioteca: 'Biblioteca',
@@ -46,7 +46,9 @@ function MainLayout(): JSX.Element {
           </h1>
         </header>
 
-        <div className="px-8 py-6">
+        {/* key={section} faz o conteúdo remontar e re-disparar a animação de entrada,
+            deixando a navegação mais fluída ao trocar de seção. */}
+        <div key={section} className="view-enter px-8 py-6">
           {section === 'biblioteca' ? (
             <LibraryView />
           ) : section === 'achar' ? (
@@ -79,11 +81,18 @@ function App(): JSX.Element {
   const refreshAuth = useApp((s) => s.refreshAuth)
   const authReady = useApp((s) => s.authReady)
   const loggedIn = useApp((s) => s.auth?.loggedIn ?? false)
+  const appearance = useApp((s) => s.appearance)
 
   useEffect(() => {
     void initAppearance()
     void refreshAuth()
   }, [initAppearance, refreshAuth])
+
+  // A tela de login/cadastro é sempre escura; dentro do app usa a aparência salva.
+  useEffect(() => {
+    if (!authReady) return
+    applyAppearance(loggedIn ? appearance : loginAppearance(appearance))
+  }, [authReady, loggedIn, appearance])
 
   if (!authReady) {
     return (

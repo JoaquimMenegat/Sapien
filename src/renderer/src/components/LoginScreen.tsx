@@ -2,7 +2,26 @@ import { useEffect, useState, type FormEvent } from 'react'
 import { Library, Mail, Lock, User, ArrowRight, LogIn, KeyRound, ExternalLink } from 'lucide-react'
 import { useApp } from '../store/app'
 import { cleanErrorMessage } from '../lib/errors'
-import { AppearancePicker } from './AppearancePicker'
+
+function RememberToggle({
+  checked,
+  onChange
+}: {
+  checked: boolean
+  onChange: (v: boolean) => void
+}): JSX.Element {
+  return (
+    <label className="flex cursor-pointer select-none items-center gap-2 text-sm text-ink-soft">
+      <input
+        type="checkbox"
+        checked={checked}
+        onChange={(e) => onChange(e.target.checked)}
+        className="h-4 w-4 rounded border-edge accent-accent"
+      />
+      Manter conectado
+    </label>
+  )
+}
 
 function GoogleConfigPanel({ onDone }: { onDone: () => void }): JSX.Element {
   const [clientId, setClientId] = useState('')
@@ -60,6 +79,7 @@ export function LoginScreen(): JSX.Element {
   const [email, setEmail] = useState('')
   const [name, setName] = useState('')
   const [password, setPassword] = useState('')
+  const [remember, setRemember] = useState(true)
   const [error, setError] = useState<string | null>(null)
   const [busy, setBusy] = useState(false)
 
@@ -75,7 +95,9 @@ export function LoginScreen(): JSX.Element {
     e.preventDefault()
     setError(null)
     setBusy(true)
-    const res = isSignup ? await signup(email, name, password) : await login(email, password)
+    const res = isSignup
+      ? await signup(email, name, password, remember)
+      : await login(email, password, remember)
     if (!res.ok) {
       setError(res.error ?? 'Não foi possível continuar.')
       setBusy(false)
@@ -89,7 +111,7 @@ export function LoginScreen(): JSX.Element {
       return
     }
     setGoogleBusy(true)
-    const res = await googleSignIn()
+    const res = await googleSignIn(remember)
     if (!res.ok) {
       setError(cleanErrorMessage(res.error ?? 'Falha no login com Google.'))
       setGoogleBusy(false)
@@ -99,10 +121,6 @@ export function LoginScreen(): JSX.Element {
 
   return (
     <div className="relative flex h-screen w-screen items-center justify-center bg-canvas px-6">
-      <div className="absolute right-6 top-6 w-44">
-        <AppearancePicker />
-      </div>
-
       <div className="w-full max-w-sm text-center">
         <div className="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-2xl bg-accent text-white shadow-lg">
           <Library size={24} />
@@ -144,6 +162,8 @@ export function LoginScreen(): JSX.Element {
               </div>
             </label>
 
+            <RememberToggle checked={remember} onChange={setRemember} />
+
             <button type="submit" disabled={busy} className="btn-primary w-full">
               {busy ? 'Aguarde...' : isSignup ? 'Criar conta' : 'Entrar'}
               {!busy && <ArrowRight size={16} />}
@@ -160,6 +180,11 @@ export function LoginScreen(): JSX.Element {
           )}
           {googleOnly && account?.picture && (
             <img src={account.picture} alt="" className="mx-auto mb-3 h-14 w-14 rounded-full border border-edge object-cover" />
+          )}
+          {googleOnly && (
+            <div className="mb-3 flex justify-center">
+              <RememberToggle checked={remember} onChange={setRemember} />
+            </div>
           )}
           <button onClick={handleGoogle} disabled={googleBusy} className="btn-ghost w-full">
             {googleBusy ? (

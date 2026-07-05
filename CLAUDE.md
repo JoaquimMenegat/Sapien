@@ -35,8 +35,12 @@ preenchimento automático (Google Books) e foco em UI fluida estilo Notion.
   usuário troca ao vivo pelo `AppearancePicker`. Preferência persistida em settings.
 - **Login local por e-mail (offline).** Uma conta por instalação, guardada na tabela
   `settings` (`account.email/name/hash/picture/provider`). Senha nunca em texto: hash com
-  **scrypt** (crypto nativo do Node, sem dependência). Sessão vive em memória no main —
-  reabrir o app exige login. Ver `src/main/db/account.ts`. Também há **"Entrar com Google"**
+  **scrypt** (crypto nativo do Node, sem dependência). Sessão vive em memória no main; por
+  padrão reabrir o app exige login, mas a opção **"Manter conectado"** (checkbox na tela de
+  login, passada a `login/signup/googleSignIn`) grava `session.remember=true` em settings e
+  o `registerIpcHandlers` restaura `loggedIn` na abertura. Logout limpa o flag. A **tela de
+  login é sempre escura** (o `App` aplica `loginAppearance()` enquanto deslogado) e **não tem
+  seletor de aparência**. Ver `src/main/db/account.ts`. Também há **"Entrar com Google"**
   (OAuth desktop loopback+PKCE, `src/main/googleAuth.ts`) — feature online que usa as
   credenciais do próprio usuário (Client ID/Secret em settings) e cria conta sem senha; e
   **perfil** editável (foto local/Google + nome) no painel Personalização.
@@ -175,3 +179,14 @@ npm run dist:win # gera instalador Windows (electron-builder)
   (chips): **Ano** (anos com livros concluídos, ex. 2026/2025/2024) e, ao escolher um ano,
   **Mês** (só os meses daquele ano com leituras). Filtra pela `finished_at`. Deixa o
   usuário separar "lidos em 2026", "lidos em março", etc. ao longo dos anos (`LibraryView`).
+- [x] **Registro de sessão em horas + minutos.** No modal de registro do Pomodoro, a duração
+  agora tem campos separados de **Horas** e **Minutos** (antes só minutos) — combinados em
+  `duration_min` ao salvar. Útil para registrar manualmente sessões longas (`PomodoroView`).
+- [x] **Pomodoro só mostra livros "lendo".** Os seletores de livro (timer e registro) usam
+  `readingBooks = books.filter(status==='lendo')`, evitando poluir com o acervo inteiro.
+- [x] **"Manter conectado" no login.** Checkbox (padrão marcado) que persiste a sessão
+  (`session.remember`) — ver a decisão de projeto sobre login. Sem seletor de aparência na
+  tela de entrada, que é sempre escura.
+- [x] **Navegação mais fluída.** Animação de entrada suave ao trocar de seção (`.view-enter`,
+  keyed por `section` em `App`) e nos modais (`.modal-in`/`.overlay-in` no `Modal`),
+  com curva ease-out. Respeita `data-anim='nenhuma'` e `prefers-reduced-motion`.
