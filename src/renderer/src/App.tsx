@@ -4,6 +4,7 @@ import { LoginScreen } from './components/LoginScreen'
 import { LibraryView } from './components/library/LibraryView'
 import { FindBookView } from './components/ai/FindBookView'
 import { GenresView } from './components/genres/GenresView'
+import { AutoresView } from './components/authors/AutoresView'
 import { ReadingView } from './components/reading/ReadingView'
 import { StatsView } from './components/stats/StatsView'
 import { PomodoroView } from './components/pomodoro/PomodoroView'
@@ -15,6 +16,7 @@ const SECTION_TITLES: Record<Section, string> = {
   biblioteca: 'Biblioteca',
   achar: 'Achar um livro',
   generos: 'Gêneros',
+  autores: 'Autores',
   lendo: 'Lendo agora',
   pomodoro: 'Pomodoro',
   metas: 'Metas',
@@ -51,6 +53,8 @@ function MainLayout(): JSX.Element {
             <FindBookView />
           ) : section === 'generos' ? (
             <GenresView />
+          ) : section === 'autores' ? (
+            <AutoresView />
           ) : section === 'lendo' ? (
             <ReadingView />
           ) : section === 'estatisticas' ? (

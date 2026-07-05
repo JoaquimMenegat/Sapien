@@ -161,3 +161,17 @@ npm run dist:win # gera instalador Windows (electron-builder)
   (ref. do usuário): por gênero, quantos livros — barras coloridas vivas + %, cartões de
   métrica coloridos, toggle Lidos/Todos. Agregação client-side a partir de `useBooks`
   (`GenresView.tsx`). Prévia do que a Fase 4 (Estatísticas) vai expandir.
+- [x] **Seção "Autores" (dashboard + drill-down).** Item na sidebar (ícone Users, depois de
+  Gêneros): por autor, quantos livros — barras coloridas + %, cartões de métrica, toggle
+  Lidos/Todos, igual a Gêneros. **Clicar num autor** abre a grade só dos livros dele (com
+  "← Todos os autores" para voltar) e clicar num livro abre o `BookDetailModal`. Autores
+  com múltiplos nomes são separados por vírgula (`authorsOf`). Agregação client-side a
+  partir de `useBooks` (`components/authors/AutoresView.tsx`).
+- [x] **Autocomplete de autor/editora.** No formulário de registro (`BookForm`), os campos
+  **autor** e **editora** sugerem valores já cadastrados via `<datalist>` nativo
+  (`#dl-authors`/`#dl-publishers`), montados dos livros existentes (distinct, ordenado).
+  Digitar "Peng" sugere "Penguin".
+- [x] **Lidos por ano e mês.** Na aba **Lido** da Biblioteca aparece um seletor de período
+  (chips): **Ano** (anos com livros concluídos, ex. 2026/2025/2024) e, ao escolher um ano,
+  **Mês** (só os meses daquele ano com leituras). Filtra pela `finished_at`. Deixa o
+  usuário separar "lidos em 2026", "lidos em março", etc. ao longo dos anos (`LibraryView`).

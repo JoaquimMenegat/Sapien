@@ -5,6 +5,7 @@ export type Section =
   | 'biblioteca'
   | 'achar'
   | 'generos'
+  | 'autores'
   | 'lendo'
   | 'pomodoro'
   | 'metas'

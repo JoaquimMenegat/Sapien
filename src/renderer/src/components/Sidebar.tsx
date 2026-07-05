@@ -9,6 +9,7 @@ import {
   LogOut,
   Sparkles,
   Tags,
+  Users,
   SlidersHorizontal
 } from 'lucide-react'
 import type { LucideIcon } from 'lucide-react'
@@ -20,6 +21,7 @@ const NAV: { id: Section; label: string; icon: LucideIcon }[] = [
   { id: 'biblioteca', label: 'Biblioteca', icon: Library },
   { id: 'achar', label: 'Achar um livro', icon: Sparkles },
   { id: 'generos', label: 'Gêneros', icon: Tags },
+  { id: 'autores', label: 'Autores', icon: Users },
   { id: 'lendo', label: 'Lendo agora', icon: BookOpen },
   { id: 'pomodoro', label: 'Pomodoro', icon: Timer },
   { id: 'metas', label: 'Metas', icon: Target },

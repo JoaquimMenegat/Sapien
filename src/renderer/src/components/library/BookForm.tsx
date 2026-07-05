@@ -1,9 +1,20 @@
-import { useState, type FormEvent } from 'react'
+import { useMemo, useState, type FormEvent } from 'react'
 import { ImagePlus } from 'lucide-react'
 import type { BookDraft, BookStatus, BookFormat } from '../../../../shared/types'
 import { STATUS_ORDER, STATUS_META, FORMAT_ORDER, FORMAT_META, LANGUAGE_LABELS } from './constants'
+import { useBooks } from '../../store/books'
 import { BookCover, StarInput } from './BookBits'
 import { GenrePicker } from './GenrePicker'
+
+// Valores distintos já usados no acervo, para autocompletar campos do registro.
+function distinct(values: (string | null)[]): string[] {
+  const set = new Set<string>()
+  for (const v of values) {
+    const t = v?.trim()
+    if (t) set.add(t)
+  }
+  return [...set].sort((a, b) => a.localeCompare(b))
+}
 
 interface Props {
   initial: Partial<BookDraft>
@@ -66,6 +77,10 @@ export function BookForm({ initial, submitLabel, busy, onSubmit, onCancel }: Pro
   const [f, setF] = useState<State>(() => toState(initial))
   const set = <K extends keyof State>(k: K, v: State[K]): void => setF((p) => ({ ...p, [k]: v }))
 
+  const books = useBooks((s) => s.books)
+  const authorOptions = useMemo(() => distinct(books.map((b) => b.authors)), [books])
+  const publisherOptions = useMemo(() => distinct(books.map((b) => b.publisher)), [books])
+
   async function chooseCoverFile(): Promise<void> {
     const url = await window.readdeck.books.pickCover()
     if (url) set('cover_url', url)
@@ -99,6 +114,16 @@ export function BookForm({ initial, submitLabel, busy, onSubmit, onCancel }: Pro
 
   return (
     <form onSubmit={handleSubmit} className="space-y-4">
+      <datalist id="dl-authors">
+        {authorOptions.map((a) => (
+          <option key={a} value={a} />
+        ))}
+      </datalist>
+      <datalist id="dl-publishers">
+        {publisherOptions.map((p) => (
+          <option key={p} value={p} />
+        ))}
+      </datalist>
       <div className="flex gap-4">
         <div className="flex shrink-0 flex-col items-center gap-2">
           <BookCover
@@ -125,7 +150,12 @@ export function BookForm({ initial, submitLabel, busy, onSubmit, onCancel }: Pro
           </div>
           <div>
             <span className={label}>Autor(es)</span>
-            <input value={f.authors} onChange={(e) => set('authors', e.target.value)} className="field" />
+            <input
+              value={f.authors}
+              onChange={(e) => set('authors', e.target.value)}
+              list="dl-authors"
+              className="field"
+            />
           </div>
         </div>
       </div>
@@ -133,7 +163,12 @@ export function BookForm({ initial, submitLabel, busy, onSubmit, onCancel }: Pro
       <div className="grid grid-cols-2 gap-3">
         <div>
           <span className={label}>Editora</span>
-          <input value={f.publisher} onChange={(e) => set('publisher', e.target.value)} className="field" />
+          <input
+            value={f.publisher}
+            onChange={(e) => set('publisher', e.target.value)}
+            list="dl-publishers"
+            className="field"
+          />
         </div>
         <div>
           <span className={label}>ISBN</span>

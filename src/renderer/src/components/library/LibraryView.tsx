@@ -21,10 +21,14 @@ const VIEWS: { id: ViewMode; icon: typeof LayoutGrid; label: string }[] = [
   { id: 'tabela', icon: Table2, label: 'Tabela' }
 ]
 
+const MONTH_NAMES = ['jan', 'fev', 'mar', 'abr', 'mai', 'jun', 'jul', 'ago', 'set', 'out', 'nov', 'dez']
+
 export function LibraryView(): JSX.Element {
   const { books, loading, filter, view, load, setFilter, setView } = useBooks()
   const [adding, setAdding] = useState(false)
   const [selected, setSelected] = useState<Book | null>(null)
+  const [year, setYear] = useState<number | 'all'>('all')
+  const [month, setMonth] = useState<number | 'all'>('all')
 
   useEffect(() => {
     void load()
@@ -36,10 +40,35 @@ export function LibraryView(): JSX.Element {
     return c
   }, [books])
 
-  const filtered = useMemo(
-    () => (filter === 'all' ? books : books.filter((b) => b.status === filter)),
-    [books, filter]
-  )
+  // Anos com livros concluídos (para o filtro "lidos em 2026").
+  const years = useMemo(() => {
+    const s = new Set<number>()
+    for (const b of books) if (b.status === 'lido' && b.finished_at) s.add(Number(b.finished_at.slice(0, 4)))
+    return [...s].sort((a, b) => b - a)
+  }, [books])
+
+  const monthsForYear = useMemo(() => {
+    if (year === 'all') return []
+    const s = new Set<number>()
+    for (const b of books) {
+      if (b.status === 'lido' && b.finished_at?.startsWith(String(year))) {
+        s.add(Number(b.finished_at.slice(5, 7)))
+      }
+    }
+    return [...s].sort((a, b) => a - b)
+  }, [books, year])
+
+  const filtered = useMemo(() => {
+    let list = filter === 'all' ? books : books.filter((b) => b.status === filter)
+    if (filter === 'lido') {
+      if (year !== 'all') list = list.filter((b) => b.finished_at?.startsWith(String(year)))
+      if (year !== 'all' && month !== 'all') {
+        const ym = `${year}-${String(month).padStart(2, '0')}`
+        list = list.filter((b) => b.finished_at?.startsWith(ym))
+      }
+    }
+    return list
+  }, [books, filter, year, month])
 
   const tabs: { id: StatusFilter; label: string }[] = [
     { id: 'all', label: 'Todos' },
@@ -85,6 +114,43 @@ export function LibraryView(): JSX.Element {
           </button>
         </div>
       </div>
+
+      {filter === 'lido' && years.length > 0 && (
+        <div className="flex flex-wrap items-center gap-1.5">
+          <span className="mr-1 text-xs font-medium text-ink-faint">Ano</span>
+          {(['all', ...years] as (number | 'all')[]).map((y) => (
+            <button
+              key={y}
+              onClick={() => {
+                setYear(y)
+                setMonth('all')
+              }}
+              className={`rounded-full px-2.5 py-1 text-xs font-medium transition-colors ${
+                year === y ? 'bg-accent text-white' : 'border border-edge text-ink-soft hover:bg-ink/[0.05]'
+              }`}
+            >
+              {y === 'all' ? 'Todos' : y}
+            </button>
+          ))}
+          {year !== 'all' && monthsForYear.length > 0 && (
+            <>
+              <span className="mx-1 text-ink-faint">·</span>
+              <span className="mr-1 text-xs font-medium text-ink-faint">Mês</span>
+              {(['all', ...monthsForYear] as (number | 'all')[]).map((m) => (
+                <button
+                  key={m}
+                  onClick={() => setMonth(m)}
+                  className={`rounded-full px-2.5 py-1 text-xs font-medium capitalize transition-colors ${
+                    month === m ? 'bg-accent text-white' : 'border border-edge text-ink-soft hover:bg-ink/[0.05]'
+                  }`}
+                >
+                  {m === 'all' ? 'Todos' : MONTH_NAMES[(m as number) - 1]}
+                </button>
+              ))}
+            </>
+          )}
+        </div>
+      )}
 
       {loading && books.length === 0 ? (
         <p className="py-16 text-center text-sm text-ink-faint">Carregando acervo…</p>
