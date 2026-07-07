@@ -1,7 +1,45 @@
-import { useState } from 'react'
-import { Check, Palette, Camera, Trash2 } from 'lucide-react'
+import { useEffect, useState } from 'react'
+import { Check, Palette, Camera, Trash2, Timer } from 'lucide-react'
 import { useApp, ACCENTS, APPEARANCES, type AnimStyle } from '../store/app'
 import { Modal } from './ui/Modal'
+
+// Tempo mínimo (min) para uma sessão contar na sequência e nas estatísticas de hoje.
+function SessionSection(): JSX.Element {
+  const [min, setMin] = useState('')
+
+  useEffect(() => {
+    void window.readdeck.getSetting('reading.minSessionMin').then((v) => setMin(v ?? '0'))
+  }, [])
+
+  function save(v: string): void {
+    setMin(v)
+    const n = Math.max(0, parseInt(v, 10) || 0)
+    void window.readdeck.setSetting('reading.minSessionMin', String(n))
+  }
+
+  return (
+    <section>
+      <h3 className="mb-2 flex items-center gap-2 text-sm font-semibold text-ink">
+        <Timer size={15} className="text-ink-faint" /> Sessão de leitura
+      </h3>
+      <label className="flex items-center gap-2 text-sm text-ink-soft">
+        Tempo mínimo para contar
+        <input
+          type="number"
+          min={0}
+          value={min}
+          onChange={(e) => save(e.target.value)}
+          className="field w-20 py-1.5 text-center"
+        />
+        min
+      </label>
+      <p className="mt-1.5 text-xs text-ink-faint">
+        Sessões mais curtas que isso não contam para a <b>sequência</b> nem para as estatísticas do
+        dia. 0 = conta todas.
+      </p>
+    </section>
+  )
+}
 
 function ProfileSection(): JSX.Element {
   const account = useApp((s) => s.auth?.account ?? null)
@@ -83,6 +121,8 @@ export function SettingsModal({
     <Modal open={open} onClose={onClose} title="Personalização">
       <div className="space-y-6">
         <ProfileSection />
+
+        <SessionSection />
 
         <section>
           <h3 className="mb-2 text-sm font-semibold text-ink">Aparência</h3>

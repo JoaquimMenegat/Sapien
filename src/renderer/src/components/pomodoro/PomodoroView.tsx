@@ -314,9 +314,7 @@ export function PomodoroView(): JSX.Element {
           </div>
           <div className="grid grid-cols-3 gap-3">
             <div>
-              <span className="mb-1.5 block text-xs font-medium text-ink-soft">
-                Páginas lidas
-              </span>
+              <span className="mb-1.5 block text-xs font-medium text-ink-soft">Páginas lidas</span>
               <input
                 type="number"
                 min={0}

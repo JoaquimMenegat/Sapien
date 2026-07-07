@@ -3,6 +3,7 @@
 
 import { all, get, insert } from './index'
 import { getBook, updateBook } from './books'
+import { getSetting } from './settings'
 import type {
   BookDraft,
   ReadingSession,
@@ -12,6 +13,13 @@ import type {
 } from '../../shared/types'
 
 const todayStr = (): string => new Date().toISOString().slice(0, 10)
+
+// Tempo mínimo (min) para uma sessão "contar" na sequência/estatísticas de hoje.
+// 0 (padrão) = conta todas. Configurável na Personalização.
+function minSessionMin(): number {
+  const v = parseInt(getSetting('reading.minSessionMin') ?? '', 10)
+  return Number.isFinite(v) && v > 0 ? v : 0
+}
 
 export function createSession(
   bookId: number,
@@ -65,7 +73,9 @@ export function computePace(): number | null {
 
 export function sessionsDaily(days: number): DailyStat[] {
   const n = Math.max(1, Math.min(90, Math.round(days)))
+  const min = minSessionMin()
   // CTE recursiva gera a série de dias; LEFT JOIN preenche zeros nos dias vazios.
+  // Só contam sessões com duração >= mínimo configurado.
   return all<DailyStat>(
     `WITH RECURSIVE d(day) AS (
        SELECT date('now', ?)
@@ -75,17 +85,19 @@ export function sessionsDaily(days: number): DailyStat[] {
             COUNT(s.id) AS sessions,
             COALESCE(SUM(s.pages_read), 0) AS pages,
             COALESCE(SUM(s.duration_min), 0) AS minutes
-     FROM d LEFT JOIN reading_sessions s ON date(s.started_at) = d.day
+     FROM d LEFT JOIN reading_sessions s
+       ON date(s.started_at) = d.day AND s.duration_min >= ?
      GROUP BY d.day
      ORDER BY d.day`,
-    [`-${n - 1} days`]
+    [`-${n - 1} days`, min]
   )
 }
 
 export function todayStats(): TodayStats {
   const row = get<{ n: number; pages: number; mins: number }>(
     `SELECT COUNT(*) AS n, COALESCE(SUM(pages_read),0) AS pages, COALESCE(SUM(duration_min),0) AS mins
-     FROM reading_sessions WHERE date(started_at) = date('now')`
+     FROM reading_sessions WHERE date(started_at) = date('now') AND duration_min >= ?`,
+    [minSessionMin()]
   )
   return { sessions: row?.n ?? 0, pages: row?.pages ?? 0, minutes: row?.mins ?? 0 }
 }

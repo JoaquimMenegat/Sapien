@@ -146,9 +146,11 @@ npm run dist:win # gera instalador Windows (electron-builder)
     médio/sessões/páginas/minutos + **área de páginas/dia** e barras de **minutos/dia** e
     **sessões/dia** (série diária das sessões, `sessions:daily` com CTE recursiva). Deixa
     o usuário comparar os dias e ver o progresso.
-  - **Metas:** `MetasView` — metas de **livros/ano, livros/mês, páginas/dia, minutos/dia**
-    com progresso real (livros lidos + sessões de hoje), upsert por tipo, barra + selo
-    "Concluída". `src/main/db/goals.ts`.
+  - **Metas:** `MetasView` (reformada no estilo do handoff) — **anel anual grande**
+    (lidos/meta + texto de ritmo), card **"Sequência de leitura"** (14 quadrados/dia com ✓,
+    hoje destacado, streak) e **"Metas do mês"** (livros/mês, páginas/dia, minutos/dia com
+    barras), mantendo o formulário de **registrar meta** (upsert por tipo). Progresso real de
+    livros lidos + sessões. `src/main/db/goals.ts`.
   - **Cronograma** de leituras (planejar períodos) fica como melhoria futura opcional.
 - [x] **Fase 5 — Notas e trechos.** `NotasView`: por livro, registra **nota**, **trecho**
   (citação, serifada em itálico com aspas) e **callout/destaque** (caixa âmbar), com
@@ -208,3 +210,8 @@ npm run dist:win # gera instalador Windows (electron-builder)
   capa flutuante, progresso, tempo restante, "Iniciar sessão"→Sessão) e **anel de meta
   anual** (→Metas), acima da estante (chips de status + grade/lista/tabela + lidos por
   ano/mês). Nova logo SVG, topbar e Plus Jakarta Sans. `LibraryView.tsx`.
+- [x] **Tempo mínimo de sessão.** Configuração em Personalização (`reading.minSessionMin`):
+  sessões mais curtas que o mínimo não contam para a **sequência** nem para as **estatísticas
+  do dia** (filtro `duration_min >= min` em `todayStats`/`sessionsDaily`). 0 = conta todas.
+- [x] **Modais via portal.** `Modal` renderiza no `document.body` (`createPortal`) — evita que
+  a topbar (com `backdrop-filter`) vire bloco de contenção e "clipe" o `position:fixed`.
