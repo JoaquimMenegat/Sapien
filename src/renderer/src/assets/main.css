@@ -2,7 +2,46 @@
 @tailwind components;
 @tailwind utilities;
 
-/* Serifada literária (Lora) empacotada localmente — funciona offline, sem CDN. */
+/* ============================================================
+   FONTES (empacotadas localmente — funcionam offline, sem CDN)
+   Plus Jakarta Sans: UI inteira do design "Executivo Indigo".
+   Lora: serifada literária, ainda usada em citações/trechos.
+   ============================================================ */
+@font-face {
+  font-family: 'Plus Jakarta Sans';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url('./fonts/PlusJakartaSans-400.woff2') format('woff2');
+}
+@font-face {
+  font-family: 'Plus Jakarta Sans';
+  font-style: normal;
+  font-weight: 500;
+  font-display: swap;
+  src: url('./fonts/PlusJakartaSans-500.woff2') format('woff2');
+}
+@font-face {
+  font-family: 'Plus Jakarta Sans';
+  font-style: normal;
+  font-weight: 600;
+  font-display: swap;
+  src: url('./fonts/PlusJakartaSans-600.woff2') format('woff2');
+}
+@font-face {
+  font-family: 'Plus Jakarta Sans';
+  font-style: normal;
+  font-weight: 700;
+  font-display: swap;
+  src: url('./fonts/PlusJakartaSans-700.woff2') format('woff2');
+}
+@font-face {
+  font-family: 'Plus Jakarta Sans';
+  font-style: normal;
+  font-weight: 800;
+  font-display: swap;
+  src: url('./fonts/PlusJakartaSans-800.woff2') format('woff2');
+}
 @font-face {
   font-family: 'Lora';
   font-style: normal;
@@ -29,10 +68,29 @@
    TEMAS (aparências). Cada bloco só redefine as CSS variables;
    os componentes usam tokens semânticos (bg-canvas, text-ink...).
    Valores são triplos RGB separados por espaço (p/ <alpha-value>).
+   Padrão: "Executivo Indigo" — grafite escuro + indigo→violeta.
    ============================================================ */
 @layer base {
-  /* Literary — claro (padrão) */
   :root,
+  [data-style='executivo'] {
+    color-scheme: dark;
+    --c-canvas: 21 23 28; /* #15171C */
+    --c-surface: 29 32 38; /* #1D2026 */
+    --c-elevated: 38 42 51; /* #262A33 */
+    --c-edge: 39 43 51; /* rgba(148,163,184,.14) composto sobre o fundo */
+    --c-ink: 241 245 249; /* #F1F5F9 */
+    --c-ink-soft: 154 163 178; /* #9AA3B2 */
+    --c-ink-faint: 100 116 139; /* #64748B */
+    --c-accent: 99 102 241; /* #6366F1 (interações/anéis) */
+    --c-accent-hover: 79 70 229; /* #4F46E5 */
+    /* Gradientes assinatura (reaproveitados nos componentes) */
+    --grad-primary: linear-gradient(135deg, #4f46e5, #7c3aed);
+    --grad-text: linear-gradient(135deg, #818cf8, #c4b5fd);
+    --shadow-card: 0 4px 20px -2px rgba(79, 70, 229, 0.22);
+    --shadow-card-hover: 0 12px 28px -6px rgba(79, 70, 229, 0.38);
+  }
+
+  /* Literary — claro (mantido por compatibilidade do seletor de aparência) */
   [data-style='literary'] {
     color-scheme: light;
     --c-canvas: 250 249 246;
@@ -42,11 +100,13 @@
     --c-ink: 56 56 56;
     --c-ink-soft: 107 105 96;
     --c-ink-faint: 154 150 139;
-    --c-accent: 218 119 86;
-    --c-accent-hover: 201 101 68;
+    --c-accent: 79 70 229;
+    --c-accent-hover: 99 102 241;
+    --grad-primary: linear-gradient(135deg, #4f46e5, #7c3aed);
+    --grad-text: linear-gradient(135deg, #4f46e5, #7c3aed);
+    --shadow-card: 0 1px 3px rgba(0, 0, 0, 0.06);
+    --shadow-card-hover: 0 8px 20px rgba(0, 0, 0, 0.1);
   }
-
-  /* Literary — escuro (papel escuro quente) */
   [data-style='literary'].dark {
     color-scheme: dark;
     --c-canvas: 26 25 23;
@@ -56,22 +116,20 @@
     --c-ink: 236 233 226;
     --c-ink-soft: 168 163 150;
     --c-ink-faint: 122 118 108;
-    --c-accent: 218 119 86;
-    --c-accent-hover: 201 101 68;
   }
 
-  /* Modern Dark — estética "Linear": quase-preto + índigo */
+  /* Modern Dark aponta para o mesmo sistema Indigo (unificado no redesign). */
   [data-style='moderndark'] {
     color-scheme: dark;
-    --c-canvas: 5 5 6;
-    --c-surface: 18 18 22;
-    --c-elevated: 26 26 31;
-    --c-edge: 42 42 51;
-    --c-ink: 237 237 239;
-    --c-ink-soft: 138 143 152;
-    --c-ink-faint: 100 104 112;
-    --c-accent: 94 106 210;
-    --c-accent-hover: 104 114 217;
+    --c-canvas: 21 23 28;
+    --c-surface: 29 32 38;
+    --c-elevated: 38 42 51;
+    --c-edge: 39 43 51;
+    --c-ink: 241 245 249;
+    --c-ink-soft: 154 163 178;
+    --c-ink-faint: 100 116 139;
+    --c-accent: 99 102 241;
+    --c-accent-hover: 79 70 229;
   }
 
   html,
@@ -83,7 +141,7 @@
 
   body {
     @apply bg-canvas text-ink antialiased;
-    font-feature-settings: 'cv11', 'ss01';
+    font-family: 'Plus Jakarta Sans', ui-sans-serif, system-ui, -apple-system, 'Segoe UI', sans-serif;
   }
 
   ::selection {
@@ -100,115 +158,234 @@
     background-clip: content-box;
   }
 
-  /* Iluminação ambiente do Modern Dark: pools de luz índigo, muito borradas. */
+  /* Iluminação ambiente: dois orbes radiais indigo/violeta, deriva lenta. */
+  [data-style='executivo'] body::before,
   [data-style='moderndark'] body::before {
     content: '';
     position: fixed;
-    inset: 0;
+    top: -140px;
+    right: -100px;
+    width: 520px;
+    height: 520px;
+    border-radius: 50%;
+    background: radial-gradient(circle, rgba(79, 70, 229, 0.16), transparent 65%);
+    filter: blur(40px);
     pointer-events: none;
     z-index: 0;
-    background:
-      radial-gradient(60% 50% at 50% -10%, rgba(94, 106, 210, 0.22), transparent 70%),
-      radial-gradient(40% 40% at 12% 20%, rgba(129, 94, 210, 0.14), transparent 70%),
-      radial-gradient(45% 45% at 92% 85%, rgba(74, 108, 220, 0.12), transparent 70%);
+    animation: blobA 10s ease-in-out infinite;
   }
-  [data-style='moderndark'] #root {
+  [data-style='executivo'] body::after,
+  [data-style='moderndark'] body::after {
+    content: '';
+    position: fixed;
+    bottom: -160px;
+    left: -80px;
+    width: 460px;
+    height: 460px;
+    border-radius: 50%;
+    background: radial-gradient(circle, rgba(124, 58, 237, 0.13), transparent 65%);
+    filter: blur(40px);
+    pointer-events: none;
+    z-index: 0;
+    animation: blobB 12s ease-in-out infinite;
+  }
+  #root {
     position: relative;
     z-index: 1;
   }
 }
 
 @layer components {
-  /* Item de navegação lateral — overlay sutil que funciona em qualquer tema. */
-  .sidebar-item {
-    @apply flex items-center gap-2.5 px-3 py-1.5 rounded-lg text-sm font-medium
-           text-ink-soft transition-colors cursor-pointer select-none
-           hover:bg-ink/[0.06];
+  /* Pílula de navegação (topbar). */
+  .nav-pill {
+    @apply cursor-pointer select-none rounded-[9px] px-3.5 py-2 text-[13px] font-bold
+           text-ink-soft transition-colors hover:text-ink;
   }
-  .sidebar-item.active {
-    @apply bg-ink/[0.08] text-ink;
+  .nav-pill.active {
+    background: rgba(99, 102, 241, 0.18);
+    color: #c7d2fe;
   }
 
-  /* Chip/pílula de sugestão. */
+  /* Chip/pílula de filtro. */
   .chip {
-    @apply inline-flex items-center gap-2 rounded-full border border-edge
-           bg-surface px-3.5 py-1.5 text-sm font-medium text-ink-soft
-           transition-colors hover:bg-ink/[0.05];
+    @apply inline-flex cursor-pointer items-center gap-2 rounded-lg border border-edge
+           bg-surface px-3.5 py-1.5 text-xs font-bold text-ink-soft
+           transition-colors hover:border-accent/60;
+  }
+  .chip.active {
+    background: var(--grad-primary);
+    border-color: transparent;
+    color: #fff;
   }
 
-  /* Cartão padrão — usado no health card, formulários, etc. */
+  /* Cartão padrão — superfície elevada com sombra colorida. */
   .card {
     @apply rounded-2xl border border-edge bg-surface;
+    box-shadow: var(--shadow-card);
+  }
+
+  /* Cartão interativo (clicável): sobe e ganha borda indigo no hover. */
+  .lift {
+    @apply transition-all duration-200;
+  }
+  .lift:hover {
+    transform: translateY(-4px);
+    box-shadow: var(--shadow-card-hover);
+    border-color: rgba(129, 140, 248, 0.5);
   }
 
   /* Campo de formulário. */
   .field {
-    @apply w-full rounded-lg border border-edge bg-elevated px-3.5 py-2.5 text-[15px]
-           text-ink placeholder:text-ink-faint outline-none transition
-           focus:border-accent focus:ring-2 focus:ring-accent/30;
+    @apply w-full rounded-xl border border-edge bg-surface px-3.5 py-2.5 text-[15px]
+           text-ink placeholder:text-ink-faint outline-none transition;
+  }
+  .field:focus {
+    border-color: #818cf8;
+    box-shadow: 0 0 0 4px rgba(99, 102, 241, 0.15);
   }
 
-  /* Botão primário (acento). Ganha brilho no Modern Dark. */
+  /* Botão primário — gradiente assinatura + sombra colorida. */
   .btn-primary {
-    @apply inline-flex items-center justify-center gap-2 rounded-lg bg-accent px-4 py-2.5
-           text-sm font-semibold text-white transition
-           hover:bg-accent-hover active:scale-[0.98] disabled:opacity-60;
+    @apply inline-flex items-center justify-center gap-2 rounded-[10px] px-4 py-2.5
+           text-sm font-bold text-white transition-transform disabled:opacity-60;
+    background: var(--grad-primary);
+    box-shadow: 0 4px 14px rgba(79, 70, 229, 0.3);
   }
-  [data-style='moderndark'] .btn-primary {
-    box-shadow:
-      0 0 0 1px rgba(94, 106, 210, 0.5),
-      0 4px 16px rgba(94, 106, 210, 0.35),
-      inset 0 1px 0 0 rgba(255, 255, 255, 0.2);
+  .btn-primary:hover {
+    transform: translateY(-2px);
+  }
+  .btn-primary:active {
+    transform: translateY(0) scale(0.99);
+  }
+  /* CTA principal — pulsa a sombra colorida. */
+  .btn-primary.pulse {
+    animation: pulseGlow 3s ease-in-out infinite;
   }
 
   /* Botão secundário/fantasma. */
   .btn-ghost {
-    @apply inline-flex items-center justify-center gap-2 rounded-lg border border-edge
-           bg-transparent px-4 py-2.5 text-sm font-medium text-ink-soft transition
-           hover:bg-ink/[0.05] hover:text-ink;
+    @apply inline-flex items-center justify-center gap-2 rounded-[10px] border border-edge
+           bg-transparent px-4 py-2.5 text-sm font-semibold text-ink-soft transition
+           hover:border-accent/60 hover:text-ink;
+  }
+
+  /* Esconde a barra de rolagem (usado na navegação da topbar). */
+  .scrollbar-none {
+    scrollbar-width: none;
+  }
+  .scrollbar-none::-webkit-scrollbar {
+    display: none;
+  }
+
+  /* Texto em gradiente (KPIs, timer). */
+  .grad-text {
+    background: var(--grad-text);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+  }
+
+  /* Item de navegação lateral — mantido caso algum lugar ainda use. */
+  .sidebar-item {
+    @apply flex cursor-pointer select-none items-center gap-2.5 rounded-lg px-3 py-1.5
+           text-sm font-medium text-ink-soft transition-colors hover:bg-ink/[0.06];
+  }
+  .sidebar-item.active {
+    @apply bg-ink/[0.08] text-ink;
   }
 }
 
 /* ============================================================
-   Estilo de animação (Personalização).
+   ANIMAÇÕES (nível alto de movimento é intencional no design).
+   Easing padrão: cubic-bezier(.22,1,.36,1).
    ============================================================ */
-[data-anim='nenhuma'] *,
-[data-anim='nenhuma'] *::before,
-[data-anim='nenhuma'] *::after {
-  transition: none !important;
-  animation: none !important;
-}
-
-/* "Rico": cartões ganham uma leve elevação ao passar o mouse. */
-[data-anim='rico'] .card {
-  transition:
-    transform 0.2s ease,
-    box-shadow 0.2s ease;
-}
-[data-anim='rico'] .card:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 10px 26px rgba(0, 0, 0, 0.14);
-}
-
-/* ============================================================
-   Navegação fluída: entrada suave do conteúdo ao trocar de seção
-   e dos modais. Curva de saída (ease-out) para dar sensação de leveza.
-   Desativado por data-anim='nenhuma' e por prefers-reduced-motion (abaixo).
-   ============================================================ */
-@keyframes view-enter {
+@keyframes fadeUp {
   from {
     opacity: 0;
-    transform: translateY(10px);
+    transform: translateY(22px);
   }
   to {
     opacity: 1;
     transform: translateY(0);
   }
 }
-.view-enter {
-  animation: view-enter 0.34s cubic-bezier(0.22, 1, 0.36, 1);
+@keyframes growBar {
+  from {
+    width: 0;
+  }
+}
+@keyframes ringDraw {
+  from {
+    stroke-dashoffset: 314;
+  }
+}
+@keyframes floatY {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-10px);
+  }
+}
+@keyframes barRise {
+  from {
+    transform: scaleY(0);
+  }
+  to {
+    transform: scaleY(1);
+  }
+}
+@keyframes pulseGlow {
+  0%,
+  100% {
+    box-shadow: 0 4px 14px rgba(79, 70, 229, 0.3);
+  }
+  50% {
+    box-shadow: 0 6px 26px rgba(79, 70, 229, 0.55);
+  }
+}
+@keyframes blobA {
+  0%,
+  100% {
+    transform: translate(0, 0) scale(1);
+  }
+  50% {
+    transform: translate(40px, -30px) scale(1.15);
+  }
+}
+@keyframes blobB {
+  0%,
+  100% {
+    transform: translate(0, 0) scale(1);
+  }
+  50% {
+    transform: translate(-50px, 25px) scale(0.9);
+  }
+}
+@keyframes tickPulse {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.35;
+  }
 }
 
+/* Entrada de tela (fadeUp escalonado é aplicado inline por delay). */
+.view-enter {
+  animation: fadeUp 0.4s cubic-bezier(0.22, 1, 0.36, 1);
+}
+.anim-fadeUp {
+  opacity: 0;
+  animation: fadeUp 0.55s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+}
+.anim-float {
+  animation: floatY 5s ease-in-out infinite;
+}
+
+/* Modais mantêm entrada suave. */
 @keyframes modal-in {
   from {
     opacity: 0;
@@ -222,7 +399,6 @@
 .modal-in {
   animation: modal-in 0.26s cubic-bezier(0.22, 1, 0.36, 1);
 }
-
 @keyframes overlay-in {
   from {
     opacity: 0;
@@ -235,9 +411,12 @@
   animation: overlay-in 0.2s ease-out;
 }
 
-/* "Rico" deixa a entrada das seções um pouco mais expressiva. */
-[data-anim='rico'] .view-enter {
-  animation-duration: 0.44s;
+/* Estilo de animação (Personalização): "nenhuma" desliga tudo. */
+[data-anim='nenhuma'] *,
+[data-anim='nenhuma'] *::before,
+[data-anim='nenhuma'] *::after {
+  animation: none !important;
+  transition: none !important;
 }
 
 /* Acessibilidade: se o SO pede menos movimento, respeitamos. */
@@ -245,8 +424,8 @@
   *,
   *::before,
   *::after {
-    transition: none !important;
     animation: none !important;
+    transition: none !important;
     scroll-behavior: auto !important;
   }
 }

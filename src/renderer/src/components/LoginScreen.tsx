@@ -1,7 +1,8 @@
 import { useEffect, useState, type FormEvent } from 'react'
-import { Library, Mail, Lock, User, ArrowRight, LogIn, KeyRound, ExternalLink } from 'lucide-react'
+import { Mail, Lock, User, ArrowRight, LogIn, KeyRound, ExternalLink } from 'lucide-react'
 import { useApp } from '../store/app'
 import { cleanErrorMessage } from '../lib/errors'
+import { LogoMark } from './Logo'
 
 function RememberToggle({
   checked,
@@ -122,10 +123,10 @@ export function LoginScreen(): JSX.Element {
   return (
     <div className="relative flex h-screen w-screen items-center justify-center bg-canvas px-6">
       <div className="w-full max-w-sm text-center">
-        <div className="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-2xl bg-accent text-white shadow-lg">
-          <Library size={24} />
-        </div>
-        <h1 className="font-serif text-3xl font-semibold tracking-tight text-ink">Sapien</h1>
+        <LogoMark size={56} className="mx-auto mb-4" />
+        <h1 className="text-3xl font-extrabold tracking-tight text-ink" style={{ letterSpacing: '-0.02em' }}>
+          Sapien
+        </h1>
         <p className="mt-1.5 text-sm text-ink-soft">
           {googleOnly
             ? `Bem-vindo de volta, ${account?.name?.split(' ')[0] || ''}.`

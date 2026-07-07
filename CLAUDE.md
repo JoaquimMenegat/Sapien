@@ -28,11 +28,22 @@ preenchimento automático (Google Books) e foco em UI fluida estilo Notion.
   no preload (`window.readdeck.*`). `contextIsolation: true`, `nodeIntegration: false`.
 - **Tipos compartilhados** ficam em `src/shared/types.ts` — fonte única de verdade do
   modelo de dados, importada por main, preload e renderer.
+- **Design "Executivo Indigo" (padrão atual).** Reskin completo a partir de um handoff de
+  design (grafite escuro `#15171C` + gradientes indigo→violeta `#4F46E5→#7C3AED`, sombras
+  coloridas, orbes de luz ambiente e muita micro-animação). Fonte **Plus Jakarta Sans**
+  empacotada localmente (woff2 em `assets/fonts`). Tokens/gradientes/keyframes vivem em
+  `assets/main.css`; utilitários: `.card`/`.lift`, `.btn-primary`(+`.pulse`), `.field`,
+  `.nav-pill`, `.chip`, `.grad-text`, e keyframes `fadeUp/growBar/ringDraw/floatY/barRise/`
+  `pulseGlow/blobA/blobB`. Marca recriada como **SVG** (arcadas em gradiente violeta, com os
+  sorrisos recortados por máscara) em `components/Logo.tsx` (`LogoMark`/`LogoLockup`).
+- **Navegação por topbar** (`components/Topbar.tsx`, substituiu a sidebar): logo + 9 seções
+  em pílulas + busca + "Adicionar livro" (pulsante, abre o modal via `app.addBookOpen`) +
+  menu de perfil (Personalização/Sair). `App` centraliza o conteúdo em `max-w-1180`.
 - **Sistema de temas por CSS variables.** As cores são tokens semânticos (`bg-canvas`,
-  `text-ink`, `bg-accent`...) que leem CSS variables. Cada "aparência" só redefine as
-  variáveis: `literary-light`, `literary-dark` (papel quente, estética Claude) e
-  `moderndark` (estética "Linear": quase-preto + índigo, com iluminação ambiente). O
-  usuário troca ao vivo pelo `AppearancePicker`. Preferência persistida em settings.
+  `text-ink`, `bg-accent`...) que leem CSS variables. Aparências redefinem as variáveis:
+  `executivo` (padrão), `literary-light`/`literary-dark` e `moderndark` (aponta p/ o mesmo
+  sistema Indigo). Trocável no painel Personalização (`SettingsModal`, lê `APPEARANCES`).
+  Preferência persistida em settings.
 - **Login local por e-mail (offline).** Uma conta por instalação, guardada na tabela
   `settings` (`account.email/name/hash/picture/provider`). Senha nunca em texto: hash com
   **scrypt** (crypto nativo do Node, sem dependência). Sessão vive em memória no main; por
@@ -190,3 +201,10 @@ npm run dist:win # gera instalador Windows (electron-builder)
 - [x] **Navegação mais fluída.** Animação de entrada suave ao trocar de seção (`.view-enter`,
   keyed por `section` em `App`) e nos modais (`.modal-in`/`.overlay-in` no `Modal`),
   com curva ease-out. Respeita `data-anim='nenhuma'` e `prefers-reduced-motion`.
+- [x] **Redesign "Executivo Indigo" + rebrand** (ver Decisões de projeto). Reskin completo a
+  partir de handoff do usuário, mantendo toda a funcionalidade. A **Biblioteca virou
+  dashboard**: 4 KPIs (lidos/ano, páginas/mês, ritmo, sequência — dados reais de
+  books+sessions+goals, com mini-barras), hero **"Lendo agora"** (gradiente navy→violeta,
+  capa flutuante, progresso, tempo restante, "Iniciar sessão"→Sessão) e **anel de meta
+  anual** (→Metas), acima da estante (chips de status + grade/lista/tabela + lidos por
+  ano/mês). Nova logo SVG, topbar e Plus Jakarta Sans. `LibraryView.tsx`.

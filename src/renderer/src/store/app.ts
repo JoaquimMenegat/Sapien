@@ -12,9 +12,10 @@ export type Section =
   | 'estatisticas'
   | 'notas'
 
-export type Appearance = 'literary-light' | 'literary-dark' | 'moderndark'
+export type Appearance = 'executivo' | 'literary-light' | 'literary-dark' | 'moderndark'
 
 export const APPEARANCES: { id: Appearance; label: string }[] = [
+  { id: 'executivo', label: 'Executivo Indigo' },
   { id: 'literary-light', label: 'Literary claro' },
   { id: 'literary-dark', label: 'Literary escuro' },
   { id: 'moderndark', label: 'Modern Dark' }
@@ -22,15 +23,20 @@ export const APPEARANCES: { id: Appearance; label: string }[] = [
 
 export function applyAppearance(appearance: Appearance): void {
   const root = document.documentElement
-  const style = appearance === 'moderndark' ? 'moderndark' : 'literary'
+  const style =
+    appearance === 'moderndark'
+      ? 'moderndark'
+      : appearance === 'executivo'
+        ? 'executivo'
+        : 'literary'
   root.setAttribute('data-style', style)
   root.classList.toggle('dark', appearance !== 'literary-light')
 }
 
-// Aparência usada na tela de login/cadastro: sempre escura, independente da preferência.
-// Se o usuário já usa um tema escuro, mantemos o dele; se usa claro, cai no Literary escuro.
+// Aparência usada na tela de login/cadastro: sempre escura (a marca Executivo Indigo).
+// Se o usuário já usa um tema escuro, mantemos o dele; se usa claro, cai no Executivo.
 export function loginAppearance(saved: Appearance): Appearance {
-  return saved === 'literary-light' ? 'literary-dark' : saved
+  return saved === 'literary-light' ? 'executivo' : saved
 }
 
 // --- Personalização: cor de acento e estilo de animação ---
@@ -76,6 +82,10 @@ interface AppState {
   section: Section
   setSection: (s: Section) => void
 
+  // Abre o modal de adicionar livro na Biblioteca (acionado pela topbar).
+  addBookOpen: boolean
+  setAddBookOpen: (v: boolean) => void
+
   appearance: Appearance
   setAppearance: (a: Appearance) => void
   initAppearance: () => Promise<void>
@@ -100,7 +110,10 @@ export const useApp = create<AppState>((set, get) => ({
   section: 'biblioteca',
   setSection: (section) => set({ section }),
 
-  appearance: 'literary-dark',
+  addBookOpen: false,
+  setAddBookOpen: (addBookOpen) => set({ addBookOpen }),
+
+  appearance: 'executivo',
   setAppearance: (appearance) => {
     applyAppearance(appearance)
     void window.readdeck.setSetting('appearance', appearance)
@@ -112,7 +125,7 @@ export const useApp = create<AppState>((set, get) => ({
       window.readdeck.getSetting('ui.accent'),
       window.readdeck.getSetting('ui.animation')
     ])
-    const appearance: Appearance = (savedApp as Appearance) ?? 'literary-dark'
+    const appearance: Appearance = (savedApp as Appearance) ?? 'executivo'
     const accent = savedAccent ?? 'tema'
     const animation = (savedAnim as AnimStyle) ?? 'sutil'
     applyAppearance(appearance)

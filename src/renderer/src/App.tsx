@@ -1,5 +1,5 @@
 import { useEffect } from 'react'
-import { Sidebar } from './components/Sidebar'
+import { Topbar } from './components/Topbar'
 import { LoginScreen } from './components/LoginScreen'
 import { LibraryView } from './components/library/LibraryView'
 import { FindBookView } from './components/ai/FindBookView'
@@ -18,7 +18,7 @@ const SECTION_TITLES: Record<Section, string> = {
   generos: 'Gêneros',
   autores: 'Autores',
   lendo: 'Lendo agora',
-  pomodoro: 'Pomodoro',
+  pomodoro: 'Sessão de leitura',
   metas: 'Metas',
   estatisticas: 'Estatísticas',
   notas: 'Notas'
@@ -37,18 +37,21 @@ function MainLayout(): JSX.Element {
   const section = useApp((s) => s.section)
 
   return (
-    <div className="flex h-screen w-screen overflow-hidden">
-      <Sidebar />
-      <main className="flex-1 overflow-y-auto">
-        <header className="sticky top-0 z-10 flex items-center border-b border-edge bg-canvas/80 px-8 py-4 backdrop-blur">
-          <h1 className="font-serif text-xl font-semibold tracking-tight text-ink">
+    <div className="min-h-screen">
+      <Topbar />
+      <main className="mx-auto max-w-[1180px] px-6 pb-16 pt-7 lg:px-10">
+        {/* Biblioteca é um dashboard (lidera com KPIs); as demais telas têm título. */}
+        {section !== 'biblioteca' && (
+          <h1
+            key={`${section}-title`}
+            className="anim-fadeUp mb-6 text-[26px] font-extrabold tracking-tight text-ink"
+          >
             {SECTION_TITLES[section]}
           </h1>
-        </header>
+        )}
 
-        {/* key={section} faz o conteúdo remontar e re-disparar a animação de entrada,
-            deixando a navegação mais fluída ao trocar de seção. */}
-        <div key={section} className="view-enter px-8 py-6">
+        {/* key={section} remonta o conteúdo e re-dispara a animação de entrada. */}
+        <div key={section} className="view-enter">
           {section === 'biblioteca' ? (
             <LibraryView />
           ) : section === 'achar' ? (
