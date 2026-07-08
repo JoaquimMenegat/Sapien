@@ -4,12 +4,12 @@ import { useApp, type Section } from '../store/app'
 import { LogoMark } from './Logo'
 import { SettingsModal } from './SettingsModal'
 
+// "Achar" (IA) e "Lendo agora" saíram da barra a pedido do usuário — o código das
+// seções continua (App.tsx) para reativar no futuro; só não há navegação até elas.
 const NAV: { id: Section; label: string }[] = [
   { id: 'biblioteca', label: 'Biblioteca' },
-  { id: 'achar', label: 'Achar' },
   { id: 'generos', label: 'Gêneros' },
   { id: 'autores', label: 'Autores' },
-  { id: 'lendo', label: 'Lendo' },
   { id: 'pomodoro', label: 'Sessão' },
   { id: 'metas', label: 'Metas' },
   { id: 'estatisticas', label: 'Stats' },
