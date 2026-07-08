@@ -39,8 +39,8 @@ preenchimento automático (Google Books) e foco em UI fluida estilo Notion.
   título de seção do `App` e no `Modal`). A Plus Jakarta Sans do redesign foi revertida — os
   woff2 dela seguem em `assets/fonts`, sem uso.
 - **Marca "Sapien".** SVG em `components/Logo.tsx` (`LogoMark`/`LogoLockup`) na **forma "COR"**
-  do manual do usuário: quadrado vermelho arredondado (`#E5342A`) com as duas arcadas brancas
-  e os sorrisos vermelhos por cima.
+  do manual (quadrado arredondado + arcadas brancas + sorrisos por cima), em **roxo**: o
+  quadrado e os sorrisos usam o gradiente indigo→violeta (`#4F46E5→#7C3AED`).
 - **Navegação por topbar** (`components/Topbar.tsx`, substituiu a sidebar): logo + seções em
   pílulas (sem "Achar"/"Lendo", removidas a pedido — o código das seções segue no `App`) +
   busca + "Adicionar livro" (pulsante, abre o modal via `app.addBookOpen`) + menu de perfil
