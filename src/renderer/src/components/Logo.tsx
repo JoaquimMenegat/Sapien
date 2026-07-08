@@ -1,9 +1,8 @@
-import { useId } from 'react'
+// Marca "Sapien" — forma padrão do manual (tile "COR"): quadrado vermelho
+// arredondado com as duas arcadas em branco e os sorrisos vermelhos (recortados
+// por cima). Recriada como SVG a partir da logo enviada.
+const SAPIEN_RED = '#E5342A'
 
-// Marca "Sapien": duas arcadas arredondadas (como dois livros/leitores) com um
-// pequeno sorriso em cada. Recriada como SVG a partir da logo enviada, preenchida
-// com o gradiente indigo→violeta do design. As "bocas" são recortes (máscara),
-// então a marca funciona sobre qualquer fundo.
 export function LogoMark({
   size = 32,
   className = ''
@@ -11,9 +10,6 @@ export function LogoMark({
   size?: number
   className?: string
 }): JSX.Element {
-  const uid = useId().replace(/:/g, '')
-  const grad = `sapien-grad-${uid}`
-  const mask = `sapien-mask-${uid}`
   return (
     <svg
       width={size}
@@ -23,33 +19,13 @@ export function LogoMark({
       role="img"
       aria-label="Sapien"
     >
-      <defs>
-        <linearGradient id={grad} x1="0" y1="0" x2="1" y2="1">
-          <stop offset="0" stopColor="#4f46e5" />
-          <stop offset="1" stopColor="#7c3aed" />
-        </linearGradient>
-        <mask id={mask}>
-          {/* área visível (branco) — as duas arcadas */}
-          <path d="M22 79 L22 45 A12 12 0 0 1 46 45 L46 79 Z" fill="#fff" />
-          <path d="M54 79 L54 45 A12 12 0 0 1 78 45 L78 79 Z" fill="#fff" />
-          {/* recortes (preto) — os dois sorrisos */}
-          <path
-            d="M29 60 Q34 66.5 39 60"
-            fill="none"
-            stroke="#000"
-            strokeWidth="3.6"
-            strokeLinecap="round"
-          />
-          <path
-            d="M61 60 Q66 66.5 71 60"
-            fill="none"
-            stroke="#000"
-            strokeWidth="3.6"
-            strokeLinecap="round"
-          />
-        </mask>
-      </defs>
-      <rect width="100" height="100" fill={`url(#${grad})`} mask={`url(#${mask})`} />
+      <rect x="4" y="4" width="92" height="92" rx="22" fill={SAPIEN_RED} />
+      {/* arcadas brancas */}
+      <path d="M26 71 L26 39 A11 11 0 0 1 48 39 L48 71 Z" fill="#fff" />
+      <path d="M52 71 L52 39 A11 11 0 0 1 74 39 L74 71 Z" fill="#fff" />
+      {/* sorrisos vermelhos por cima */}
+      <path d="M32 53 Q37 58.5 42 53" fill="none" stroke={SAPIEN_RED} strokeWidth="3.4" strokeLinecap="round" />
+      <path d="M58 53 Q63 58.5 68 53" fill="none" stroke={SAPIEN_RED} strokeWidth="3.4" strokeLinecap="round" />
     </svg>
   )
 }

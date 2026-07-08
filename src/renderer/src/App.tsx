@@ -44,7 +44,7 @@ function MainLayout(): JSX.Element {
         {section !== 'biblioteca' && (
           <h1
             key={`${section}-title`}
-            className="anim-fadeUp mb-6 text-[26px] font-extrabold tracking-tight text-ink"
+            className="anim-fadeUp mb-6 font-serif text-[26px] font-bold tracking-tight text-ink"
           >
             {SECTION_TITLES[section]}
           </h1>

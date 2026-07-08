@@ -34,7 +34,7 @@ export function Modal({ open, onClose, title, children, wide }: ModalProps): JSX
         onMouseDown={(e) => e.stopPropagation()}
       >
         <div className="flex items-center justify-between border-b border-edge px-5 py-3.5">
-          <h2 className="text-lg font-extrabold tracking-tight text-ink">{title}</h2>
+          <h2 className="font-serif text-lg font-bold text-ink">{title}</h2>
           <button
             onClick={onClose}
             aria-label="Fechar"

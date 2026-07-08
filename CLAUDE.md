@@ -30,15 +30,22 @@ preenchimento automático (Google Books) e foco em UI fluida estilo Notion.
   modelo de dados, importada por main, preload e renderer.
 - **Design "Executivo Indigo" (padrão atual).** Reskin completo a partir de um handoff de
   design (grafite escuro `#15171C` + gradientes indigo→violeta `#4F46E5→#7C3AED`, sombras
-  coloridas, orbes de luz ambiente e muita micro-animação). Fonte **Plus Jakarta Sans**
-  empacotada localmente (woff2 em `assets/fonts`). Tokens/gradientes/keyframes vivem em
-  `assets/main.css`; utilitários: `.card`/`.lift`, `.btn-primary`(+`.pulse`), `.field`,
+  coloridas, orbes de luz ambiente e muita micro-animação). Tokens/gradientes/keyframes vivem
+  em `assets/main.css`; utilitários: `.card`/`.lift`, `.btn-primary`(+`.pulse`), `.field`,
   `.nav-pill`, `.chip`, `.grad-text`, e keyframes `fadeUp/growBar/ringDraw/floatY/barRise/`
-  `pulseGlow/blobA/blobB`. Marca recriada como **SVG** (arcadas em gradiente violeta, com os
-  sorrisos recortados por máscara) em `components/Logo.tsx` (`LogoMark`/`LogoLockup`).
-- **Navegação por topbar** (`components/Topbar.tsx`, substituiu a sidebar): logo + 9 seções
-  em pílulas + busca + "Adicionar livro" (pulsante, abre o modal via `app.addBookOpen`) +
-  menu de perfil (Personalização/Sair). `App` centraliza o conteúdo em `max-w-1180`.
+  `pulseGlow/blobA/blobB`.
+- **Tipografia (revertida a pedido do usuário).** Corpo/UI na **fonte do sistema** (stack
+  `Inter→Segoe UI`, como antes do redesign) e **títulos na serifada Lora** (`font-serif` no
+  título de seção do `App` e no `Modal`). A Plus Jakarta Sans do redesign foi revertida — os
+  woff2 dela seguem em `assets/fonts`, sem uso.
+- **Marca "Sapien".** SVG em `components/Logo.tsx` (`LogoMark`/`LogoLockup`) na **forma "COR"**
+  do manual do usuário: quadrado vermelho arredondado (`#E5342A`) com as duas arcadas brancas
+  e os sorrisos vermelhos por cima.
+- **Navegação por topbar** (`components/Topbar.tsx`, substituiu a sidebar): logo + seções em
+  pílulas (sem "Achar"/"Lendo", removidas a pedido — o código das seções segue no `App`) +
+  busca + "Adicionar livro" (pulsante, abre o modal via `app.addBookOpen`) + menu de perfil
+  (Personalização/Sair). `App` centraliza o conteúdo em `max-w-1180`. Os **modais** usam
+  portal p/ o `document.body` (senão o `backdrop-filter` da topbar recorta o `position:fixed`).
 - **Sistema de temas por CSS variables.** As cores são tokens semânticos (`bg-canvas`,
   `text-ink`, `bg-accent`...) que leem CSS variables. Aparências redefinem as variáveis:
   `executivo` (padrão), `literary-light`/`literary-dark` e `moderndark` (aponta p/ o mesmo

@@ -5,8 +5,9 @@ module.exports = {
   theme: {
     extend: {
       fontFamily: {
+        // Fonte do corpo/UI = fonte do sistema (como antes do redesign).
         sans: [
-          'Plus Jakarta Sans',
+          'Inter',
           'ui-sans-serif',
           'system-ui',
           '-apple-system',
@@ -16,6 +17,7 @@ module.exports = {
           'Arial',
           'sans-serif'
         ],
+        // Serifada (títulos) — Lora, empacotada localmente.
         serif: ['Lora', 'Georgia', 'Cambria', 'Times New Roman', 'serif']
       },
       // Tokens semânticos que leem CSS variables. Cada aparência (Literary claro,
