@@ -222,3 +222,17 @@ npm run dist:win # gera instalador Windows (electron-builder)
   do dia** (filtro `duration_min >= min` em `todayStats`/`sessionsDaily`). 0 = conta todas.
 - [x] **Modais via portal.** `Modal` renderiza no `document.body` (`createPortal`) — evita que
   a topbar (com `backdrop-filter`) vire bloco de contenção e "clipe" o `position:fixed`.
+- [x] **Estatísticas por período.** Os gráficos de evolução (páginas/minutos/sessões por dia)
+  têm seletor de janela **7 / 30 / 90 dias / 1 ano** (`StatsView`, refetch de `sessions:daily`;
+  o clamp do backend subiu para 366). Eixo X ajusta os rótulos ao tamanho da janela.
+- [x] **Pomodoro persistente.** O estado do timer vive num store global (`store/pomodoro.ts`)
+  e o tique roda no `PomodoroEngine` (montado no `App`), então **continua rodando ao navegar**
+  por outras seções — com um **widget flutuante** (livro + tempo + pausar/encerrar/expandir)
+  quando o usuário sai da aba Sessão. O modal de registro também é do engine (portal).
+- [x] **Histórico de sessões editável.** Na aba Sessão, a lista vira "Histórico de sessões":
+  clicar numa sessão abre um modal para **editar** (livro/páginas/duração) ou **excluir**
+  (`sessions:update`/`sessions:delete`; não reajusta a página do livro — isso segue editável
+  no cadastro). `store/sessions.ts` recarrega hoje/ritmo/recentes.
+- [x] **Datas de início e conclusão no livro.** `BookForm` ganhou campos de data **Início da
+  leitura** (`started_at`) e **Conclusão** (`finished_at`), com dica "Levou X dias para
+  terminar". Continuam sendo setados automaticamente pelo `StatusPicker`, mas agora editáveis.

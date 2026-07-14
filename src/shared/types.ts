@@ -248,9 +248,20 @@ export interface SessionWithBook extends ReadingSession {
   book_title: string
 }
 
+// Campos editáveis de uma sessão registrada (histórico).
+export interface SessionPatch {
+  book_id?: number
+  duration_min?: number
+  pages_read?: number
+}
+
 export interface SessionsApi {
   create(bookId: number, durationMin: number, pagesRead: number): Promise<ReadingSession>
   recent(limit?: number): Promise<SessionWithBook[]>
+  /** Edita um registro de sessão (livro/páginas/duração). */
+  update(id: number, patch: SessionPatch): Promise<ReadingSession>
+  /** Exclui um registro de sessão. */
+  remove(id: number): Promise<void>
   /** Ritmo medido em páginas/hora a partir das sessões (null se não houver dados). */
   pace(): Promise<number | null>
   today(): Promise<TodayStats>

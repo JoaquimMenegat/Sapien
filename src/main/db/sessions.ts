@@ -1,13 +1,15 @@
 // Sessões de leitura (alimentadas pelo Pomodoro): páginas lidas + duração.
 // Cada sessão avança o progresso do livro e alimenta o cálculo de ritmo (pág/h).
 
-import { all, get, insert } from './index'
+import { all, get, insert, run } from './index'
 import { getBook, updateBook } from './books'
 import { getSetting } from './settings'
+import type { SqlValue } from 'sql.js'
 import type {
   BookDraft,
   ReadingSession,
   SessionWithBook,
+  SessionPatch,
   TodayStats,
   DailyStat
 } from '../../shared/types'
@@ -49,6 +51,33 @@ export function createSession(
   return get<ReadingSession>('SELECT * FROM reading_sessions WHERE id = ?', [id]) as ReadingSession
 }
 
+// Edita um registro de sessão (livro/páginas/duração). Não reajusta o progresso
+// do livro — a página atual continua editável direto no cadastro do livro.
+export function updateSession(id: number, patch: SessionPatch): ReadingSession {
+  const fields: string[] = []
+  const params: SqlValue[] = []
+  if (patch.book_id != null) {
+    fields.push('book_id = ?')
+    params.push(patch.book_id)
+  }
+  if (patch.duration_min != null) {
+    fields.push('duration_min = ?')
+    params.push(Math.max(0, Math.round(patch.duration_min)))
+  }
+  if (patch.pages_read != null) {
+    fields.push('pages_read = ?')
+    params.push(Math.max(0, Math.round(patch.pages_read)))
+  }
+  if (fields.length > 0) {
+    run(`UPDATE reading_sessions SET ${fields.join(', ')} WHERE id = ?`, [...params, id])
+  }
+  return get<ReadingSession>('SELECT * FROM reading_sessions WHERE id = ?', [id]) as ReadingSession
+}
+
+export function deleteSession(id: number): void {
+  run('DELETE FROM reading_sessions WHERE id = ?', [id])
+}
+
 export function recentSessions(limit = 20): SessionWithBook[] {
   return all<SessionWithBook>(
     `SELECT s.*, COALESCE(b.title, '(livro removido)') AS book_title
@@ -72,7 +101,7 @@ export function computePace(): number | null {
 }
 
 export function sessionsDaily(days: number): DailyStat[] {
-  const n = Math.max(1, Math.min(90, Math.round(days)))
+  const n = Math.max(1, Math.min(366, Math.round(days)))
   const min = minSessionMin()
   // CTE recursiva gera a série de dias; LEFT JOIN preenche zeros nos dias vazios.
   // Só contam sessões com duração >= mínimo configurado.

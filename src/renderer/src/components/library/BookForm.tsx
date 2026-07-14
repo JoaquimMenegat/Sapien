@@ -39,6 +39,8 @@ type State = {
   current_page: string
   status: BookStatus
   format: BookFormat | ''
+  started_at: string
+  finished_at: string
   rating: number | null
   public_rating: number | null
   ratings_count: number | null
@@ -61,6 +63,8 @@ function toState(d: Partial<BookDraft>): State {
     current_page: d.current_page != null ? String(d.current_page) : '',
     status: d.status ?? 'wishlist',
     format: d.format ?? '',
+    started_at: d.started_at ? d.started_at.slice(0, 10) : '',
+    finished_at: d.finished_at ? d.finished_at.slice(0, 10) : '',
     rating: d.rating ?? null,
     public_rating: d.public_rating ?? null,
     ratings_count: d.ratings_count ?? null,
@@ -71,6 +75,16 @@ function toState(d: Partial<BookDraft>): State {
 function num(s: string): number | null {
   const n = parseInt(s, 10)
   return Number.isFinite(n) ? n : null
+}
+
+// "Levou X dias para terminar" a partir das datas de início e conclusão.
+function durationText(start: string, end: string): string {
+  const s = new Date(`${start}T00:00:00`).getTime()
+  const e = new Date(`${end}T00:00:00`).getTime()
+  if (!Number.isFinite(s) || !Number.isFinite(e) || e < s) return ''
+  const days = Math.round((e - s) / 86400000)
+  if (days === 0) return 'Lido em um único dia 🎉'
+  return `Levou ${days} ${days === 1 ? 'dia' : 'dias'} para terminar.`
 }
 
 export function BookForm({ initial, submitLabel, busy, onSubmit, onCancel }: Props): JSX.Element {
@@ -103,6 +117,8 @@ export function BookForm({ initial, submitLabel, busy, onSubmit, onCancel }: Pro
       current_page: num(f.current_page) ?? 0,
       status: f.status,
       format: f.format || null,
+      started_at: f.started_at || null,
+      finished_at: f.finished_at || null,
       rating: f.rating,
       public_rating: f.public_rating,
       ratings_count: f.ratings_count,
@@ -212,7 +228,30 @@ export function BookForm({ initial, submitLabel, busy, onSubmit, onCancel }: Pro
             className="field"
           />
         </div>
+        <div>
+          <span className={label}>Início da leitura</span>
+          <input
+            type="date"
+            value={f.started_at}
+            onChange={(e) => set('started_at', e.target.value)}
+            className="field"
+          />
+        </div>
+        <div>
+          <span className={label}>Conclusão</span>
+          <input
+            type="date"
+            value={f.finished_at}
+            onChange={(e) => set('finished_at', e.target.value)}
+            className="field"
+          />
+        </div>
       </div>
+      {f.started_at && f.finished_at && durationText(f.started_at, f.finished_at) && (
+        <p className="-mt-1 text-xs font-medium text-accent">
+          {durationText(f.started_at, f.finished_at)}
+        </p>
+      )}
 
       <div>
         <span className={label}>Sua avaliação</span>

@@ -147,7 +147,12 @@ function Legend({ items }: { items: { name: string; value: number; color: string
   )
 }
 
-const DAYS = 14
+const RANGES: { days: number; label: string }[] = [
+  { days: 7, label: '7 dias' },
+  { days: 30, label: '30 dias' },
+  { days: 90, label: '90 dias' },
+  { days: 365, label: '1 ano' }
+]
 
 function dayLabel(day: string): string {
   const [, m, d] = day.split('-')
@@ -160,12 +165,16 @@ export function StatsView(): JSX.Element {
   const c = useThemeColors()
   const [daily, setDaily] = useState<DailyStat[]>([])
   const [pace, setPace] = useState<number | null>(null)
+  const [rangeDays, setRangeDays] = useState(30)
 
   useEffect(() => {
     void load()
-    void window.readdeck.sessions.daily(DAYS).then(setDaily)
     void window.readdeck.sessions.pace().then(setPace)
   }, [load])
+
+  useEffect(() => {
+    void window.readdeck.sessions.daily(rangeDays).then(setDaily)
+  }, [rangeDays])
 
   const series = useMemo(
     () =>
@@ -177,6 +186,9 @@ export function StatsView(): JSX.Element {
       })),
     [daily]
   )
+  // Mostra ~8–10 rótulos no eixo X, independente do tamanho da janela.
+  const xInterval = Math.max(0, Math.floor(series.length / 9))
+  const rangeLabel = RANGES.find((r) => r.days === rangeDays)?.label ?? `${rangeDays} dias`
   const period = useMemo(
     () =>
       daily.reduce(
@@ -307,10 +319,23 @@ export function StatsView(): JSX.Element {
       </div>
 
       <div className="space-y-4">
-        <h2 className="font-serif text-lg font-semibold text-ink">
-          Sua evolução{' '}
-          <span className="text-sm font-normal text-ink-faint">· últimos {DAYS} dias</span>
-        </h2>
+        <div className="flex flex-wrap items-center justify-between gap-3">
+          <h2 className="font-serif text-lg font-semibold text-ink">
+            Sua evolução{' '}
+            <span className="text-sm font-normal text-ink-faint">· últimos {rangeLabel}</span>
+          </h2>
+          <div className="flex flex-wrap gap-1.5">
+            {RANGES.map((r) => (
+              <button
+                key={r.days}
+                onClick={() => setRangeDays(r.days)}
+                className={`chip ${rangeDays === r.days ? 'active' : ''}`}
+              >
+                {r.label}
+              </button>
+            ))}
+          </div>
+        </div>
 
         <div className="grid grid-cols-2 gap-3 lg:grid-cols-4">
           <MetricCard label="Ritmo médio" value={pace ? `${pace} pág/h` : '—'} color="#f59e0b" />
@@ -324,7 +349,7 @@ export function StatsView(): JSX.Element {
           <ResponsiveContainer width="100%" height={230}>
             <AreaChart data={series} margin={{ top: 4, right: 8, left: -18, bottom: 0 }}>
               <CartesianGrid vertical={false} stroke={c.edge} />
-              <XAxis dataKey="label" tick={{ fill: c.inkFaint, fontSize: 11 }} axisLine={{ stroke: c.edge }} tickLine={false} interval={1} />
+              <XAxis dataKey="label" tick={{ fill: c.inkFaint, fontSize: 11 }} axisLine={{ stroke: c.edge }} tickLine={false} interval={xInterval} minTickGap={8} />
               <YAxis allowDecimals={false} tick={{ fill: c.inkFaint, fontSize: 11 }} axisLine={false} tickLine={false} width={28} />
               <Tooltip contentStyle={{ background: c.surface, border: `1px solid ${c.edge}`, borderRadius: 12, color: c.ink, fontSize: 13 }} labelStyle={{ color: c.ink }} />
               <Area name="Páginas" dataKey="pages" stroke={c.accent} strokeWidth={2} fill={c.accent} fillOpacity={0.15} />
@@ -338,7 +363,7 @@ export function StatsView(): JSX.Element {
             <ResponsiveContainer width="100%" height={200}>
               <BarChart data={series} margin={{ top: 4, right: 8, left: -18, bottom: 0 }}>
                 <CartesianGrid vertical={false} stroke={c.edge} />
-                <XAxis dataKey="label" tick={{ fill: c.inkFaint, fontSize: 11 }} axisLine={{ stroke: c.edge }} tickLine={false} interval={2} />
+                <XAxis dataKey="label" tick={{ fill: c.inkFaint, fontSize: 11 }} axisLine={{ stroke: c.edge }} tickLine={false} interval={xInterval} minTickGap={8} />
                 <YAxis allowDecimals={false} tick={{ fill: c.inkFaint, fontSize: 11 }} axisLine={false} tickLine={false} width={28} />
                 <Tooltip cursor={{ fill: c.edge, opacity: 0.4 }} contentStyle={{ background: c.surface, border: `1px solid ${c.edge}`, borderRadius: 12, color: c.ink, fontSize: 13 }} labelStyle={{ color: c.ink }} />
                 <Bar name="Minutos" dataKey="minutes" fill="#8b5cf6" radius={[5, 5, 0, 0]} maxBarSize={22} />
@@ -350,7 +375,7 @@ export function StatsView(): JSX.Element {
             <ResponsiveContainer width="100%" height={200}>
               <BarChart data={series} margin={{ top: 4, right: 8, left: -18, bottom: 0 }}>
                 <CartesianGrid vertical={false} stroke={c.edge} />
-                <XAxis dataKey="label" tick={{ fill: c.inkFaint, fontSize: 11 }} axisLine={{ stroke: c.edge }} tickLine={false} interval={2} />
+                <XAxis dataKey="label" tick={{ fill: c.inkFaint, fontSize: 11 }} axisLine={{ stroke: c.edge }} tickLine={false} interval={xInterval} minTickGap={8} />
                 <YAxis allowDecimals={false} tick={{ fill: c.inkFaint, fontSize: 11 }} axisLine={false} tickLine={false} width={28} />
                 <Tooltip cursor={{ fill: c.edge, opacity: 0.4 }} contentStyle={{ background: c.surface, border: `1px solid ${c.edge}`, borderRadius: 12, color: c.ink, fontSize: 13 }} labelStyle={{ color: c.ink }} />
                 <Bar name="Sessões" dataKey="sessions" fill="#3b82f6" radius={[5, 5, 0, 0]} maxBarSize={22} />

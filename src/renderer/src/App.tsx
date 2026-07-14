@@ -8,6 +8,7 @@ import { AutoresView } from './components/authors/AutoresView'
 import { ReadingView } from './components/reading/ReadingView'
 import { StatsView } from './components/stats/StatsView'
 import { PomodoroView } from './components/pomodoro/PomodoroView'
+import { PomodoroEngine } from './components/pomodoro/PomodoroEngine'
 import { MetasView } from './components/goals/MetasView'
 import { NotasView } from './components/notes/NotasView'
 import { useApp, applyAppearance, loginAppearance, type Section } from './store/app'
@@ -75,6 +76,9 @@ function MainLayout(): JSX.Element {
           )}
         </div>
       </main>
+
+      {/* Motor do Pomodoro: mantém o timer rodando + widget flutuante + modal de registro. */}
+      <PomodoroEngine />
     </div>
   )
 }

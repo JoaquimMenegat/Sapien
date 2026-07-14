@@ -40,6 +40,8 @@ const api: ReadDeckApi = {
     create: (bookId, durationMin, pagesRead) =>
       ipcRenderer.invoke('sessions:create', bookId, durationMin, pagesRead),
     recent: (limit) => ipcRenderer.invoke('sessions:recent', limit),
+    update: (id, patch) => ipcRenderer.invoke('sessions:update', id, patch),
+    remove: (id) => ipcRenderer.invoke('sessions:delete', id),
     pace: () => ipcRenderer.invoke('sessions:pace'),
     today: () => ipcRenderer.invoke('sessions:today'),
     daily: (days) => ipcRenderer.invoke('sessions:daily', days)

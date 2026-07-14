@@ -17,7 +17,15 @@ import { listBooks, getBook, createBook, updateBook, deleteBook } from './db/boo
 import { searchBooks } from './bookSearch'
 import { pickCover } from './covers'
 import { aiStatus, chatAboutBooks } from './ai'
-import { createSession, recentSessions, computePace, todayStats, sessionsDaily } from './db/sessions'
+import {
+  createSession,
+  updateSession,
+  deleteSession,
+  recentSessions,
+  computePace,
+  todayStats,
+  sessionsDaily
+} from './db/sessions'
 import { listGoals, setGoal, deleteGoal } from './db/goals'
 import { listNotes, createNote, updateNote, deleteNote } from './db/notes'
 import type {
@@ -33,6 +41,7 @@ import type {
   ChatMessage,
   ReadingSession,
   SessionWithBook,
+  SessionPatch,
   TodayStats,
   DailyStat,
   Goal,
@@ -160,6 +169,10 @@ export function registerIpcHandlers(): void {
   ipcMain.handle('sessions:recent', (_e, limit?: number): SessionWithBook[] =>
     recentSessions(limit)
   )
+  ipcMain.handle('sessions:update', (_e, id: number, patch: SessionPatch): ReadingSession =>
+    updateSession(id, patch)
+  )
+  ipcMain.handle('sessions:delete', (_e, id: number): void => deleteSession(id))
   ipcMain.handle('sessions:pace', (): number | null => computePace())
   ipcMain.handle('sessions:today', (): TodayStats => todayStats())
   ipcMain.handle('sessions:daily', (_e, days: number): DailyStat[] => sessionsDaily(days))
