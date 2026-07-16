@@ -9,6 +9,7 @@ import { STATUS_ORDER, STATUS_META, FORMAT_META } from './constants'
 import { BookCover, StatusBadge, StarRating, ReadingProgress } from './BookBits'
 import { AddBookModal } from './AddBookModal'
 import { BookDetailModal } from './BookDetailModal'
+import { EncouragementLine } from '../Encouragement'
 
 const IN_PROGRESS: Book['status'][] = ['lendo', 'pausado', 'abandonado']
 
@@ -208,6 +209,8 @@ export function LibraryView(): JSX.Element {
 
   return (
     <div className="space-y-6">
+      <EncouragementLine />
+
       {/* ── KPIs ── */}
       <div className="grid grid-cols-2 gap-4 lg:grid-cols-4">
         <KpiCard

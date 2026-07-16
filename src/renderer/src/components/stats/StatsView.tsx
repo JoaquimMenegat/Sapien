@@ -17,6 +17,7 @@ import { BarChart3 } from 'lucide-react'
 import type { Book, BookStatus, DailyStat } from '../../../../shared/types'
 import { useBooks } from '../../store/books'
 import { useApp } from '../../store/app'
+import { EncouragementBlock } from '../Encouragement'
 import { STATUS_META, STATUS_ORDER, FORMAT_META, FORMAT_ORDER } from '../library/constants'
 
 const STATUS_HEX: Record<BookStatus, string> = {
@@ -257,6 +258,8 @@ export function StatsView(): JSX.Element {
           color="#f59e0b"
         />
       </div>
+
+      <EncouragementBlock />
 
       <div className="card p-5">
         <h2 className="mb-1 font-serif text-lg font-semibold text-ink">Livros lidos por mês</h2>

@@ -236,3 +236,9 @@ npm run dist:win # gera instalador Windows (electron-builder)
 - [x] **Datas de início e conclusão no livro.** `BookForm` ganhou campos de data **Início da
   leitura** (`started_at`) e **Conclusão** (`finished_at`), com dica "Levou X dias para
   terminar". Continuam sendo setados automaticamente pelo `StatusPicker`, mas agora editáveis.
+- [x] **Mensagens de incentivo ("progresso sem culpa").** `lib/encouragement.ts` traduz os
+  dados reais (páginas mês vs. mês passado, sequência, melhor mês, meta, ritmo…) numa **gama de
+  frases** positivas + evergreen + gentis (para semana apertada). `components/Encouragement.tsx`
+  expõe `EncouragementLine` (indicadores da **Biblioteca**) e `EncouragementBlock` (relatório de
+  **Estatísticas**, no estilo do handoff: chips com aspas + "PROGRESSO SEM CULPA."). Tom sempre
+  incentiva, nunca cobra.
