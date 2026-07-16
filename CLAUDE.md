@@ -237,9 +237,10 @@ npm run dist:win # gera instalador Windows (electron-builder)
   leitura** (`started_at`) e **Conclusão** (`finished_at`), com dica "Levou X dias para
   terminar". Continuam sendo setados automaticamente pelo `StatusPicker`, mas agora editáveis.
 - [x] **Mensagens de incentivo ("progresso sem culpa").** `lib/encouragement.ts` traduz os
-  dados reais (páginas mês vs. mês passado, sequência, melhor mês, meta, ritmo…) numa **gama de
-  frases** positivas + evergreen + gentis (para semana apertada). `components/Encouragement.tsx`
-  expõe `EncouragementLine` (uma frase nos **indicadores da Biblioteca**) e `EncouragementBlock`
-  (bloco estilo handoff). O **bloco em Estatísticas foi retirado a pedido do usuário** — só a
-  linha da Biblioteca segue montada (o `EncouragementBlock` continua no código, sem uso). Tom
-  sempre incentiva, nunca cobra.
+  dados reais em frases, classificadas por **prioridade: evolução → estado → perene** (+ gentis
+  para semana apertada). *Evolução* = comparações que mostram progresso (leu mais livros/páginas
+  que no mês passado, melhor mês, sequência, ritmo acelerando, perto da meta). A
+  **`EncouragementLine`** (indicadores da **Biblioteca**) mostra sempre a frase de **maior
+  prioridade** — só cai na perene se não houver nada guiado por dados, garantindo coerência com
+  a evolução do usuário. `EncouragementBlock` (bloco estilo handoff) segue no código, **sem uso**
+  (retirado da aba Estatísticas a pedido). Tom sempre incentiva, nunca cobra.

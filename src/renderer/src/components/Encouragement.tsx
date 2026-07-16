@@ -4,7 +4,13 @@ import type { DailyStat } from '../../../shared/types'
 import { useBooks } from '../store/books'
 import { useGoals } from '../store/goals'
 import { useSessions } from '../store/sessions'
-import { buildEncInput, computeEncouragements, type Encouragements } from '../lib/encouragement'
+import {
+  buildEncInput,
+  computeEncouragements,
+  bestPool,
+  allPositive,
+  type Encouragements
+} from '../lib/encouragement'
 
 function useEncouragements(): { enc: Encouragements; ready: boolean } {
   const books = useBooks((s) => s.books)
@@ -34,7 +40,8 @@ export function EncouragementLine(): JSX.Element | null {
   const { enc, ready } = useEncouragements()
   const [seed] = useState(() => Math.random())
   if (!ready) return null
-  const pool = enc.lowActivity ? enc.gentle : enc.positive
+  // Prioriza mensagens de evolução (evergreen só se não houver nada guiado por dados).
+  const pool = bestPool(enc)
   if (!pool.length) return null
   const msg = pool[Math.floor(seed * pool.length) % pool.length]
   return (
@@ -61,7 +68,7 @@ function Chip({ text, gentle }: { text: string; gentle?: boolean }): JSX.Element
 export function EncouragementBlock(): JSX.Element | null {
   const { enc, ready } = useEncouragements()
   if (!ready) return null
-  const positive = enc.positive.slice(0, 5)
+  const positive = allPositive(enc).slice(0, 5)
   const gentle = enc.gentle.slice(0, 3)
   return (
     <div className="card p-5">
