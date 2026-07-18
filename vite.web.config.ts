@@ -8,6 +8,8 @@ import autoprefixer from 'autoprefixer'
 // A ponte window.readdeck é provida pelo Supabase (ver src/renderer/src/main.tsx).
 export default defineConfig({
   root: resolve('src/renderer'),
+  // .env.local fica na raiz do projeto (não em src/renderer).
+  envDir: resolve('.'),
   base: '/',
   resolve: {
     alias: {
