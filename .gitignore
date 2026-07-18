@@ -14,3 +14,6 @@ design-style.zip
 design-style/
 overkill-web-design/
 31_claude_dashboard/
+
+# Web build (SaaS)
+dist-web

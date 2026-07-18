@@ -74,15 +74,20 @@ export function LoginScreen(): JSX.Element {
   const login = useApp((s) => s.login)
   const googleSignIn = useApp((s) => s.googleSignIn)
 
-  const isSignup = !hasAccount
+  // Na web (SaaS), qualquer visitante pode entrar OU criar conta → toggle.
+  // No desktop, é uma conta por instalação (signup só se não existe conta).
+  const IS_WEB = !!import.meta.env.VITE_SUPABASE_URL
   const googleOnly = account?.provider === 'google'
 
   const [email, setEmail] = useState('')
   const [name, setName] = useState('')
   const [password, setPassword] = useState('')
   const [remember, setRemember] = useState(true)
+  const [webMode, setWebMode] = useState<'login' | 'signup'>('login')
   const [error, setError] = useState<string | null>(null)
   const [busy, setBusy] = useState(false)
+
+  const isSignup = IS_WEB ? webMode === 'signup' : !hasAccount
 
   const [googleReady, setGoogleReady] = useState(false)
   const [showCfg, setShowCfg] = useState(false)
@@ -172,7 +177,8 @@ export function LoginScreen(): JSX.Element {
           </form>
         )}
 
-        {/* Entrar com Google */}
+        {/* Entrar com Google — só no desktop (na web, Google é via Supabase, fase futura). */}
+        {!IS_WEB && (
         <div className={googleOnly ? 'card mt-6 p-6' : 'mt-3'}>
           {!googleOnly && (
             <div className="mb-3 flex items-center gap-3 text-xs text-ink-faint">
@@ -202,13 +208,30 @@ export function LoginScreen(): JSX.Element {
             <p className="mt-2 text-xs text-ink-faint">Conclua o login na aba que abriu e volte aqui.</p>
           )}
         </div>
+        )}
 
         {error && <p className="mt-3 text-sm text-red-500">{error}</p>}
 
-        <p className="mt-5 text-xs leading-relaxed text-ink-faint">
-          Seus dados ficam neste computador. O login com Google é opcional e usa suas próprias
-          credenciais.
-        </p>
+        {IS_WEB ? (
+          <p className="mt-5 text-sm text-ink-soft">
+            {isSignup ? 'Já tem conta?' : 'Ainda não tem conta?'}{' '}
+            <button
+              type="button"
+              onClick={() => {
+                setWebMode(isSignup ? 'login' : 'signup')
+                setError(null)
+              }}
+              className="font-semibold text-accent hover:underline"
+            >
+              {isSignup ? 'Entrar' : 'Criar conta'}
+            </button>
+          </p>
+        ) : (
+          <p className="mt-5 text-xs leading-relaxed text-ink-faint">
+            Seus dados ficam neste computador. O login com Google é opcional e usa suas próprias
+            credenciais.
+          </p>
+        )}
       </div>
     </div>
   )
