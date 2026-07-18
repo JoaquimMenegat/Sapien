@@ -20,6 +20,7 @@
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.110.0",
+    "@supabase/supabase-js": "^2.110.7",
     "recharts": "^3.9.2",
     "sql.js": "^1.12.0"
   },
