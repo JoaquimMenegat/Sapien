@@ -126,20 +126,27 @@ alter table public.goals          enable row level security;
 alter table public.notes          enable row level security;
 alter table public.user_settings  enable row level security;
 
+-- Dropa antes de criar (CREATE POLICY não aceita IF NOT EXISTS) — script re-executável.
+drop policy if exists "profiles: dono" on public.profiles;
 create policy "profiles: dono" on public.profiles
   for all using (auth.uid() = id) with check (auth.uid() = id);
 
+drop policy if exists "books: dono" on public.books;
 create policy "books: dono" on public.books
   for all using (auth.uid() = user_id) with check (auth.uid() = user_id);
 
+drop policy if exists "sessions: dono" on public.reading_sessions;
 create policy "sessions: dono" on public.reading_sessions
   for all using (auth.uid() = user_id) with check (auth.uid() = user_id);
 
+drop policy if exists "goals: dono" on public.goals;
 create policy "goals: dono" on public.goals
   for all using (auth.uid() = user_id) with check (auth.uid() = user_id);
 
+drop policy if exists "notes: dono" on public.notes;
 create policy "notes: dono" on public.notes
   for all using (auth.uid() = user_id) with check (auth.uid() = user_id);
 
+drop policy if exists "settings: dono" on public.user_settings;
 create policy "settings: dono" on public.user_settings
   for all using (auth.uid() = user_id) with check (auth.uid() = user_id);
