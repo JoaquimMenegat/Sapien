@@ -82,6 +82,39 @@ export function updateProfile(name: string, picture: string | null): AuthResult 
   return { ok: true, account: getAccountInfo() ?? undefined }
 }
 
+export function changePassword(current: string, next: string): AuthResult {
+  if (!hasAccount()) return { ok: false, error: 'Nenhuma conta.' }
+  const stored = getSetting('account.hash')
+  if (!stored) return { ok: false, error: 'Esta conta entra com o Google; não tem senha.' }
+  if (!verifyPassword(current, stored)) return { ok: false, error: 'Senha atual incorreta.' }
+  if (next.length < 6) return { ok: false, error: 'A nova senha precisa ter pelo menos 6 caracteres.' }
+  setSetting('account.hash', hashPassword(next))
+  return { ok: true, account: getAccountInfo() ?? undefined }
+}
+
+export function changeEmail(newEmail: string): AuthResult {
+  if (!hasAccount()) return { ok: false, error: 'Nenhuma conta.' }
+  const normEmail = normalizeEmail(newEmail)
+  if (!isValidEmail(normEmail)) return { ok: false, error: 'E-mail inválido.' }
+  setSetting('account.email', normEmail)
+  return { ok: true, account: getAccountInfo() ?? undefined }
+}
+
+// Limpa as chaves da conta local (os dados das tabelas são apagados no ipc).
+export function deleteAccount(): AuthResult {
+  for (const k of [
+    'account.email',
+    'account.name',
+    'account.hash',
+    'account.picture',
+    'account.provider',
+    'session.remember'
+  ]) {
+    setSetting(k, '')
+  }
+  return { ok: true }
+}
+
 export function verifyLogin(email: string, password: string): AuthResult {
   const stored = getSetting('account.hash')
   const storedEmail = getSetting('account.email')

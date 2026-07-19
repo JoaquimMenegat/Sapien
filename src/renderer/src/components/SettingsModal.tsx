@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import { Check, Palette, Camera, Trash2, Timer } from 'lucide-react'
+import { Check, Palette, Camera, Trash2, Timer, ShieldAlert } from 'lucide-react'
 import { useApp, ACCENTS, APPEARANCES, type AnimStyle } from '../store/app'
 import { Modal } from './ui/Modal'
 
@@ -102,6 +102,185 @@ function ProfileSection(): JSX.Element {
   )
 }
 
+type Msg = { ok: boolean; text: string } | null
+
+// Gerenciar a própria conta: trocar e-mail, trocar senha e excluir a conta + dados.
+function AccountSection(): JSX.Element {
+  const account = useApp((s) => s.auth?.account ?? null)
+  const changePassword = useApp((s) => s.changePassword)
+  const changeEmail = useApp((s) => s.changeEmail)
+  const deleteAccount = useApp((s) => s.deleteAccount)
+
+  const IS_WEB = !!import.meta.env.VITE_SUPABASE_URL
+  const isGoogle = account?.provider === 'google'
+
+  const [email, setEmail] = useState(account?.email ?? '')
+  const [emailMsg, setEmailMsg] = useState<Msg>(null)
+  const [emailBusy, setEmailBusy] = useState(false)
+
+  const [curPw, setCurPw] = useState('')
+  const [newPw, setNewPw] = useState('')
+  const [pwMsg, setPwMsg] = useState<Msg>(null)
+  const [pwBusy, setPwBusy] = useState(false)
+
+  const [confirmDel, setConfirmDel] = useState(false)
+  const [delBusy, setDelBusy] = useState(false)
+  const [delErr, setDelErr] = useState<string | null>(null)
+
+  async function saveEmail(): Promise<void> {
+    const next = email.trim()
+    if (!next || next === account?.email) return
+    setEmailBusy(true)
+    setEmailMsg(null)
+    const res = await changeEmail(next)
+    setEmailBusy(false)
+    setEmailMsg(
+      res.ok
+        ? {
+            ok: true,
+            text: IS_WEB
+              ? 'Enviamos um link de confirmação. Confirme no e-mail (novo e atual) para concluir a troca.'
+              : 'E-mail atualizado.'
+          }
+        : { ok: false, text: res.error ?? 'Não foi possível trocar o e-mail.' }
+    )
+  }
+
+  async function savePassword(): Promise<void> {
+    if (!newPw) return
+    setPwBusy(true)
+    setPwMsg(null)
+    const res = await changePassword(curPw, newPw)
+    setPwBusy(false)
+    if (res.ok) {
+      setPwMsg({ ok: true, text: 'Senha alterada com sucesso.' })
+      setCurPw('')
+      setNewPw('')
+    } else {
+      setPwMsg({ ok: false, text: res.error ?? 'Não foi possível trocar a senha.' })
+    }
+  }
+
+  async function confirmDelete(): Promise<void> {
+    setDelBusy(true)
+    setDelErr(null)
+    const res = await deleteAccount()
+    // Sucesso: refreshAuth desloga e o App volta para a tela de login (este modal some junto).
+    if (!res.ok) {
+      setDelBusy(false)
+      setDelErr(res.error ?? 'Não foi possível excluir a conta.')
+    }
+  }
+
+  return (
+    <section>
+      <h3 className="mb-2 flex items-center gap-2 text-sm font-semibold text-ink">
+        <ShieldAlert size={15} className="text-ink-faint" /> Conta e segurança
+      </h3>
+
+      <div className="mb-4">
+        <span className="mb-1 block text-xs font-medium text-ink-soft">E-mail de acesso</span>
+        <div className="flex gap-2">
+          <input
+            type="email"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            className="field"
+          />
+          <button
+            onClick={saveEmail}
+            disabled={emailBusy || !email.trim() || email.trim() === account?.email}
+            className="btn-ghost shrink-0"
+          >
+            {emailBusy ? '...' : 'Trocar'}
+          </button>
+        </div>
+        {emailMsg && (
+          <p className={`mt-1.5 text-xs ${emailMsg.ok ? 'text-emerald-500' : 'text-red-500'}`}>
+            {emailMsg.text}
+          </p>
+        )}
+      </div>
+
+      {isGoogle ? (
+        <p className="mb-4 text-xs text-ink-faint">
+          Esta conta entra com o Google — a senha é gerenciada por lá.
+        </p>
+      ) : (
+        <div className="mb-4">
+          <span className="mb-1 block text-xs font-medium text-ink-soft">Trocar senha</span>
+          <div className="space-y-2">
+            <input
+              type="password"
+              value={curPw}
+              onChange={(e) => setCurPw(e.target.value)}
+              placeholder="Senha atual"
+              className="field"
+            />
+            <div className="flex gap-2">
+              <input
+                type="password"
+                value={newPw}
+                onChange={(e) => setNewPw(e.target.value)}
+                placeholder="Nova senha (mín. 6)"
+                className="field"
+              />
+              <button onClick={savePassword} disabled={pwBusy || !newPw} className="btn-ghost shrink-0">
+                {pwBusy ? '...' : 'Salvar'}
+              </button>
+            </div>
+          </div>
+          {pwMsg && (
+            <p className={`mt-1.5 text-xs ${pwMsg.ok ? 'text-emerald-500' : 'text-red-500'}`}>
+              {pwMsg.text}
+            </p>
+          )}
+        </div>
+      )}
+
+      <div className="rounded-xl border border-red-500/30 bg-red-500/[0.04] p-3">
+        <p className="text-sm font-medium text-ink">Excluir minha conta</p>
+        <p className="mt-0.5 text-xs text-ink-faint">
+          Remove sua conta e <b>todos os dados</b> (livros, sessões, metas, notas). Não dá para
+          desfazer.
+        </p>
+        {!confirmDel ? (
+          <button
+            onClick={() => {
+              setConfirmDel(true)
+              setDelErr(null)
+            }}
+            className="mt-2 inline-flex items-center gap-1.5 rounded-lg border border-red-500/40 px-3 py-1.5 text-sm font-medium text-red-500 transition-colors hover:bg-red-500/10"
+          >
+            <Trash2 size={14} /> Excluir conta
+          </button>
+        ) : (
+          <div className="mt-2">
+            <p className="text-xs font-medium text-ink">Tem certeza? Isso apaga tudo.</p>
+            <div className="mt-2 flex gap-2">
+              <button
+                onClick={() => setConfirmDel(false)}
+                disabled={delBusy}
+                className="btn-ghost py-1.5 text-sm"
+              >
+                Cancelar
+              </button>
+              <button
+                onClick={confirmDelete}
+                disabled={delBusy}
+                className="inline-flex items-center gap-1.5 rounded-lg bg-red-600 px-3 py-1.5 text-sm font-semibold text-white transition-colors hover:bg-red-700 disabled:opacity-60"
+              >
+                {delBusy ? 'Excluindo…' : 'Sim, excluir tudo'}
+              </button>
+            </div>
+          </div>
+        )}
+        {delErr && <p className="mt-1.5 text-xs text-red-500">{delErr}</p>}
+      </div>
+    </section>
+  )
+}
+
 const ANIMS: { id: AnimStyle; label: string; desc: string }[] = [
   { id: 'sutil', label: 'Sutil', desc: 'Transições suaves (padrão)' },
   { id: 'rico', label: 'Rico', desc: 'Cartões ganham leve elevação ao passar o mouse' },
@@ -121,6 +300,8 @@ export function SettingsModal({
     <Modal open={open} onClose={onClose} title="Personalização">
       <div className="space-y-6">
         <ProfileSection />
+
+        <AccountSection />
 
         <SessionSection />
 

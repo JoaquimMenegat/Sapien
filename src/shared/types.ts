@@ -178,6 +178,12 @@ export interface AccountApi {
   login(email: string, password: string, remember?: boolean): Promise<AuthResult>
   logout(): Promise<void>
   updateProfile(name: string, picture: string | null): Promise<AuthResult>
+  /** Troca a senha (reautentica com a atual). Contas Google não têm senha. */
+  changePassword(currentPassword: string, newPassword: string): Promise<AuthResult>
+  /** Troca o e-mail da conta. Na web, dispara um e-mail de confirmação. */
+  changeEmail(newEmail: string): Promise<AuthResult>
+  /** Exclui a própria conta e TODOS os dados. Irreversível. */
+  deleteAccount(): Promise<AuthResult>
   /** Escolhe uma imagem local e devolve a URL (readdeck-cover://) para usar como avatar. */
   pickAvatar(): Promise<string | null>
   googleConfig(): Promise<GoogleConfig>

@@ -15,6 +15,10 @@ const api: ReadDeckApi = {
       ipcRenderer.invoke('account:login', email, password, remember),
     logout: () => ipcRenderer.invoke('account:logout'),
     updateProfile: (name, picture) => ipcRenderer.invoke('account:updateProfile', name, picture),
+    changePassword: (current, next) =>
+      ipcRenderer.invoke('account:changePassword', current, next),
+    changeEmail: (email) => ipcRenderer.invoke('account:changeEmail', email),
+    deleteAccount: () => ipcRenderer.invoke('account:deleteAccount'),
     pickAvatar: () => ipcRenderer.invoke('account:pickAvatar'),
     googleConfig: () => ipcRenderer.invoke('account:googleConfig'),
     setGoogleConfig: (clientId, clientSecret) =>

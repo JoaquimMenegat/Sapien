@@ -2,7 +2,7 @@
 // tudo passa por estes canais, expostos de forma segura pelo preload.
 
 import { ipcMain, app } from 'electron'
-import { get, getDbPath } from './db/index'
+import { get, run, getDbPath } from './db/index'
 import { getSetting, setSetting } from './db/settings'
 import {
   hasAccount,
@@ -10,7 +10,10 @@ import {
   createAccount,
   verifyLogin,
   upsertGoogleAccount,
-  updateProfile
+  updateProfile,
+  changePassword,
+  changeEmail,
+  deleteAccount
 } from './db/account'
 import { googleConfigured, setGoogleConfig, googleSignIn } from './googleAuth'
 import { listBooks, getBook, createBook, updateBook, deleteBook } from './db/books'
@@ -122,6 +125,17 @@ export function registerIpcHandlers(): void {
   ipcMain.handle('account:updateProfile', (_e, name: string, picture: string | null): AuthResult =>
     updateProfile(name, picture)
   )
+  ipcMain.handle('account:changePassword', (_e, current: string, next: string): AuthResult =>
+    changePassword(current, next)
+  )
+  ipcMain.handle('account:changeEmail', (_e, email: string): AuthResult => changeEmail(email))
+  ipcMain.handle('account:deleteAccount', (): AuthResult => {
+    // Apaga os dados do usuário e, em seguida, a conta local; encerra a sessão.
+    for (const t of ['notes', 'reading_sessions', 'goals', 'books']) run(`DELETE FROM ${t}`)
+    const res = deleteAccount()
+    loggedIn = false
+    return res
+  })
   ipcMain.handle('account:pickAvatar', (): Promise<string | null> => pickCover())
 
   ipcMain.handle('account:googleConfig', () => ({ configured: googleConfigured() }))

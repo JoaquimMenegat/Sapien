@@ -150,3 +150,25 @@ create policy "notes: dono" on public.notes
 drop policy if exists "settings: dono" on public.user_settings;
 create policy "settings: dono" on public.user_settings
   for all using (auth.uid() = user_id) with check (auth.uid() = user_id);
+
+-- ============================================================================
+-- Auto-exclusão de conta: o usuário apaga a PRÓPRIA conta (linha em auth.users).
+-- O ON DELETE CASCADE de todas as tabelas remove junto perfil, livros, sessões,
+-- metas, notas e preferências. Roda como SECURITY DEFINER (dono = postgres) para
+-- ter permissão de deletar em auth.users; só o próprio dono (auth.uid()) é afetado.
+-- ============================================================================
+create or replace function public.delete_own_user()
+returns void
+language plpgsql
+security definer set search_path = public, auth
+as $$
+begin
+  if auth.uid() is null then
+    raise exception 'Não autenticado.';
+  end if;
+  delete from auth.users where id = auth.uid();
+end;
+$$;
+
+revoke all on function public.delete_own_user() from anon, public;
+grant execute on function public.delete_own_user() to authenticated;

@@ -104,6 +104,9 @@ interface AppState {
   logout: () => Promise<void>
   googleSignIn: (remember?: boolean) => Promise<AuthResult>
   updateProfile: (name: string, picture: string | null) => Promise<AuthResult>
+  changePassword: (currentPassword: string, newPassword: string) => Promise<AuthResult>
+  changeEmail: (newEmail: string) => Promise<AuthResult>
+  deleteAccount: () => Promise<AuthResult>
 }
 
 export const useApp = create<AppState>((set, get) => ({
@@ -174,6 +177,19 @@ export const useApp = create<AppState>((set, get) => ({
   },
   updateProfile: async (name, picture) => {
     const res = await window.readdeck.account.updateProfile(name, picture)
+    if (res.ok) await get().refreshAuth()
+    return res
+  },
+  changePassword: async (currentPassword, newPassword) => {
+    return window.readdeck.account.changePassword(currentPassword, newPassword)
+  },
+  changeEmail: async (newEmail) => {
+    const res = await window.readdeck.account.changeEmail(newEmail)
+    if (res.ok) await get().refreshAuth()
+    return res
+  },
+  deleteAccount: async () => {
+    const res = await window.readdeck.account.deleteAccount()
     if (res.ok) await get().refreshAuth()
     return res
   }

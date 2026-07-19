@@ -167,6 +167,40 @@ export function createSupabaseApi(): ReadDeckApi {
         must(await sb().from('profiles').update(patch).eq('id', id).select().single())
         return { ok: true, account: (await getAccount()) ?? undefined }
       },
+      async changePassword(currentPassword, newPassword): Promise<AuthResult> {
+        if (newPassword.length < 6) {
+          return { ok: false, error: 'A nova senha precisa ter pelo menos 6 caracteres.' }
+        }
+        const acc = await getAccount()
+        // Reautentica com a senha atual — confirma que é o dono antes de trocar.
+        if (acc?.email && currentPassword) {
+          const { error: reauth } = await sb().auth.signInWithPassword({
+            email: acc.email,
+            password: currentPassword
+          })
+          if (reauth) return { ok: false, error: 'Senha atual incorreta.' }
+        }
+        const { error } = await sb().auth.updateUser({ password: newPassword })
+        if (error) return { ok: false, error: authError(error.message) }
+        return { ok: true, account: (await getAccount()) ?? undefined }
+      },
+      async changeEmail(newEmail): Promise<AuthResult> {
+        const email = newEmail.trim()
+        if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+          return { ok: false, error: 'E-mail inválido.' }
+        }
+        // Dispara e-mail(s) de confirmação; a troca só se efetiva após confirmar.
+        const { error } = await sb().auth.updateUser({ email })
+        if (error) return { ok: false, error: authError(error.message) }
+        return { ok: true, account: (await getAccount()) ?? undefined }
+      },
+      async deleteAccount(): Promise<AuthResult> {
+        // Apaga a linha em auth.users; o ON DELETE CASCADE remove todos os dados.
+        const { error } = await sb().rpc('delete_own_user')
+        if (error) return { ok: false, error: authError(error.message) }
+        await sb().auth.signOut()
+        return { ok: true }
+      },
       async pickAvatar(): Promise<string | null> {
         return null // Upload de avatar via Storage chega numa fase futura.
       },
