@@ -38,12 +38,21 @@ Detalhe do domínio (Fase 1):
 
 **URL atual:** `https://sapien-git-main-joaquimmenegat-2410s-projects.vercel.app`
 
-## Fase 1 — Domínio próprio
-*Fundação de e-mail, marca e Stripe. Custo: ~R$ 40–110/ano.*
+## Fase 1 — Domínio próprio ⏳ (2 de 3)
 
-- [ ] **[Você]** Escolher e registrar o domínio (Registro.br ou Cloudflare)
-- [ ] **[Você]** Conectar o domínio na Vercel (DNS — eu te guio)
+**Domínio: `sapienapp.com.br`** — Registro.br, R$ 40/ano, expira 22/07/2027.
+**Site no ar:** https://sapienapp.com.br (apex faz 308 → `www.sapienapp.com.br`)
+
+- [x] **[Você]** Registrar o domínio → `sapienapp.com.br` (2026-07-22)
+- [x] **[Você]** Conectar na Vercel + DNS no Registro.br → **Valid Configuration**, HTTPS OK
 - [ ] **[Você]** Verificar o domínio no Resend (SPF/DKIM — eu digo o que colar)
+
+DNS configurado no Registro.br (modo avançado — não aceita `@`, usar nome completo):
+
+| Tipo | Nome | Dados |
+| ---- | ---- | ----- |
+| A | `sapienapp.com.br` | `216.198.79.1` |
+| CNAME | `www.sapienapp.com.br` | `ee09846eed954f80.vercel-dns-017.com` |
 
 > Sem domínio, o Resend só entrega e-mail pra você mesmo — nenhum usuário real confirma
 > cadastro. O domínio destrava e-mail, marca e Stripe de uma vez.
