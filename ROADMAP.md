@@ -38,21 +38,32 @@ Detalhe do domínio (Fase 1):
 
 **URL atual:** `https://sapien-git-main-joaquimmenegat-2410s-projects.vercel.app`
 
-## Fase 1 — Domínio próprio ⏳ (2 de 3)
+## Fase 1 — Domínio próprio ✅ CONCLUÍDA (2026-07-23)
 
 **Domínio: `sapienapp.com.br`** — Registro.br, R$ 40/ano, expira 22/07/2027.
-**Site no ar:** https://sapienapp.com.br (apex faz 308 → `www.sapienapp.com.br`)
+**Site no ar:** https://sapienapp.com.br (apex faz 308 → `www.sapienapp.com.br`), HTTPS OK.
+**Resend:** domínio **Verified** (região São Paulo / `sa-east-1`) — acabou a limitação do
+modo teste; agora envia e-mail para **qualquer destinatário**.
 
-- [x] **[Você]** Registrar o domínio → `sapienapp.com.br` (2026-07-22)
-- [x] **[Você]** Conectar na Vercel + DNS no Registro.br → **Valid Configuration**, HTTPS OK
-- [ ] **[Você]** Verificar o domínio no Resend (SPF/DKIM — eu digo o que colar)
+- [x] **[Você]** Registrar o domínio → `sapienapp.com.br`
+- [x] **[Você]** Conectar na Vercel + DNS no Registro.br → **Valid Configuration**
+- [x] **[Você]** Verificar o domínio no Resend (DKIM + SPF + DMARC)
 
-DNS configurado no Registro.br (modo avançado — não aceita `@`, usar nome completo):
+DNS no Registro.br (modo avançado — **não aceita `@`**; no formulário digita-se só o
+prefixo, que ele completa com `.sapienapp.com.br`):
 
 | Tipo | Nome | Dados |
 | ---- | ---- | ----- |
 | A | `sapienapp.com.br` | `216.198.79.1` |
 | CNAME | `www.sapienapp.com.br` | `ee09846eed954f80.vercel-dns-017.com` |
+| TXT | `resend._domainkey` | chave pública DKIM do Resend |
+| MX | `send` | `10 feedback-smtp.sa-east-1.amazonses.com` |
+| TXT | `send` | `v=spf1 include:amazonses.com ~all` |
+| TXT | `_dmarc` | `v=DMARC1; p=none;` |
+
+> ⚠️ **Aprendizados do Registro.br:** (1) ele desloga durante a edição e **descarta** o save —
+> se pedir login ao salvar, refaça tudo; (2) a publicação nos servidores autoritativos leva
+> alguns minutos depois de salvar (o painel mostra antes do DNS responder).
 
 > Sem domínio, o Resend só entrega e-mail pra você mesmo — nenhum usuário real confirma
 > cadastro. O domínio destrava e-mail, marca e Stripe de uma vez.
