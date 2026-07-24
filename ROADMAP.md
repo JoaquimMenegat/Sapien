@@ -68,7 +68,7 @@ prefixo, que ele completa com `.sapienapp.com.br`):
 > Sem domínio, o Resend só entrega e-mail pra você mesmo — nenhum usuário real confirma
 > cadastro. O domínio destrava e-mail, marca e Stripe de uma vez.
 
-## Fase 2 — Autenticação nível produção ⏳ (5 de 7)
+## Fase 2 — Autenticação nível produção ✅ CONCLUÍDA (2026-07-23)
 
 - [x] **[Você]** SMTP do Resend no Supabase + remetente **`no-reply@sapienapp.com.br`**
 - [x] **[Você]** Site URL / Redirect URLs apontando para `https://sapienapp.com.br`
@@ -84,9 +84,13 @@ prefixo, que ele completa com `.sapienapp.com.br`):
       antes de ligar no Supabase. Site key na Vercel (widget "Sapien", 2 hostnames).
       *Correção necessária: a CSP herdada do Electron (`script-src 'self'`) bloqueava o
       script do Turnstile — liberado `challenges.cloudflare.com` em `script-src`/`frame-src`.*
-- [ ] **[Você]** Ligar o CAPTCHA no Supabase (Attack Protection → secret key do Turnstile)
-- [ ] **[Você]** Ligar: proteção de senha vazada + mínimo 8 caracteres
-- [ ] **[Você]** Apagar usuários de teste
+- [x] **[Você]** CAPTCHA ligado no Supabase (Attack Protection + secret key do Turnstile).
+      **Validado em produção:** login com o token responde `invalid_credentials` (ou seja,
+      o captcha foi *aceito* e só então as credenciais foram checadas) ✅
+- [x] **[Você]** Senha mínima de 8 caracteres
+      *(⚠️ "prevent use of leaked passwords" (HaveIBeenPwned) **exige plano Pro** do
+      Supabase — indisponível no Free. Fica como melhoria se um dia assinar o Pro.)*
+- [x] **[Você]** Usuários de teste apagados
 
 ## Fase 3 — Site completo: landing + app
 - [ ] **[Você]** Fornecer o HTML da landing (do chatgpt.site) OU decidir usar a do repo
