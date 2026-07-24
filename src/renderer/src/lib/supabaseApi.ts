@@ -140,11 +140,11 @@ export function createSupabaseApi(): ReadDeckApi {
         const loggedIn = !!data.session
         return { hasAccount: loggedIn, loggedIn, account: loggedIn ? await getAccount() : null }
       },
-      async signup(email, name, password): Promise<AuthResult> {
+      async signup(email, name, password, _remember, captchaToken): Promise<AuthResult> {
         const { data, error } = await sb().auth.signUp({
           email: email.trim(),
           password,
-          options: { data: { name: name.trim() } }
+          options: { data: { name: name.trim() }, captchaToken }
         })
         if (error) return { ok: false, error: authError(error.message) }
         if (!data.session) {
@@ -152,8 +152,12 @@ export function createSupabaseApi(): ReadDeckApi {
         }
         return { ok: true, account: (await getAccount()) ?? undefined }
       },
-      async login(email, password): Promise<AuthResult> {
-        const { error } = await sb().auth.signInWithPassword({ email: email.trim(), password })
+      async login(email, password, _remember, captchaToken): Promise<AuthResult> {
+        const { error } = await sb().auth.signInWithPassword({
+          email: email.trim(),
+          password,
+          options: { captchaToken }
+        })
         if (error) return { ok: false, error: authError(error.message) }
         return { ok: true, account: (await getAccount()) ?? undefined }
       },
@@ -184,14 +188,14 @@ export function createSupabaseApi(): ReadDeckApi {
         if (error) return { ok: false, error: authError(error.message) }
         return { ok: true, account: (await getAccount()) ?? undefined }
       },
-      async requestPasswordReset(email): Promise<AuthResult> {
+      async requestPasswordReset(email, captchaToken): Promise<AuthResult> {
         const mail = email.trim()
         if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(mail)) {
           return { ok: false, error: 'E-mail inválido.' }
         }
         // O link do e-mail volta para a própria origem com #type=recovery.
         const redirectTo = `${window.location.origin}/`
-        const { error } = await sb().auth.resetPasswordForEmail(mail, { redirectTo })
+        const { error } = await sb().auth.resetPasswordForEmail(mail, { redirectTo, captchaToken })
         if (error) return { ok: false, error: authError(error.message) }
         return { ok: true }
       },

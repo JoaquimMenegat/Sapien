@@ -174,14 +174,25 @@ export interface GoogleConfig {
 
 export interface AccountApi {
   status(): Promise<AuthStatus>
-  signup(email: string, name: string, password: string, remember?: boolean): Promise<AuthResult>
-  login(email: string, password: string, remember?: boolean): Promise<AuthResult>
+  signup(
+    email: string,
+    name: string,
+    password: string,
+    remember?: boolean,
+    captchaToken?: string
+  ): Promise<AuthResult>
+  login(
+    email: string,
+    password: string,
+    remember?: boolean,
+    captchaToken?: string
+  ): Promise<AuthResult>
   logout(): Promise<void>
   updateProfile(name: string, picture: string | null): Promise<AuthResult>
   /** Troca a senha (reautentica com a atual). Contas Google não têm senha. */
   changePassword(currentPassword: string, newPassword: string): Promise<AuthResult>
   /** Envia por e-mail um link para redefinir a senha (esqueci minha senha). */
-  requestPasswordReset(email: string): Promise<AuthResult>
+  requestPasswordReset(email: string, captchaToken?: string): Promise<AuthResult>
   /** Define a nova senha no fim do fluxo de recuperação (a sessão vem do link). */
   completePasswordReset(newPassword: string): Promise<AuthResult>
   /** Troca o e-mail da conta. Na web, dispara um e-mail de confirmação. */

@@ -9,10 +9,10 @@ const api: ReadDeckApi = {
   setSetting: (key: string, value: string) => ipcRenderer.invoke('settings:set', key, value),
   account: {
     status: () => ipcRenderer.invoke('account:status'),
-    signup: (email, name, password, remember) =>
-      ipcRenderer.invoke('account:signup', email, name, password, remember),
-    login: (email, password, remember) =>
-      ipcRenderer.invoke('account:login', email, password, remember),
+    signup: (email, name, password, remember, captchaToken) =>
+      ipcRenderer.invoke('account:signup', email, name, password, remember, captchaToken),
+    login: (email, password, remember, captchaToken) =>
+      ipcRenderer.invoke('account:login', email, password, remember, captchaToken),
     logout: () => ipcRenderer.invoke('account:logout'),
     updateProfile: (name, picture) => ipcRenderer.invoke('account:updateProfile', name, picture),
     changePassword: (current, next) =>

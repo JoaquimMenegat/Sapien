@@ -3,6 +3,7 @@ import { Mail, Lock, User, ArrowRight, LogIn, KeyRound, ExternalLink } from 'luc
 import { useApp } from '../store/app'
 import { cleanErrorMessage } from '../lib/errors'
 import { LogoMark } from './Logo'
+import { Turnstile, captchaEnabled } from './Turnstile'
 
 function RememberToggle({
   checked,
@@ -74,15 +75,22 @@ function ForgotPassword({ onBack }: { onBack: () => void }): JSX.Element {
   const [sent, setSent] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [busy, setBusy] = useState(false)
+  const [captchaToken, setCaptchaToken] = useState<string | null>(null)
+  const [captchaKey, setCaptchaKey] = useState(0)
 
   async function submit(e: FormEvent): Promise<void> {
     e.preventDefault()
     setError(null)
     setBusy(true)
-    const res = await requestPasswordReset(email)
+    const res = await requestPasswordReset(email, captchaToken ?? undefined)
     setBusy(false)
     if (res.ok) setSent(true)
-    else setError(res.error ?? 'Não foi possível enviar o link.')
+    else {
+      setError(res.error ?? 'Não foi possível enviar o link.')
+      // Token do CAPTCHA é de uso único — renova para a próxima tentativa.
+      setCaptchaToken(null)
+      setCaptchaKey((k) => k + 1)
+    }
   }
 
   if (sent) {
@@ -120,7 +128,12 @@ function ForgotPassword({ onBack }: { onBack: () => void }): JSX.Element {
             />
           </div>
         </label>
-        <button type="submit" disabled={busy} className="btn-primary w-full">
+        <Turnstile onToken={setCaptchaToken} resetKey={captchaKey} />
+        <button
+          type="submit"
+          disabled={busy || (captchaEnabled && !captchaToken)}
+          className="btn-primary w-full"
+        >
           {busy ? 'Enviando...' : 'Enviar link de redefinição'}
           {!busy && <ArrowRight size={16} />}
         </button>
@@ -155,6 +168,8 @@ export function LoginScreen(): JSX.Element {
   const [forgot, setForgot] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [busy, setBusy] = useState(false)
+  const [captchaToken, setCaptchaToken] = useState<string | null>(null)
+  const [captchaKey, setCaptchaKey] = useState(0)
 
   const isSignup = IS_WEB ? webMode === 'signup' : !hasAccount
 
@@ -170,12 +185,16 @@ export function LoginScreen(): JSX.Element {
     e.preventDefault()
     setError(null)
     setBusy(true)
+    const token = captchaToken ?? undefined
     const res = isSignup
-      ? await signup(email, name, password, remember)
-      : await login(email, password, remember)
+      ? await signup(email, name, password, remember, token)
+      : await login(email, password, remember, token)
     if (!res.ok) {
       setError(res.error ?? 'Não foi possível continuar.')
       setBusy(false)
+      // Token do CAPTCHA é de uso único — renova para a próxima tentativa.
+      setCaptchaToken(null)
+      setCaptchaKey((k) => k + 1)
     }
   }
 
@@ -272,7 +291,13 @@ export function LoginScreen(): JSX.Element {
               )}
             </div>
 
-            <button type="submit" disabled={busy} className="btn-primary w-full">
+            <Turnstile onToken={setCaptchaToken} resetKey={captchaKey} />
+
+            <button
+              type="submit"
+              disabled={busy || (captchaEnabled && !captchaToken)}
+              className="btn-primary w-full"
+            >
               {busy ? 'Aguarde...' : isSignup ? 'Criar conta' : 'Entrar'}
               {!busy && <ArrowRight size={16} />}
             </button>

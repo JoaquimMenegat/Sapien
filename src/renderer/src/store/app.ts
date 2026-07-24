@@ -100,8 +100,19 @@ interface AppState {
   auth: AuthStatus | null
   authReady: boolean
   refreshAuth: () => Promise<void>
-  signup: (email: string, name: string, password: string, remember?: boolean) => Promise<AuthResult>
-  login: (email: string, password: string, remember?: boolean) => Promise<AuthResult>
+  signup: (
+    email: string,
+    name: string,
+    password: string,
+    remember?: boolean,
+    captchaToken?: string
+  ) => Promise<AuthResult>
+  login: (
+    email: string,
+    password: string,
+    remember?: boolean,
+    captchaToken?: string
+  ) => Promise<AuthResult>
   logout: () => Promise<void>
   googleSignIn: (remember?: boolean) => Promise<AuthResult>
   updateProfile: (name: string, picture: string | null) => Promise<AuthResult>
@@ -110,7 +121,7 @@ interface AppState {
   deleteAccount: () => Promise<AuthResult>
 
   // Fluxo "esqueci minha senha"
-  requestPasswordReset: (email: string) => Promise<AuthResult>
+  requestPasswordReset: (email: string, captchaToken?: string) => Promise<AuthResult>
   completePasswordReset: (newPassword: string) => Promise<AuthResult>
   /** A página foi aberta pelo link do e-mail: pedir senha nova em vez de entrar. */
   recovery: boolean
@@ -164,13 +175,13 @@ export const useApp = create<AppState>((set, get) => ({
     const auth = await window.readdeck.account.status()
     set({ auth, authReady: true })
   },
-  signup: async (email, name, password, remember) => {
-    const res = await window.readdeck.account.signup(email, name, password, remember)
+  signup: async (email, name, password, remember, captchaToken) => {
+    const res = await window.readdeck.account.signup(email, name, password, remember, captchaToken)
     if (res.ok) await get().refreshAuth()
     return res
   },
-  login: async (email, password, remember) => {
-    const res = await window.readdeck.account.login(email, password, remember)
+  login: async (email, password, remember, captchaToken) => {
+    const res = await window.readdeck.account.login(email, password, remember, captchaToken)
     if (res.ok) await get().refreshAuth()
     return res
   },
@@ -202,7 +213,8 @@ export const useApp = create<AppState>((set, get) => ({
     return res
   },
 
-  requestPasswordReset: async (email) => window.readdeck.account.requestPasswordReset(email),
+  requestPasswordReset: async (email, captchaToken) =>
+    window.readdeck.account.requestPasswordReset(email, captchaToken),
   completePasswordReset: async (newPassword) => {
     const res = await window.readdeck.account.completePasswordReset(newPassword)
     if (res.ok) {
