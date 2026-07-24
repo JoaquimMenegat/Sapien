@@ -86,6 +86,63 @@ async function getAccount(): Promise<AccountInfo | null> {
   }
 }
 
+// --- Upload de imagens (capas e avatares) via Supabase Storage ---
+// Bucket público `media`, com os arquivos sempre sob `{user_id}/...` — é isso que as
+// policies usam para garantir que cada usuário só escreve na própria pasta.
+const MEDIA_BUCKET = 'media'
+const MAX_UPLOAD_BYTES = 5 * 1024 * 1024 // 5 MB
+
+/** Abre o seletor de arquivos do navegador. Resolve null se o usuário cancelar. */
+function pickImageFile(): Promise<File | null> {
+  return new Promise((resolve) => {
+    const input = document.createElement('input')
+    input.type = 'file'
+    input.accept = 'image/png,image/jpeg,image/webp,image/gif'
+    input.style.display = 'none'
+    document.body.appendChild(input)
+
+    let settled = false
+    const done = (file: File | null): void => {
+      if (settled) return
+      settled = true
+      input.remove()
+      resolve(file)
+    }
+
+    input.onchange = () => done(input.files?.[0] ?? null)
+    // `cancel` é o caminho moderno; o foco de volta na janela cobre navegadores antigos.
+    input.oncancel = () => done(null)
+    window.addEventListener('focus', () => window.setTimeout(() => done(null), 800), {
+      once: true
+    })
+    input.click()
+  })
+}
+
+async function uploadImage(folder: 'covers' | 'avatars'): Promise<string | null> {
+  const file = await pickImageFile()
+  if (!file) return null
+  if (file.size > MAX_UPLOAD_BYTES) {
+    throw new Error('Imagem muito grande — o limite é 5 MB.')
+  }
+
+  const uid = await userId()
+  const ext = (file.name.split('.').pop() || 'jpg').toLowerCase().replace(/[^a-z0-9]/g, '')
+  const path = `${uid}/${folder}/${crypto.randomUUID()}.${ext || 'jpg'}`
+
+  const { error } = await sb()
+    .storage.from(MEDIA_BUCKET)
+    .upload(path, file, { cacheControl: '3600', upsert: false, contentType: file.type })
+  if (error) {
+    const msg = /bucket/i.test(error.message)
+      ? 'O armazenamento de imagens ainda não está configurado no servidor.'
+      : `Não foi possível enviar a imagem: ${error.message}`
+    throw new Error(msg)
+  }
+
+  return sb().storage.from(MEDIA_BUCKET).getPublicUrl(path).data.publicUrl
+}
+
 async function searchGoogleBooks(query: string): Promise<GoogleBookResult[]> {
   const q = query.trim()
   if (!q) return []
@@ -226,7 +283,7 @@ export function createSupabaseApi(): ReadDeckApi {
         return { ok: true }
       },
       async pickAvatar(): Promise<string | null> {
-        return null // Upload de avatar via Storage chega numa fase futura.
+        return uploadImage('avatars')
       },
       async googleConfig() {
         return { configured: false }
@@ -272,7 +329,7 @@ export function createSupabaseApi(): ReadDeckApi {
         return searchGoogleBooks(query)
       },
       async pickCover(): Promise<string | null> {
-        return null // Upload de capa via Storage chega numa fase futura.
+        return uploadImage('covers')
       }
     },
 

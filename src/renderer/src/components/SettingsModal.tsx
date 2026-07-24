@@ -46,12 +46,18 @@ function ProfileSection(): JSX.Element {
   const updateProfile = useApp((s) => s.updateProfile)
   const [name, setName] = useState(account?.name ?? '')
   const [busy, setBusy] = useState(false)
+  const [avatarError, setAvatarError] = useState<string | null>(null)
 
   const initials = (account?.name || account?.email || '?').slice(0, 2).toUpperCase()
 
   async function chooseAvatar(): Promise<void> {
-    const url = await window.readdeck.account.pickAvatar()
-    if (url) await updateProfile(account?.name ?? name, url)
+    setAvatarError(null)
+    try {
+      const url = await window.readdeck.account.pickAvatar()
+      if (url) await updateProfile(account?.name ?? name, url)
+    } catch (err) {
+      setAvatarError(err instanceof Error ? err.message : 'Não foi possível enviar a foto.')
+    }
   }
   async function removeAvatar(): Promise<void> {
     await updateProfile(account?.name ?? name, null)
@@ -85,6 +91,7 @@ function ProfileSection(): JSX.Element {
           )}
         </div>
       </div>
+      {avatarError && <p className="mt-2 text-xs text-red-500">{avatarError}</p>}
       <div className="mt-3">
         <span className="mb-1 block text-xs font-medium text-ink-soft">Nome</span>
         <div className="flex gap-2">

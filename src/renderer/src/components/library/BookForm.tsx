@@ -95,9 +95,20 @@ export function BookForm({ initial, submitLabel, busy, onSubmit, onCancel }: Pro
   const authorOptions = useMemo(() => distinct(books.map((b) => b.authors)), [books])
   const publisherOptions = useMemo(() => distinct(books.map((b) => b.publisher)), [books])
 
+  const [coverBusy, setCoverBusy] = useState(false)
+  const [coverError, setCoverError] = useState<string | null>(null)
+
   async function chooseCoverFile(): Promise<void> {
-    const url = await window.readdeck.books.pickCover()
-    if (url) set('cover_url', url)
+    setCoverError(null)
+    try {
+      const url = await window.readdeck.books.pickCover()
+      // O upload só começa depois de escolher o arquivo — daí o busy aqui.
+      if (url) set('cover_url', url)
+    } catch (err) {
+      setCoverError(err instanceof Error ? err.message : 'Não foi possível enviar a imagem.')
+    } finally {
+      setCoverBusy(false)
+    }
   }
 
   function handleSubmit(e: FormEvent): void {
@@ -150,10 +161,14 @@ export function BookForm({ initial, submitLabel, busy, onSubmit, onCancel }: Pro
           <button
             type="button"
             onClick={chooseCoverFile}
+            disabled={coverBusy}
             className="btn-ghost w-28 justify-center px-2 py-1.5 text-xs"
           >
-            <ImagePlus size={14} /> Escolher capa
+            <ImagePlus size={14} /> {coverBusy ? 'Enviando...' : 'Escolher capa'}
           </button>
+          {coverError && (
+            <p className="w-28 text-center text-[11px] leading-tight text-red-500">{coverError}</p>
+          )}
         </div>
         <div className="flex-1 space-y-3">
           <div>
