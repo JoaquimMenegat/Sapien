@@ -4,6 +4,7 @@
 // cliente (volume por usuário é pequeno). IA e capas locais ficam para fases futuras.
 
 import { getSupabase } from './supabase'
+import { searchBooks } from './bookSearch'
 import type {
   ReadDeckApi,
   AppHealth,
@@ -141,41 +142,6 @@ async function uploadImage(folder: 'covers' | 'avatars'): Promise<string | null>
   }
 
   return sb().storage.from(MEDIA_BUCKET).getPublicUrl(path).data.publicUrl
-}
-
-async function searchGoogleBooks(query: string): Promise<GoogleBookResult[]> {
-  const q = query.trim()
-  if (!q) return []
-  const url = `https://www.googleapis.com/books/v1/volumes?q=${encodeURIComponent(q)}&maxResults=20&langRestrict=pt`
-  const res = await fetch(url)
-  if (!res.ok) return []
-  const json = await res.json()
-  const items: Array<{ id: string; volumeInfo?: Record<string, unknown> }> = json.items ?? []
-  return items.map((it) => {
-    const v = (it.volumeInfo ?? {}) as Record<string, unknown>
-    const ids = (v.industryIdentifiers as Array<{ type: string; identifier: string }>) ?? []
-    const isbn =
-      ids.find((x) => x.type === 'ISBN_13')?.identifier ??
-      ids.find((x) => x.type === 'ISBN_10')?.identifier ??
-      null
-    const img = (v.imageLinks as Record<string, string>)?.thumbnail
-    return {
-      google_books_id: it.id,
-      title: (v.title as string) ?? 'Sem título',
-      subtitle: (v.subtitle as string) ?? null,
-      authors: (v.authors as string[])?.join(', ') ?? null,
-      publisher: (v.publisher as string) ?? null,
-      published_date: (v.publishedDate as string) ?? null,
-      synopsis: (v.description as string) ?? null,
-      total_pages: (v.pageCount as number) ?? null,
-      genres: (v.categories as string[])?.join(', ') ?? null,
-      cover_url: img ? img.replace('http://', 'https://') : null,
-      isbn,
-      language: (v.language as string) ?? null,
-      public_rating: (v.averageRating as number) ?? null,
-      ratings_count: (v.ratingsCount as number) ?? null
-    }
-  })
 }
 
 export function createSupabaseApi(): ReadDeckApi {
@@ -326,7 +292,7 @@ export function createSupabaseApi(): ReadDeckApi {
         must(await sb().from('books').delete().eq('id', id).select())
       },
       search(query: string): Promise<GoogleBookResult[]> {
-        return searchGoogleBooks(query)
+        return searchBooks(query)
       },
       async pickCover(): Promise<string | null> {
         return uploadImage('covers')
