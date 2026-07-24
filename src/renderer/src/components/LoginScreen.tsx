@@ -201,6 +201,8 @@ export function LoginScreen(): JSX.Element {
   async function handleGoogle(): Promise<void> {
     setError(null)
     if (!googleReady) {
+      // Na web o provedor é ligado no painel do Supabase — não há o que configurar aqui.
+      if (IS_WEB) return
       setShowCfg(true)
       return
     }
@@ -304,8 +306,10 @@ export function LoginScreen(): JSX.Element {
           </form>
         )}
 
-        {/* Entrar com Google — só no desktop (na web, Google é via Supabase, fase futura). */}
-        {!IS_WEB && (
+        {/* Entrar com Google. No desktop usa as credenciais do próprio usuário; na web,
+            o provedor é ligado no painel do Supabase — por isso só mostramos o botão
+            quando o servidor confirma que o Google está habilitado. */}
+        {(!IS_WEB || googleReady) && (
         <div className={googleOnly ? 'card mt-6 p-6' : 'mt-3'}>
           {!googleOnly && (
             <div className="mb-3 flex items-center gap-3 text-xs text-ink-faint">
@@ -322,7 +326,7 @@ export function LoginScreen(): JSX.Element {
           )}
           <button onClick={handleGoogle} disabled={googleBusy} className="btn-ghost w-full">
             {googleBusy ? (
-              'Abrindo o navegador…'
+              IS_WEB ? 'Redirecionando…' : 'Abrindo o navegador…'
             ) : (
               <>
                 {googleReady ? <LogIn size={16} /> : <KeyRound size={16} />}
@@ -330,8 +334,10 @@ export function LoginScreen(): JSX.Element {
               </>
             )}
           </button>
-          {showCfg && <GoogleConfigPanel onDone={() => { setGoogleReady(true); setShowCfg(false) }} />}
-          {googleBusy && (
+          {!IS_WEB && showCfg && (
+            <GoogleConfigPanel onDone={() => { setGoogleReady(true); setShowCfg(false) }} />
+          )}
+          {googleBusy && !IS_WEB && (
             <p className="mt-2 text-xs text-ink-faint">Conclua o login na aba que abriu e volte aqui.</p>
           )}
         </div>

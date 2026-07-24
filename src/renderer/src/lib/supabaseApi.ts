@@ -252,13 +252,31 @@ export function createSupabaseApi(): ReadDeckApi {
         return uploadImage('avatars')
       },
       async googleConfig() {
-        return { configured: false }
+        // Na web não há configuração por usuário: o provedor é ligado no painel do
+        // Supabase. Perguntamos ao próprio servidor se o Google está habilitado —
+        // assim o botão só aparece quando realmente funciona.
+        try {
+          const url = import.meta.env.VITE_SUPABASE_URL
+          const key = import.meta.env.VITE_SUPABASE_ANON_KEY
+          const res = await fetch(`${url}/auth/v1/settings`, { headers: { apikey: key } })
+          if (!res.ok) return { configured: false }
+          const json = (await res.json()) as { external?: Record<string, boolean> }
+          return { configured: !!json.external?.google }
+        } catch {
+          return { configured: false }
+        }
       },
       async setGoogleConfig(): Promise<void> {
         /* Google via Supabase OAuth — configurado no painel, não aqui. */
       },
       async googleSignIn(): Promise<AuthResult> {
-        return { ok: false, error: 'Login com Google chega em breve na versão web.' }
+        const { error } = await sb().auth.signInWithOAuth({
+          provider: 'google',
+          options: { redirectTo: `${window.location.origin}/` }
+        })
+        if (error) return { ok: false, error: authError(error.message) }
+        // A partir daqui o navegador é redirecionado ao Google; a sessão volta na URL.
+        return { ok: true }
       }
     },
 
