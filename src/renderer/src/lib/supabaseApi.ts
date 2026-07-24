@@ -184,6 +184,26 @@ export function createSupabaseApi(): ReadDeckApi {
         if (error) return { ok: false, error: authError(error.message) }
         return { ok: true, account: (await getAccount()) ?? undefined }
       },
+      async requestPasswordReset(email): Promise<AuthResult> {
+        const mail = email.trim()
+        if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(mail)) {
+          return { ok: false, error: 'E-mail inválido.' }
+        }
+        // O link do e-mail volta para a própria origem com #type=recovery.
+        const redirectTo = `${window.location.origin}/`
+        const { error } = await sb().auth.resetPasswordForEmail(mail, { redirectTo })
+        if (error) return { ok: false, error: authError(error.message) }
+        return { ok: true }
+      },
+      async completePasswordReset(newPassword): Promise<AuthResult> {
+        if (newPassword.length < 6) {
+          return { ok: false, error: 'A nova senha precisa ter pelo menos 6 caracteres.' }
+        }
+        // Aqui a sessão já veio autenticada pelo link — não há senha atual para conferir.
+        const { error } = await sb().auth.updateUser({ password: newPassword })
+        if (error) return { ok: false, error: authError(error.message) }
+        return { ok: true, account: (await getAccount()) ?? undefined }
+      },
       async changeEmail(newEmail): Promise<AuthResult> {
         const email = newEmail.trim()
         if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {

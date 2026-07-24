@@ -1,5 +1,6 @@
 import { create } from 'zustand'
 import type { AuthStatus, AuthResult } from '../../../shared/types'
+import { openedFromRecoveryLink } from '../lib/supabase'
 
 export type Section =
   | 'biblioteca'
@@ -107,6 +108,13 @@ interface AppState {
   changePassword: (currentPassword: string, newPassword: string) => Promise<AuthResult>
   changeEmail: (newEmail: string) => Promise<AuthResult>
   deleteAccount: () => Promise<AuthResult>
+
+  // Fluxo "esqueci minha senha"
+  requestPasswordReset: (email: string) => Promise<AuthResult>
+  completePasswordReset: (newPassword: string) => Promise<AuthResult>
+  /** A página foi aberta pelo link do e-mail: pedir senha nova em vez de entrar. */
+  recovery: boolean
+  endRecovery: () => void
 }
 
 export const useApp = create<AppState>((set, get) => ({
@@ -192,5 +200,17 @@ export const useApp = create<AppState>((set, get) => ({
     const res = await window.readdeck.account.deleteAccount()
     if (res.ok) await get().refreshAuth()
     return res
-  }
+  },
+
+  requestPasswordReset: async (email) => window.readdeck.account.requestPasswordReset(email),
+  completePasswordReset: async (newPassword) => {
+    const res = await window.readdeck.account.completePasswordReset(newPassword)
+    if (res.ok) {
+      set({ recovery: false })
+      await get().refreshAuth()
+    }
+    return res
+  },
+  recovery: openedFromRecoveryLink,
+  endRecovery: () => set({ recovery: false })
 }))

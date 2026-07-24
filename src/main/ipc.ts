@@ -129,6 +129,21 @@ export function registerIpcHandlers(): void {
     changePassword(current, next)
   )
   ipcMain.handle('account:changeEmail', (_e, email: string): AuthResult => changeEmail(email))
+  // Recuperação por e-mail só existe na versão web (o desktop é offline, sem servidor de e-mail).
+  ipcMain.handle(
+    'account:requestPasswordReset',
+    (): AuthResult => ({
+      ok: false,
+      error: 'Recuperação por e-mail está disponível apenas na versão web.'
+    })
+  )
+  ipcMain.handle(
+    'account:completePasswordReset',
+    (): AuthResult => ({
+      ok: false,
+      error: 'Recuperação por e-mail está disponível apenas na versão web.'
+    })
+  )
   ipcMain.handle('account:deleteAccount', (): AuthResult => {
     // Apaga os dados do usuário e, em seguida, a conta local; encerra a sessão.
     for (const t of ['notes', 'reading_sessions', 'goals', 'books']) run(`DELETE FROM ${t}`)

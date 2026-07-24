@@ -1,6 +1,7 @@
 import { useEffect } from 'react'
 import { Topbar } from './components/Topbar'
 import { LoginScreen } from './components/LoginScreen'
+import { ResetPasswordScreen } from './components/ResetPasswordScreen'
 import { LibraryView } from './components/library/LibraryView'
 import { FindBookView } from './components/ai/FindBookView'
 import { GenresView } from './components/genres/GenresView'
@@ -88,6 +89,7 @@ function App(): JSX.Element {
   const refreshAuth = useApp((s) => s.refreshAuth)
   const authReady = useApp((s) => s.authReady)
   const loggedIn = useApp((s) => s.auth?.loggedIn ?? false)
+  const recovery = useApp((s) => s.recovery)
   const appearance = useApp((s) => s.appearance)
 
   useEffect(() => {
@@ -95,11 +97,11 @@ function App(): JSX.Element {
     void refreshAuth()
   }, [initAppearance, refreshAuth])
 
-  // A tela de login/cadastro é sempre escura; dentro do app usa a aparência salva.
+  // A tela de login/cadastro/recuperação é sempre escura; dentro do app usa a aparência salva.
   useEffect(() => {
     if (!authReady) return
-    applyAppearance(loggedIn ? appearance : loginAppearance(appearance))
-  }, [authReady, loggedIn, appearance])
+    applyAppearance(loggedIn && !recovery ? appearance : loginAppearance(appearance))
+  }, [authReady, loggedIn, recovery, appearance])
 
   if (!authReady) {
     return (
@@ -108,6 +110,9 @@ function App(): JSX.Element {
       </div>
     )
   }
+
+  // Veio do link de "redefinir senha": pede a senha nova antes de entrar.
+  if (recovery) return <ResetPasswordScreen />
 
   return loggedIn ? <MainLayout /> : <LoginScreen />
 }

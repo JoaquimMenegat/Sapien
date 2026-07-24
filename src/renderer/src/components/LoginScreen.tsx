@@ -67,6 +67,74 @@ function GoogleConfigPanel({ onDone }: { onDone: () => void }): JSX.Element {
   )
 }
 
+// "Esqueci minha senha": pede o e-mail e dispara o link de redefinição.
+function ForgotPassword({ onBack }: { onBack: () => void }): JSX.Element {
+  const requestPasswordReset = useApp((s) => s.requestPasswordReset)
+  const [email, setEmail] = useState('')
+  const [sent, setSent] = useState(false)
+  const [error, setError] = useState<string | null>(null)
+  const [busy, setBusy] = useState(false)
+
+  async function submit(e: FormEvent): Promise<void> {
+    e.preventDefault()
+    setError(null)
+    setBusy(true)
+    const res = await requestPasswordReset(email)
+    setBusy(false)
+    if (res.ok) setSent(true)
+    else setError(res.error ?? 'Não foi possível enviar o link.')
+  }
+
+  if (sent) {
+    return (
+      <>
+        <div className="card mt-6 p-6 text-left">
+          <p className="text-sm text-ink">
+            Se existir uma conta com <b>{email.trim()}</b>, enviamos um link para redefinir a
+            senha. Verifique sua caixa de entrada (e o spam).
+          </p>
+        </div>
+        <p className="mt-5 text-sm text-ink-soft">
+          <button type="button" onClick={onBack} className="font-semibold text-accent hover:underline">
+            Voltar para o login
+          </button>
+        </p>
+      </>
+    )
+  }
+
+  return (
+    <>
+      <form onSubmit={submit} className="card mt-6 space-y-4 p-6 text-left">
+        <label className="block">
+          <span className="mb-1.5 block text-xs font-medium text-ink-soft">E-mail da conta</span>
+          <div className="relative">
+            <Mail size={16} className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-ink-faint" />
+            <input
+              type="email"
+              required
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              placeholder="voce@exemplo.com"
+              className="field pl-9"
+            />
+          </div>
+        </label>
+        <button type="submit" disabled={busy} className="btn-primary w-full">
+          {busy ? 'Enviando...' : 'Enviar link de redefinição'}
+          {!busy && <ArrowRight size={16} />}
+        </button>
+      </form>
+      {error && <p className="mt-3 text-sm text-red-500">{error}</p>}
+      <p className="mt-5 text-sm text-ink-soft">
+        <button type="button" onClick={onBack} className="font-semibold text-accent hover:underline">
+          Voltar para o login
+        </button>
+      </p>
+    </>
+  )
+}
+
 export function LoginScreen(): JSX.Element {
   const account = useApp((s) => s.auth?.account ?? null)
   const hasAccount = useApp((s) => s.auth?.hasAccount ?? false)
@@ -84,6 +152,7 @@ export function LoginScreen(): JSX.Element {
   const [password, setPassword] = useState('')
   const [remember, setRemember] = useState(true)
   const [webMode, setWebMode] = useState<'login' | 'signup'>('login')
+  const [forgot, setForgot] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [busy, setBusy] = useState(false)
 
@@ -123,6 +192,25 @@ export function LoginScreen(): JSX.Element {
       setGoogleBusy(false)
     }
     // Sucesso: refreshAuth troca a tela.
+  }
+
+  // Modo "esqueci minha senha" ocupa a tela inteira (mesma moldura da marca).
+  if (forgot) {
+    return (
+      <div className="relative flex h-screen w-screen items-center justify-center bg-canvas px-6">
+        <div className="w-full max-w-sm text-center">
+          <LogoMark size={56} className="mx-auto mb-4" />
+          <h1
+            className="text-3xl font-extrabold tracking-tight text-ink"
+            style={{ letterSpacing: '-0.02em' }}
+          >
+            Sapien
+          </h1>
+          <p className="mt-1.5 text-sm text-ink-soft">Vamos recuperar seu acesso.</p>
+          <ForgotPassword onBack={() => setForgot(false)} />
+        </div>
+      </div>
+    )
   }
 
   return (
@@ -168,7 +256,21 @@ export function LoginScreen(): JSX.Element {
               </div>
             </label>
 
-            <RememberToggle checked={remember} onChange={setRemember} />
+            <div className="flex items-center justify-between gap-2">
+              <RememberToggle checked={remember} onChange={setRemember} />
+              {IS_WEB && !isSignup && (
+                <button
+                  type="button"
+                  onClick={() => {
+                    setForgot(true)
+                    setError(null)
+                  }}
+                  className="text-xs font-medium text-accent hover:underline"
+                >
+                  Esqueci minha senha
+                </button>
+              )}
+            </div>
 
             <button type="submit" disabled={busy} className="btn-primary w-full">
               {busy ? 'Aguarde...' : isSignup ? 'Criar conta' : 'Entrar'}

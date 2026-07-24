@@ -180,6 +180,10 @@ export interface AccountApi {
   updateProfile(name: string, picture: string | null): Promise<AuthResult>
   /** Troca a senha (reautentica com a atual). Contas Google não têm senha. */
   changePassword(currentPassword: string, newPassword: string): Promise<AuthResult>
+  /** Envia por e-mail um link para redefinir a senha (esqueci minha senha). */
+  requestPasswordReset(email: string): Promise<AuthResult>
+  /** Define a nova senha no fim do fluxo de recuperação (a sessão vem do link). */
+  completePasswordReset(newPassword: string): Promise<AuthResult>
   /** Troca o e-mail da conta. Na web, dispara um e-mail de confirmação. */
   changeEmail(newEmail: string): Promise<AuthResult>
   /** Exclui a própria conta e TODOS os dados. Irreversível. */

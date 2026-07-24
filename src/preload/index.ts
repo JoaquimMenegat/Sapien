@@ -18,6 +18,9 @@ const api: ReadDeckApi = {
     changePassword: (current, next) =>
       ipcRenderer.invoke('account:changePassword', current, next),
     changeEmail: (email) => ipcRenderer.invoke('account:changeEmail', email),
+    requestPasswordReset: (email) => ipcRenderer.invoke('account:requestPasswordReset', email),
+    completePasswordReset: (newPassword) =>
+      ipcRenderer.invoke('account:completePasswordReset', newPassword),
     deleteAccount: () => ipcRenderer.invoke('account:deleteAccount'),
     pickAvatar: () => ipcRenderer.invoke('account:pickAvatar'),
     googleConfig: () => ipcRenderer.invoke('account:googleConfig'),
