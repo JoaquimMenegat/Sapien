@@ -68,15 +68,17 @@ prefixo, que ele completa com `.sapienapp.com.br`):
 > Sem domínio, o Resend só entrega e-mail pra você mesmo — nenhum usuário real confirma
 > cadastro. O domínio destrava e-mail, marca e Stripe de uma vez.
 
-## Fase 2 — Autenticação nível produção ⏳ (3 de 7)
+## Fase 2 — Autenticação nível produção ⏳ (5 de 7)
 
 - [x] **[Você]** SMTP do Resend no Supabase + remetente **`no-reply@sapienapp.com.br`**
 - [x] **[Você]** Site URL / Redirect URLs apontando para `https://sapienapp.com.br`
 - [x] **[Juntos]** **Teste ponta a ponta OK** (2026-07-23): cadastro → e-mail do Sapien
       chega → "Confirmar e-mail" → cai no site **já logado** ✅
-- [ ] **[Você]** Colar os templates de e-mail (o de confirmação está pronto em
-      `supabase/emails/confirm-signup.html`; **[Eu]** faço o de redefinir senha)
-- [ ] **[Eu]** Fluxo **"Esqueci minha senha"** na tela de login web (hoje não existe)
+- [x] **[Você]** Templates de e-mail com a marca Sapien colados no Supabase (confirmação
+      de cadastro + redefinição de senha) — fontes em `supabase/emails/`
+- [x] **[Eu]** Fluxo **"Esqueci minha senha"**: link no login → tela de pedir o e-mail →
+      e-mail do Sapien → tela "Criar nova senha" → entra logado.
+      **Testado em produção e funcionando** ✅ (2026-07-23)
 - [ ] **[Você]** Ligar: proteção de senha vazada, mínimo 8 caracteres, CAPTCHA
 - [ ] **[Você]** Apagar usuários de teste
 
