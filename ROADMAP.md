@@ -79,7 +79,13 @@ prefixo, que ele completa com `.sapienapp.com.br`):
 - [x] **[Eu]** Fluxo **"Esqueci minha senha"**: link no login → tela de pedir o e-mail →
       e-mail do Sapien → tela "Criar nova senha" → entra logado.
       **Testado em produção e funcionando** ✅ (2026-07-23)
-- [ ] **[Você]** Ligar: proteção de senha vazada, mínimo 8 caracteres, CAPTCHA
+- [x] **[Eu]** **CAPTCHA (Cloudflare Turnstile)** no cadastro/login/reset — o widget só
+      aparece quando `VITE_TURNSTILE_SITE_KEY` existe, então o código é seguro de publicar
+      antes de ligar no Supabase. Site key na Vercel (widget "Sapien", 2 hostnames).
+      *Correção necessária: a CSP herdada do Electron (`script-src 'self'`) bloqueava o
+      script do Turnstile — liberado `challenges.cloudflare.com` em `script-src`/`frame-src`.*
+- [ ] **[Você]** Ligar o CAPTCHA no Supabase (Attack Protection → secret key do Turnstile)
+- [ ] **[Você]** Ligar: proteção de senha vazada + mínimo 8 caracteres
 - [ ] **[Você]** Apagar usuários de teste
 
 ## Fase 3 — Site completo: landing + app
