@@ -97,11 +97,17 @@ prefixo, que ele completa com `.sapienapp.com.br`):
 - [ ] **[Eu]** Landing na raiz do domínio + app em rota própria + CTA "Criar conta grátis"
 - [ ] **[Eu]** SEO básico (título, descrição, preview em redes/WhatsApp)
 
-## Fase 4 — Paridade do app web
-- [ ] **[Eu]** Upload de capas e avatar via Supabase Storage (hoje são stubs na web)
-- [ ] **[Eu]** IA "Achar um livro" via Edge Function *(decidir: incluir no v1?)*
-- [ ] **[Eu]** Revisão de responsividade (telas menores)
-- [ ] **[Juntos]** Teste geral das 9 seções na web
+## Fase 4 — Paridade do app web ⏳ (quase — IA adiada)
+- [x] **[Eu]** Upload de capas e avatar via Supabase Storage (bucket `media`,
+      `{user_id}/{covers|avatars}/`, leitura pública + escrita restrita à própria pasta).
+      ⚠️ **falta [Você] rodar `supabase/storage.sql`** pra criar o bucket
+- [x] **[Eu]** **Bug da busca de livros corrigido**: sem chave, o Google Books dá 429 e a
+      busca falhava em silêncio. Agora usa Google + **Open Library** em paralelo (validado)
+- [x] **[Eu]** **Login com Google** na web (Supabase OAuth) — provedor habilitado e
+      confirmado (`"google":true`); botão aparece só quando o provedor está ligado
+- [x] **[Eu]** Responsividade revisada (foco é desktop/web; correções de celular ficam de bônus)
+- [ ] **[decisão]** IA "Achar um livro" — **adiada de propósito**: vira recurso **premium**
+      na Fase 5 (evita bancar API da Anthropic de graça para estranhos)
 
 ## Fase 5 — Assinatura (Stripe) 💰
 - [ ] **[Você]** Definir modelo: preço mensal, plano grátis?, trial?, o que é pago?
