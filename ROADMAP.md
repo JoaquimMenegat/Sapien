@@ -54,12 +54,21 @@ prefixo, que ele completa com `.sapienapp.com.br`):
 
 | Tipo | Nome | Dados |
 | ---- | ---- | ----- |
-| A | `sapienapp.com.br` | `216.198.79.1` |
-| CNAME | `www.sapienapp.com.br` | `ee09846eed954f80.vercel-dns-017.com` |
+| A | `sapienapp.com.br` | `76.76.21.21` |
+| CNAME | `www.sapienapp.com.br` | `cname.vercel-dns.com` |
 | TXT | `resend._domainkey` | chave pública DKIM do Resend |
 | MX | `send` | `10 feedback-smtp.sa-east-1.amazonses.com` |
 | TXT | `send` | `v=spf1 include:amazonses.com ~all` |
 | TXT | `_dmarc` | `v=DMARC1; p=none;` |
+
+> 🐛 **Correção crítica (2026-07-23) — IP da Vercel resetava conexões.** A Vercel recomendou
+> a faixa **nova** (`216.198.79.1` no A; `ee09846…vercel-dns-017.com` no CNAME), mas ela era
+> **resetada por muitas redes** (faculdade, datacenters, até a infra da Anthropic) — TCP conectava
+> e o TLS levava RST; `ERR_CONNECTION_RESET`. O `.vercel.app` funcionava (outra rota), o que
+> mascarava o problema, e o painel da Vercel mostrava "Valid Configuration". **Solução:** trocar
+> pelos registros **legados** e estáveis — **A → `76.76.21.21`** e **CNAME www → `cname.vercel-dns.com`**
+> (`cname.vercel-dns.com` resolve para `76.76.21.241`/`66.33.60.193`). Confirmado carregando de fora.
+> **Lição:** se um domínio novo da Vercel der reset em algumas redes, use os IPs legados.
 
 > ⚠️ **Aprendizados do Registro.br:** (1) ele desloga durante a edição e **descarta** o save —
 > se pedir login ao salvar, refaça tudo; (2) a publicação nos servidores autoritativos leva
