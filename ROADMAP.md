@@ -18,6 +18,7 @@ Vercel (frontend) + Supabase (banco/auth) + Resend (e-mails) + Stripe (pagamento
 | 2–4 | Supabase / Vercel / Resend | **R$ 0** — planos grátis dão conta do lançamento |
 | 5 | Stripe | **R$ 0** de mensalidade; cobra **~% por transação**, só quando você recebe |
 | 6 | Termos/Privacidade | R$ 0 (eu redijo o rascunho) |
+| 6 | **E-mail de suporte** (Zoho Mail grátis) | **R$ 0** (até 5 caixas no seu domínio) |
 
 Detalhe do domínio (Fase 1):
 - `.com.br` no **Registro.br** → **~R$ 40/ano** (mais barato, ideal p/ produto BR)
@@ -67,7 +68,9 @@ prefixo, que ele completa com `.sapienapp.com.br`):
 > e o TLS levava RST; `ERR_CONNECTION_RESET`. O `.vercel.app` funcionava (outra rota), o que
 > mascarava o problema, e o painel da Vercel mostrava "Valid Configuration". **Solução:** trocar
 > pelos registros **legados** e estáveis — **A → `76.76.21.21`** e **CNAME www → `cname.vercel-dns.com`**
-> (`cname.vercel-dns.com` resolve para `76.76.21.241`/`66.33.60.193`). Confirmado carregando de fora.
+> (`cname.vercel-dns.com` resolve para `76.76.21.241`/`66.33.60.193`). **Confirmado** carregando de
+> fora e pelo usuário no **4G**. O único bloqueio que sobrou é o **filtro da rede da universidade**
+> (domínio novo / não categorizado) — é local, tende a sumir com o tempo e **não afeta usuários reais**.
 > **Lição:** se um domínio novo da Vercel der reset em algumas redes, use os IPs legados.
 
 > ⚠️ **Aprendizados do Registro.br:** (1) ele desloga durante a edição e **descarta** o save —
@@ -127,6 +130,10 @@ prefixo, que ele completa com `.sapienapp.com.br`):
 - [ ] **[Juntos]** Testar no modo teste do Stripe antes da cobrança real
 
 ## Fase 6 — Lançamento
+- [ ] **[Você/Eu]** **E-mail de suporte** `suporte@sapienapp.com.br` — decisão: **Zoho Mail
+      plano grátis** (R$ 0, até 5 caixas, webmail + app; sem IMAP no grátis). Setup = verificar
+      domínio (TXT) + registros MX no Registro.br. Convive com o Resend (ele usa o `send.`,
+      o suporte usa o domínio raiz). Eu guio o DNS.
 - [ ] **[Eu]** Rascunho de Termos de Uso + Política de Privacidade (LGPD)
 - [ ] **[Eu]** Checklist final de segurança + monitoramento de erros
 - [ ] **[Você]** Beta fechado (5–10 pessoas)
