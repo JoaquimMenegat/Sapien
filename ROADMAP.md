@@ -147,9 +147,12 @@ começando **no cadastro** (sem cartão). **IA "Achar um livro": descartada por 
       desktop = sempre Premium, pois é o app pessoal)
 - [ ] **[Eu]** Backend (função de servidor): criar assinatura no Asaas + receber webhooks de status
 - [ ] **[Eu]** Tela **"Assinar Premium"** (Pix/boleto/cartão via Asaas)
+- [ ] **[Eu]** Área **"Minha assinatura"** (em Personalização): plano atual, status, data de
+      renovação / fim do trial, **cancelar**, trocar plano (mensal↔anual), histórico de pagamentos
 - [ ] **[Eu]** Construir o **Exportar dados** (CSV/JSON) — recurso Premium novo
-- [ ] **[Eu]** **Gating** das 5 áreas pagas (só ativa quando o fluxo de assinar existir, p/ não
-      trancar o site antes da hora)
+- [ ] **[Eu]** **Gating** das 5 áreas pagas com **prévia borrada** + paywall por cima (mais
+      tentador). Nav mantém as áreas visíveis com selo/cadeado. Banner de "teste acaba em X dias"
+      durante o trial. Só ativa quando o fluxo de assinar existir (p/ não trancar antes da hora)
 - [ ] **[Juntos]** Testar tudo no **sandbox** do Asaas antes de ativar cobrança real
 
 ## Fase 6 — Lançamento
