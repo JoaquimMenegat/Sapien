@@ -1,5 +1,12 @@
 import { create } from 'zustand'
-import type { AuthStatus, AuthResult, BillingStatus } from '../../../shared/types'
+import type {
+  AuthStatus,
+  AuthResult,
+  BillingStatus,
+  PaidPlan,
+  SubscribeResult,
+  CancelResult
+} from '../../../shared/types'
 import { openedFromRecoveryLink } from '../lib/supabase'
 
 export type Section =
@@ -100,6 +107,8 @@ interface AppState {
   billing: BillingStatus | null
   isPremium: boolean
   refreshBilling: () => Promise<void>
+  subscribe: (plan: PaidPlan) => Promise<SubscribeResult>
+  cancelSubscription: () => Promise<CancelResult>
 
   // Autenticação
   auth: AuthStatus | null
@@ -184,6 +193,12 @@ export const useApp = create<AppState>((set, get) => ({
     } catch {
       set({ isPremium: true }) // nunca trancar por erro técnico
     }
+  },
+  subscribe: async (plan) => window.readdeck.billing.subscribe(plan),
+  cancelSubscription: async () => {
+    const res = await window.readdeck.billing.cancel()
+    if (res.ok) await get().refreshBilling()
+    return res
   },
 
   auth: null,

@@ -95,6 +95,15 @@ export function registerIpcHandlers(): void {
     trialEndsAt: null,
     currentPeriodEnd: null
   }))
+  // Assinatura é só na web; no desktop não há o que assinar/cancelar.
+  ipcMain.handle('billing:subscribe', () => ({
+    ok: false,
+    error: 'A assinatura é gerenciada pela versão web.'
+  }))
+  ipcMain.handle('billing:cancel', () => ({
+    ok: false,
+    error: 'A assinatura é gerenciada pela versão web.'
+  }))
   ipcMain.handle('settings:set', (_e, key: string, value: string): void => {
     setSetting(key, value)
   })

@@ -29,7 +29,9 @@ import type {
   NotePatch,
   BillingStatus,
   PlanKind,
-  SubStatus
+  SubStatus,
+  SubscribeResult,
+  CancelResult
 } from '../../../shared/types'
 
 const sb = getSupabase
@@ -512,7 +514,12 @@ export function createSupabaseApi(): ReadDeckApi {
           const trialEndsAt = (data.trial_ends_at as string) ?? null
           const currentPeriodEnd = (data.current_period_end as string) ?? null
           const trialOk = trialEndsAt ? new Date(trialEndsAt).getTime() > now : false
-          const premium = status === 'active' || (status === 'trialing' && trialOk)
+          const periodOk = currentPeriodEnd ? new Date(currentPeriodEnd).getTime() > now : false
+          // Ativo, trial vigente, ou cancelado mas ainda dentro do período pago/trial.
+          const premium =
+            status === 'active' ||
+            (status === 'trialing' && trialOk) ||
+            (status === 'canceled' && (periodOk || trialOk))
           return {
             premium,
             plan: (data.plan as PlanKind) ?? 'free',
@@ -523,6 +530,39 @@ export function createSupabaseApi(): ReadDeckApi {
         } catch {
           // Falha ao consultar (rede/tabela): não trancar o usuário — libera (fail-open).
           return { ...free, premium: true }
+        }
+      },
+      async subscribe(plan): Promise<SubscribeResult> {
+        try {
+          const { data } = await sb().auth.getSession()
+          const token = data.session?.access_token
+          if (!token) return { ok: false, error: 'Não autenticado.' }
+          const res = await fetch('/api/subscribe', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
+            body: JSON.stringify({ plan })
+          })
+          const body = (await res.json().catch(() => ({}))) as { invoiceUrl?: string; error?: string }
+          if (!res.ok) return { ok: false, error: body.error ?? 'Falha ao criar a assinatura.' }
+          return { ok: true, invoiceUrl: body.invoiceUrl }
+        } catch (e) {
+          return { ok: false, error: e instanceof Error ? e.message : 'Erro de rede.' }
+        }
+      },
+      async cancel(): Promise<CancelResult> {
+        try {
+          const { data } = await sb().auth.getSession()
+          const token = data.session?.access_token
+          if (!token) return { ok: false, error: 'Não autenticado.' }
+          const res = await fetch('/api/cancel-subscription', {
+            method: 'POST',
+            headers: { Authorization: `Bearer ${token}` }
+          })
+          const body = (await res.json().catch(() => ({}))) as { error?: string }
+          if (!res.ok) return { ok: false, error: body.error ?? 'Falha ao cancelar.' }
+          return { ok: true }
+        } catch (e) {
+          return { ok: false, error: e instanceof Error ? e.message : 'Erro de rede.' }
         }
       }
     }

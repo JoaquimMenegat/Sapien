@@ -305,8 +305,27 @@ export interface BillingStatus {
   currentPeriodEnd: string | null
 }
 
+/** Planos pagos (o que o usuário pode assinar). */
+export type PaidPlan = 'monthly' | 'yearly'
+
+export interface SubscribeResult {
+  ok: boolean
+  /** Link de pagamento do Asaas (Pix/boleto/cartão) para abrir no navegador. */
+  invoiceUrl?: string
+  error?: string
+}
+
+export interface CancelResult {
+  ok: boolean
+  error?: string
+}
+
 export interface BillingApi {
   status(): Promise<BillingStatus>
+  /** Cria a assinatura e devolve o link de pagamento (só na web). */
+  subscribe(plan: PaidPlan): Promise<SubscribeResult>
+  /** Cancela a renovação; o acesso segue até o fim do período pago (só na web). */
+  cancel(): Promise<CancelResult>
 }
 
 export interface ReadDeckApi {

@@ -66,7 +66,9 @@ const api: ReadDeckApi = {
     remove: (id) => ipcRenderer.invoke('notes:delete', id)
   },
   billing: {
-    status: () => ipcRenderer.invoke('billing:status')
+    status: () => ipcRenderer.invoke('billing:status'),
+    subscribe: (plan) => ipcRenderer.invoke('billing:subscribe', plan),
+    cancel: () => ipcRenderer.invoke('billing:cancel')
   }
 }
 
