@@ -16,7 +16,7 @@ Vercel (frontend) + Supabase (banco/auth) + Resend (e-mails) + Stripe (pagamento
 | ---- | ---- | ----- |
 | 1 | **Domínio próprio** | **~R$ 40–110/ano** (único gasto obrigatório antes do Stripe) |
 | 2–4 | Supabase / Vercel / Resend | **R$ 0** — planos grátis dão conta do lançamento |
-| 5 | Stripe | **R$ 0** de mensalidade; cobra **~% por transação**, só quando você recebe |
+| 5 | Asaas (gateway) | **R$ 0** de mensalidade; cobra **taxa por transação**, só quando você recebe |
 | 6 | Termos/Privacidade | R$ 0 (eu redijo o rascunho) |
 | 6 | **E-mail de suporte** (Zoho Mail grátis) | **R$ 0** (até 5 caixas no seu domínio) |
 
@@ -121,13 +121,36 @@ prefixo, que ele completa com `.sapienapp.com.br`):
 - [ ] **[decisão]** IA "Achar um livro" — **adiada de propósito**: vira recurso **premium**
       na Fase 5 (evita bancar API da Anthropic de graça para estranhos)
 
-## Fase 5 — Assinatura (Stripe) 💰
-- [ ] **[Você]** Definir modelo: preço mensal, plano grátis?, trial?, o que é pago?
-- [ ] **[Você]** Criar conta no Stripe (CPF/CNPJ + conta bancária)
-- [ ] **[Eu]** Tabela `subscriptions` + webhook do Stripe (Edge Function) mantendo o status
-- [ ] **[Eu]** Checkout + portal do cliente (trocar cartão, cancelar)
-- [ ] **[Eu]** Gating: recursos pagos só para assinantes ativos
-- [ ] **[Juntos]** Testar no modo teste do Stripe antes da cobrança real
+## Fase 5 — Assinatura (Asaas) 💰
+
+**Gateway: Asaas** (brasileiro, aceita **CPF**, faz **Pix/boleto/cartão**, tem sandbox + webhooks).
+**Preço:** R$ 19,90/mês · R$ 149,90/ano (≈ R$ 12,49/mês). **Trial:** 7 dias de Premium grátis,
+começando **no cadastro** (sem cartão). **IA "Achar um livro": descartada por ora.**
+
+**Grátis vs Premium** (o que cada plano acessa):
+
+| Recurso | Grátis | Premium |
+| ------- | :----: | :-----: |
+| Biblioteca / acervo (livros ilimitados) | ✅ | ✅ |
+| Sessão (Pomodoro) + ritmo | ✅ | ✅ |
+| Notas e trechos | ✅ | ✅ |
+| Temas e cores personalizadas | ✅ | ✅ |
+| Gêneros · Autores · Metas · Estatísticas | 🔒 | ✅ |
+| Exportar dados (**recurso novo, a construir**) | 🔒 | ✅ |
+
+- [x] **[Eu]** Tabela `subscriptions` + RLS (`supabase/subscriptions.sql`) — usuário só LÊ o
+      próprio status; escrita só via service_role (webhook). Trigger dá 7 dias de trial no cadastro.
+- [ ] **[Você]** Rodar `supabase/subscriptions.sql` no SQL Editor
+- [ ] **[Você]** Criar conta no Asaas + pegar chave de **sandbox**
+      *(⚠️ a chave NÃO vem pro chat — vai como **secret** no servidor; eu só referencio)*
+- [ ] **[Eu]** Plumbing de estado: `billing.status()` + `isPremium` no app (web lê a tabela;
+      desktop = sempre Premium, pois é o app pessoal)
+- [ ] **[Eu]** Backend (função de servidor): criar assinatura no Asaas + receber webhooks de status
+- [ ] **[Eu]** Tela **"Assinar Premium"** (Pix/boleto/cartão via Asaas)
+- [ ] **[Eu]** Construir o **Exportar dados** (CSV/JSON) — recurso Premium novo
+- [ ] **[Eu]** **Gating** das 5 áreas pagas (só ativa quando o fluxo de assinar existir, p/ não
+      trancar o site antes da hora)
+- [ ] **[Juntos]** Testar tudo no **sandbox** do Asaas antes de ativar cobrança real
 
 ## Fase 6 — Lançamento
 - [ ] **[Você/Eu]** **E-mail de suporte** `suporte@sapienapp.com.br` — decisão: **Zoho Mail
