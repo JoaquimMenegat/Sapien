@@ -11,6 +11,10 @@ function addPeriod(from: Date, plan: string): Date {
 }
 
 export default async function handler(req: any, res: any): Promise<void> {
+  // Ping de conectividade (o Asaas pode testar a URL ao ativar o webhook): responde 200.
+  if (req.method === 'GET' || req.method === 'HEAD') {
+    return json(res, 200, { ok: true, service: 'asaas-webhook' })
+  }
   if (req.method !== 'POST') return json(res, 405, { error: 'Método não permitido.' })
 
   // Autenticidade: se configurado, o Asaas envia este token no header.
