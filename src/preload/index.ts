@@ -67,7 +67,7 @@ const api: ReadDeckApi = {
   },
   billing: {
     status: () => ipcRenderer.invoke('billing:status'),
-    subscribe: (plan) => ipcRenderer.invoke('billing:subscribe', plan),
+    subscribe: (plan, cpfCnpj) => ipcRenderer.invoke('billing:subscribe', plan, cpfCnpj),
     cancel: () => ipcRenderer.invoke('billing:cancel')
   }
 }

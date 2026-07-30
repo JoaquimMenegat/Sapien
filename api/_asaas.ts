@@ -53,17 +53,36 @@ async function asaas(path: string, init?: { method?: string; body?: string }): P
   return data
 }
 
-/** Cria (ou reaproveita) o cliente Asaas do usuário e devolve o id. */
+/** Cria (ou reaproveita) o cliente Asaas do usuário e devolve o id.
+ *  O Asaas exige CPF/CNPJ para gerar a cobrança — enviamos ao criar. */
 export async function ensureCustomer(o: {
   userId: string
   name: string
   email: string
+  cpfCnpj: string
   existingId?: string | null
 }): Promise<string> {
-  if (o.existingId) return o.existingId
+  const cpf = (o.cpfCnpj || '').replace(/\D/g, '')
+  if (o.existingId) {
+    // Cliente já existe: garante que o CPF/CNPJ esteja preenchido.
+    if (cpf) {
+      await asaas(`/customers/${o.existingId}`, {
+        method: 'POST',
+        body: JSON.stringify({ cpfCnpj: cpf })
+      }).catch(() => {
+        /* se a atualização falhar, seguimos com o id existente */
+      })
+    }
+    return o.existingId
+  }
   const c = await asaas('/customers', {
     method: 'POST',
-    body: JSON.stringify({ name: o.name || o.email, email: o.email, externalReference: o.userId })
+    body: JSON.stringify({
+      name: o.name || o.email,
+      email: o.email,
+      cpfCnpj: cpf,
+      externalReference: o.userId
+    })
   })
   return c.id as string
 }

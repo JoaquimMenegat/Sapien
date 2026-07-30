@@ -322,6 +322,7 @@ function SubscriptionSection(): JSX.Element | null {
   const refreshBilling = useApp((s) => s.refreshBilling)
 
   const [plan, setPlan] = useState<PaidPlan>('yearly')
+  const [cpf, setCpf] = useState('')
   const [busy, setBusy] = useState(false)
   const [msg, setMsg] = useState<Msg>(null)
   const [confirmCancel, setConfirmCancel] = useState(false)
@@ -365,9 +366,14 @@ function SubscriptionSection(): JSX.Element | null {
             }
 
   async function handleSubscribe(): Promise<void> {
+    const digits = cpf.replace(/\D/g, '')
+    if (digits.length !== 11 && digits.length !== 14) {
+      setMsg({ ok: false, text: 'Informe um CPF (11 dígitos) ou CNPJ (14 dígitos) válido.' })
+      return
+    }
     setBusy(true)
     setMsg(null)
-    const res = await subscribe(plan)
+    const res = await subscribe(plan, digits)
     setBusy(false)
     if (!res.ok) {
       setMsg({ ok: false, text: res.error ?? 'Não foi possível iniciar a assinatura.' })
@@ -466,6 +472,19 @@ function SubscriptionSection(): JSX.Element | null {
                 </button>
               )
             })}
+          </div>
+          <div className="mt-3">
+            <label className="mb-1 block text-xs font-medium text-ink-soft">CPF ou CNPJ</label>
+            <input
+              value={cpf}
+              onChange={(e) => setCpf(e.target.value)}
+              inputMode="numeric"
+              placeholder="Só números (ex.: 12345678900)"
+              className="field"
+            />
+            <p className="mt-1 text-[11px] text-ink-faint">
+              Exigido pelo Asaas para emitir a cobrança (Pix/boleto/cartão). Não fica salvo no Sapien.
+            </p>
           </div>
           <button onClick={handleSubscribe} disabled={busy} className="btn-primary mt-3 w-full">
             {busy ? 'Abrindo pagamento…' : isTrial ? 'Assinar agora' : isCanceled ? 'Reassinar' : 'Assinar Premium'}

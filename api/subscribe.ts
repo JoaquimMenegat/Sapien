@@ -20,9 +20,13 @@ export default async function handler(req: any, res: any): Promise<void> {
     if (uErr || !u?.user) return json(res, 401, { error: 'Sessão inválida.' })
     const user = u.user
 
-    // 2) Valida o plano.
+    // 2) Valida o plano e o CPF/CNPJ (o Asaas exige para gerar a cobrança).
     const plan = req.body?.plan as PlanId
     if (plan !== 'monthly' && plan !== 'yearly') return json(res, 400, { error: 'Plano inválido.' })
+    const cpfCnpj = String(req.body?.cpfCnpj || '').replace(/\D/g, '')
+    if (cpfCnpj.length !== 11 && cpfCnpj.length !== 14) {
+      return json(res, 400, { error: 'Informe um CPF (11 dígitos) ou CNPJ (14 dígitos) válido.' })
+    }
 
     // 3) Cliente Asaas (reaproveita se já existir) + assinatura.
     const db = admin()
@@ -36,6 +40,7 @@ export default async function handler(req: any, res: any): Promise<void> {
       userId: user.id,
       name: (user.user_metadata?.name as string) || '',
       email: user.email || '',
+      cpfCnpj,
       existingId: current?.asaas_customer_id ?? null
     })
 

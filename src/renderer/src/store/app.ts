@@ -107,7 +107,7 @@ interface AppState {
   billing: BillingStatus | null
   isPremium: boolean
   refreshBilling: () => Promise<void>
-  subscribe: (plan: PaidPlan) => Promise<SubscribeResult>
+  subscribe: (plan: PaidPlan, cpfCnpj: string) => Promise<SubscribeResult>
   cancelSubscription: () => Promise<CancelResult>
 
   // Autenticação
@@ -194,7 +194,7 @@ export const useApp = create<AppState>((set, get) => ({
       set({ isPremium: true }) // nunca trancar por erro técnico
     }
   },
-  subscribe: async (plan) => window.readdeck.billing.subscribe(plan),
+  subscribe: async (plan, cpfCnpj) => window.readdeck.billing.subscribe(plan, cpfCnpj),
   cancelSubscription: async () => {
     const res = await window.readdeck.billing.cancel()
     if (res.ok) await get().refreshBilling()

@@ -532,7 +532,7 @@ export function createSupabaseApi(): ReadDeckApi {
           return { ...free, premium: true }
         }
       },
-      async subscribe(plan): Promise<SubscribeResult> {
+      async subscribe(plan, cpfCnpj): Promise<SubscribeResult> {
         try {
           const { data } = await sb().auth.getSession()
           const token = data.session?.access_token
@@ -540,7 +540,7 @@ export function createSupabaseApi(): ReadDeckApi {
           const res = await fetch('/api/subscribe', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
-            body: JSON.stringify({ plan })
+            body: JSON.stringify({ plan, cpfCnpj })
           })
           const body = (await res.json().catch(() => ({}))) as {
             invoiceUrl?: string

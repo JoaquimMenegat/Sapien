@@ -322,8 +322,8 @@ export interface CancelResult {
 
 export interface BillingApi {
   status(): Promise<BillingStatus>
-  /** Cria a assinatura e devolve o link de pagamento (só na web). */
-  subscribe(plan: PaidPlan): Promise<SubscribeResult>
+  /** Cria a assinatura e devolve o link de pagamento (só na web). Exige CPF/CNPJ. */
+  subscribe(plan: PaidPlan, cpfCnpj: string): Promise<SubscribeResult>
   /** Cancela a renovação; o acesso segue até o fim do período pago (só na web). */
   cancel(): Promise<CancelResult>
 }
