@@ -542,8 +542,15 @@ export function createSupabaseApi(): ReadDeckApi {
             headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
             body: JSON.stringify({ plan })
           })
-          const body = (await res.json().catch(() => ({}))) as { invoiceUrl?: string; error?: string }
-          if (!res.ok) return { ok: false, error: body.error ?? 'Falha ao criar a assinatura.' }
+          const body = (await res.json().catch(() => ({}))) as {
+            invoiceUrl?: string
+            error?: string
+            detail?: string
+          }
+          if (!res.ok) {
+            const detail = body.detail ? ` (${body.detail})` : ''
+            return { ok: false, error: (body.error ?? 'Falha ao criar a assinatura.') + detail }
+          }
           return { ok: true, invoiceUrl: body.invoiceUrl }
         } catch (e) {
           return { ok: false, error: e instanceof Error ? e.message : 'Erro de rede.' }
