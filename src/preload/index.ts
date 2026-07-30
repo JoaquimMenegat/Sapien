@@ -64,6 +64,9 @@ const api: ReadDeckApi = {
       ipcRenderer.invoke('notes:create', bookId, type, content, pageRef),
     update: (id, patch) => ipcRenderer.invoke('notes:update', id, patch),
     remove: (id) => ipcRenderer.invoke('notes:delete', id)
+  },
+  billing: {
+    status: () => ipcRenderer.invoke('billing:status')
   }
 }
 

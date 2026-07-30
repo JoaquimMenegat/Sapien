@@ -291,6 +291,24 @@ export interface SessionsApi {
 }
 
 // Superfície da API exposta ao renderer via preload (window.readdeck).
+// --- Assinatura (Premium) ---
+
+export type PlanKind = 'free' | 'monthly' | 'yearly'
+export type SubStatus = 'none' | 'trialing' | 'active' | 'past_due' | 'canceled'
+
+export interface BillingStatus {
+  /** Acesso Premium liberado agora? (assinatura ativa OU trial vigente) */
+  premium: boolean
+  plan: PlanKind
+  status: SubStatus
+  trialEndsAt: string | null
+  currentPeriodEnd: string | null
+}
+
+export interface BillingApi {
+  status(): Promise<BillingStatus>
+}
+
 export interface ReadDeckApi {
   health(): Promise<AppHealth>
   getSetting(key: string): Promise<string | null>
@@ -301,4 +319,5 @@ export interface ReadDeckApi {
   sessions: SessionsApi
   goals: GoalsApi
   notes: NotesApi
+  billing: BillingApi
 }

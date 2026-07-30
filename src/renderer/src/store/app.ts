@@ -1,5 +1,5 @@
 import { create } from 'zustand'
-import type { AuthStatus, AuthResult } from '../../../shared/types'
+import type { AuthStatus, AuthResult, BillingStatus } from '../../../shared/types'
 import { openedFromRecoveryLink } from '../lib/supabase'
 
 export type Section =
@@ -96,6 +96,11 @@ interface AppState {
   animation: AnimStyle
   setAnimation: (a: AnimStyle) => void
 
+  // Assinatura (Premium)
+  billing: BillingStatus | null
+  isPremium: boolean
+  refreshBilling: () => Promise<void>
+
   // Autenticação
   auth: AuthStatus | null
   authReady: boolean
@@ -169,11 +174,24 @@ export const useApp = create<AppState>((set, get) => ({
     set({ animation: a })
   },
 
+  // isPremium começa `true` (fail-open) e é ajustado ao carregar o status real.
+  billing: null,
+  isPremium: true,
+  refreshBilling: async () => {
+    try {
+      const billing = await window.readdeck.billing.status()
+      set({ billing, isPremium: billing.premium })
+    } catch {
+      set({ isPremium: true }) // nunca trancar por erro técnico
+    }
+  },
+
   auth: null,
   authReady: false,
   refreshAuth: async () => {
     const auth = await window.readdeck.account.status()
     set({ auth, authReady: true })
+    if (auth.loggedIn) void get().refreshBilling()
   },
   signup: async (email, name, password, remember, captchaToken) => {
     const res = await window.readdeck.account.signup(email, name, password, remember, captchaToken)

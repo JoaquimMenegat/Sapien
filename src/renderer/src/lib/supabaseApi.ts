@@ -26,7 +26,10 @@ import type {
   GoalType,
   Note,
   NoteType,
-  NotePatch
+  NotePatch,
+  BillingStatus,
+  PlanKind,
+  SubStatus
 } from '../../../shared/types'
 
 const sb = getSupabase
@@ -486,6 +489,41 @@ export function createSupabaseApi(): ReadDeckApi {
       },
       async remove(id: number): Promise<void> {
         must(await sb().from('notes').delete().eq('id', id).select())
+      }
+    },
+
+    billing: {
+      async status(): Promise<BillingStatus> {
+        const free: BillingStatus = {
+          premium: false,
+          plan: 'free',
+          status: 'none',
+          trialEndsAt: null,
+          currentPeriodEnd: null
+        }
+        try {
+          const { data } = await sb()
+            .from('subscriptions')
+            .select('status,plan,trial_ends_at,current_period_end')
+            .maybeSingle()
+          if (!data) return free
+          const now = Date.now()
+          const status = (data.status as SubStatus) ?? 'none'
+          const trialEndsAt = (data.trial_ends_at as string) ?? null
+          const currentPeriodEnd = (data.current_period_end as string) ?? null
+          const trialOk = trialEndsAt ? new Date(trialEndsAt).getTime() > now : false
+          const premium = status === 'active' || (status === 'trialing' && trialOk)
+          return {
+            premium,
+            plan: (data.plan as PlanKind) ?? 'free',
+            status,
+            trialEndsAt,
+            currentPeriodEnd
+          }
+        } catch {
+          // Falha ao consultar (rede/tabela): não trancar o usuário — libera (fail-open).
+          return { ...free, premium: true }
+        }
       }
     }
   }

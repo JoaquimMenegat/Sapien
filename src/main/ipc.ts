@@ -86,6 +86,15 @@ export function registerIpcHandlers(): void {
   })
 
   ipcMain.handle('settings:get', (_e, key: string): string | null => getSetting(key))
+
+  // Desktop é o app pessoal do usuário: sempre Premium (gating de assinatura é só na web).
+  ipcMain.handle('billing:status', () => ({
+    premium: true,
+    plan: 'yearly',
+    status: 'active',
+    trialEndsAt: null,
+    currentPeriodEnd: null
+  }))
   ipcMain.handle('settings:set', (_e, key: string, value: string): void => {
     setSetting(key, value)
   })
