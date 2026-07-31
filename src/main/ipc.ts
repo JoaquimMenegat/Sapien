@@ -95,6 +95,18 @@ export function registerIpcHandlers(): void {
     trialEndsAt: null,
     currentPeriodEnd: null
   }))
+  ipcMain.handle('billing:details', () => ({
+    premium: true,
+    plan: 'yearly',
+    status: 'active',
+    trialEndsAt: null,
+    currentPeriodEnd: null,
+    startDate: null,
+    nextDueDate: null,
+    value: null,
+    billingType: null,
+    payments: []
+  }))
   // Assinatura é só na web; no desktop não há o que assinar/cancelar.
   ipcMain.handle('billing:subscribe', () => ({
     ok: false,

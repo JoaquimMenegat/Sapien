@@ -320,8 +320,41 @@ export interface CancelResult {
   error?: string
 }
 
+/** Uma cobrança do histórico (vinda do Asaas). */
+export interface BillingPayment {
+  id: string
+  dueDate: string | null
+  paidDate: string | null
+  value: number
+  /** Estado cru do Asaas: CONFIRMED, RECEIVED, PENDING, OVERDUE, REFUNDED… */
+  status: string
+  /** PIX | BOLETO | CREDIT_CARD | UNDEFINED */
+  billingType: string
+  invoiceUrl: string | null
+}
+
+/** Visão completa da assinatura para a página "Gerenciar assinatura". */
+export interface BillingDetails {
+  premium: boolean
+  plan: PlanKind
+  status: SubStatus
+  trialEndsAt: string | null
+  currentPeriodEnd: string | null
+  /** Data de adesão (criação da assinatura no Asaas). */
+  startDate: string | null
+  /** Próximo vencimento. */
+  nextDueDate: string | null
+  /** Valor recorrente (R$). */
+  value: number | null
+  /** Forma de pagamento efetiva (PIX/BOLETO/CREDIT_CARD) ou null. */
+  billingType: string | null
+  payments: BillingPayment[]
+}
+
 export interface BillingApi {
   status(): Promise<BillingStatus>
+  /** Detalhes ricos p/ a tela de gerenciamento (enriquecidos pelo Asaas). */
+  details(): Promise<BillingDetails>
   /** Cria a assinatura e devolve o link de pagamento (só na web). Exige CPF/CNPJ. */
   subscribe(plan: PaidPlan, cpfCnpj: string): Promise<SubscribeResult>
   /** Cancela a renovação; o acesso segue até o fim do período pago (só na web). */

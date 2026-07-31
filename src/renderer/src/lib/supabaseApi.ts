@@ -31,7 +31,8 @@ import type {
   PlanKind,
   SubStatus,
   SubscribeResult,
-  CancelResult
+  CancelResult,
+  BillingDetails
 } from '../../../shared/types'
 
 const sb = getSupabase
@@ -530,6 +531,32 @@ export function createSupabaseApi(): ReadDeckApi {
         } catch {
           // Falha ao consultar (rede/tabela): não trancar o usuário — libera (fail-open).
           return { ...free, premium: true }
+        }
+      },
+      async details(): Promise<BillingDetails> {
+        const base: BillingDetails = {
+          premium: false,
+          plan: 'free',
+          status: 'none',
+          trialEndsAt: null,
+          currentPeriodEnd: null,
+          startDate: null,
+          nextDueDate: null,
+          value: null,
+          billingType: null,
+          payments: []
+        }
+        try {
+          const { data } = await sb().auth.getSession()
+          const token = data.session?.access_token
+          if (!token) return base
+          const res = await fetch('/api/subscription', {
+            headers: { Authorization: `Bearer ${token}` }
+          })
+          if (!res.ok) return base
+          return (await res.json()) as BillingDetails
+        } catch {
+          return base
         }
       },
       async subscribe(plan, cpfCnpj): Promise<SubscribeResult> {
