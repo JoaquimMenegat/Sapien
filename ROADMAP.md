@@ -150,11 +150,12 @@ começando **no cadastro** (sem cartão). **IA "Achar um livro": descartada por 
 - [x] **[Eu]** Tela **"Assinar Premium"** (Pix/boleto/cartão via Asaas)
 - [x] **[Eu]** Área **"Gerenciar assinatura"**: plano, status, renovação/fim do trial,
       valor, forma de pagamento, adesão, tempo restante, **cancelar** e **histórico de pagamentos**
-- [ ] **[Eu]** Construir o **Exportar dados** (CSV/JSON) — recurso Premium novo *(pendente)*
+- [x] **[Eu]** Construir o **Exportar dados** (JSON completo + CSV do acervo) — recurso Premium
+      (em Personalização, gated pelo paywall)
 - [x] **[Eu]** **Gating** das áreas pagas com **prévia borrada** + paywall (Gêneros, Autores,
-      Metas, Estatísticas). Livre durante o trial; teste do bloqueio via `?lockpremium=1`.
-- [ ] **[Juntos]** Testar tudo no **sandbox** do Asaas antes de ativar cobrança real *(próximo)*
-- [ ] **[Eu]** Reverter o `/api/health` (hoje expõe *presença* das env vars — usado no diagnóstico)
+      Metas, Estatísticas, Exportar). Livre durante o trial; teste do bloqueio via `?lockpremium=1`.
+- [x] **[Eu]** Reverter o `/api/health` (não expõe mais presença das env vars)
+- [ ] **[Você]** Testar cobrança no sandbox — **decidido: fazer no fim do trial, no fluxo real**
 
 ## Fase 6 — Lançamento
 - [ ] **[Você/Eu]** **E-mail de suporte** `suporte@sapienapp.com.br` — decisão: **Zoho Mail
