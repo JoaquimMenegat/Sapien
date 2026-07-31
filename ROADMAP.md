@@ -112,7 +112,7 @@ prefixo, que ele completa com `.sapienapp.com.br`):
 ## Fase 4 — Paridade do app web ⏳ (quase — IA adiada)
 - [x] **[Eu]** Upload de capas e avatar via Supabase Storage (bucket `media`,
       `{user_id}/{covers|avatars}/`, leitura pública + escrita restrita à própria pasta).
-      ⚠️ **falta [Você] rodar `supabase/storage.sql`** pra criar o bucket
+      ✅ **[Você] rodou `supabase/storage.sql`** — bucket criado e upload de capa testado (2026-07-31)
 - [x] **[Eu]** **Bug da busca de livros corrigido**: sem chave, o Google Books dá 429 e a
       busca falhava em silêncio. Agora usa Google + **Open Library** em paralelo (validado)
 - [x] **[Eu]** **Login com Google** na web (Supabase OAuth) — provedor habilitado e
