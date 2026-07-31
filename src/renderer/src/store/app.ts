@@ -106,6 +106,8 @@ interface AppState {
   // Assinatura (Premium)
   billing: BillingStatus | null
   isPremium: boolean
+  /** Força a tela de bloqueio (para testar o paywall via ?lockpremium=1). */
+  previewLock: boolean
   refreshBilling: () => Promise<void>
   subscribe: (plan: PaidPlan, cpfCnpj: string) => Promise<SubscribeResult>
   cancelSubscription: () => Promise<CancelResult>
@@ -186,6 +188,9 @@ export const useApp = create<AppState>((set, get) => ({
   // isPremium começa `true` (fail-open) e é ajustado ao carregar o status real.
   billing: null,
   isPremium: true,
+  previewLock:
+    typeof window !== 'undefined' &&
+    new URLSearchParams(window.location.search).get('lockpremium') === '1',
   refreshBilling: async () => {
     try {
       const billing = await window.readdeck.billing.status()

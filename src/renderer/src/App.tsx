@@ -12,6 +12,7 @@ import { PomodoroView } from './components/pomodoro/PomodoroView'
 import { PomodoroEngine } from './components/pomodoro/PomodoroEngine'
 import { MetasView } from './components/goals/MetasView'
 import { NotasView } from './components/notes/NotasView'
+import { PremiumGate } from './components/PremiumGate'
 import { useApp, applyAppearance, loginAppearance, type Section } from './store/app'
 
 const SECTION_TITLES: Record<Section, string> = {
@@ -59,17 +60,25 @@ function MainLayout(): JSX.Element {
           ) : section === 'achar' ? (
             <FindBookView />
           ) : section === 'generos' ? (
-            <GenresView />
+            <PremiumGate title="Gêneros">
+              <GenresView />
+            </PremiumGate>
           ) : section === 'autores' ? (
-            <AutoresView />
+            <PremiumGate title="Autores">
+              <AutoresView />
+            </PremiumGate>
           ) : section === 'lendo' ? (
             <ReadingView />
           ) : section === 'estatisticas' ? (
-            <StatsView />
+            <PremiumGate title="Estatísticas">
+              <StatsView />
+            </PremiumGate>
           ) : section === 'pomodoro' ? (
             <PomodoroView />
           ) : section === 'metas' ? (
-            <MetasView />
+            <PremiumGate title="Metas">
+              <MetasView />
+            </PremiumGate>
           ) : section === 'notas' ? (
             <NotasView />
           ) : (
