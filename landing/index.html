@@ -1,0 +1,1465 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Sapien — desenvolva o leitor que existe em você</title>
+  <meta name="description" content="O Sapien transforma leituras soltas em um hábito consistente. Acompanhe seu progresso página por página e veja sua evolução como leitor." />
+  <meta property="og:title" content="Sapien — desenvolva o leitor que existe em você" />
+  <meta property="og:description" content="O Sapien transforma leituras soltas em um hábito consistente. Acompanhe seu progresso página por página e veja sua evolução como leitor." />
+  <meta property="og:type" content="website" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,600;9..144,900&family=Newsreader:ital,opsz@0,6..72;1,6..72&family=IBM+Plex+Mono:wght@400;500;600&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <style>
+    /* ============================================================
+       SAPIEN — Landing "Instrumento encadernado"
+       Tecido aubergine + ouro de gravação + fita escarlate.
+       Movimento dirigido por scroll (rAF), sem dependências.
+       ============================================================ */
+    :root {
+      --cloth:   #17131c;   /* fundo — capa de tecido */
+      --cloth-2: #1f1826;   /* painel levemente elevado */
+      --cloth-3: #2a2130;   /* hover / borda de tecido */
+      --paper:   #ede6d6;   /* seção "vira página" */
+      --ink-hi:  #f4ede2;   /* título — branco de papel */
+      --ink:     #ddd3c6;   /* corpo */
+      --ink-soft:#a99f90;   /* secundário */
+      --ink-faint:#948a7c;  /* legendas / fólios (≥5:1 sobre o tecido) */
+      --foil:    #c6a15b;   /* ouro — fios, fólios, versaletes */
+      --foil-hi: #e6cd8f;
+      --indigo:  #6366f1;
+      --indigo-d:#4f46e5;
+      --violet:  #7c3aed;
+      --ribbon:  #c62a2a;   /* fita escarlate — a assinatura */
+      --ribbon-hi:#e0433f;
+      --edge:    rgba(198,161,91,0.18);   /* fio dourado tênue */
+      --edge-soft: rgba(237,230,214,0.09);
+      --ease: cubic-bezier(0.22, 1, 0.36, 1);
+      --ease-io: cubic-bezier(0.65, 0, 0.35, 1);
+      --maxw: 1240px;
+      --gutter: clamp(20px, 5vw, 84px);
+      --display: 'Fraunces', Georgia, 'Times New Roman', serif;
+      --serif: 'Newsreader', Georgia, serif;
+      --sans: 'Inter', system-ui, -apple-system, 'Segoe UI', sans-serif;
+      --mono: 'IBM Plex Mono', ui-monospace, 'Cascadia Code', monospace;
+    }
+
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    html { scroll-behavior: smooth; -webkit-text-size-adjust: 100%; }
+    body {
+      font-family: var(--sans);
+      background: var(--cloth);
+      color: var(--ink);
+      line-height: 1.6;
+      -webkit-font-smoothing: antialiased;
+      overflow-x: hidden;
+      touch-action: manipulation;
+    }
+    ::selection { background: rgba(198,161,91,0.28); color: var(--ink-hi); }
+
+    /* Textura de tecido + grão — sutil, atrás de tudo */
+    .weave { position: fixed; inset: 0; z-index: -2; pointer-events: none;
+      background:
+        radial-gradient(1200px 800px at 78% -8%, rgba(124,58,237,0.16), transparent 60%),
+        radial-gradient(900px 700px at 8% 12%, rgba(79,70,229,0.12), transparent 62%),
+        radial-gradient(900px 900px at 50% 120%, rgba(198,161,91,0.06), transparent 60%);
+    }
+    .weave::after { content: ""; position: absolute; inset: 0; opacity: 0.5;
+      background-image:
+        repeating-linear-gradient(90deg, rgba(255,255,255,0.014) 0 1px, transparent 1px 3px),
+        repeating-linear-gradient(0deg, rgba(0,0,0,0.05) 0 1px, transparent 1px 3px);
+      mix-blend-mode: overlay;
+    }
+
+    a { color: inherit; text-decoration: none; }
+    img, svg { display: block; }
+
+    /* Foco visível */
+    a:focus-visible, button:focus-visible, summary:focus-visible {
+      outline: 2px solid var(--foil-hi); outline-offset: 3px; border-radius: 4px;
+    }
+    .skip-link { position: absolute; left: 16px; top: -60px; z-index: 200; background: var(--foil); color: #201a10;
+      padding: 10px 18px; border-radius: 4px; font: 600 14px/1 var(--sans); transition: top .2s var(--ease); }
+    .skip-link:focus { top: 16px; }
+
+    /* Utilidades tipográficas */
+    .mono { font-family: var(--mono); font-weight: 500; }
+    .kicker {
+      font-family: var(--mono); font-size: 11.5px; letter-spacing: 0.32em; text-transform: uppercase;
+      color: var(--foil); font-weight: 500; display: inline-flex; align-items: center; gap: 12px;
+    }
+    .kicker::before { content: ""; width: 26px; height: 1px; background: var(--foil); opacity: 0.7; }
+    .foil-text { color: var(--foil);
+      background: linear-gradient(94deg, var(--foil) 10%, var(--foil-hi) 50%, var(--foil) 90%);
+      background-size: 220% 100%; -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent;
+    }
+    .num { font-variant-numeric: tabular-nums; }
+
+    .wrap { width: 100%; max-width: var(--maxw); margin-inline: auto; padding-inline: var(--gutter); }
+
+    /* ============ FITA — barra de progresso da página ============ */
+    .ribbon { position: fixed; top: 0; left: clamp(10px, 3vw, 40px); width: 3px; height: 100vh; z-index: 90; pointer-events: none; }
+    .ribbon .rail { position: absolute; inset: 0; background: var(--edge-soft); }
+    .ribbon .fill { position: absolute; top: 0; left: 0; width: 100%; height: 0%;
+      background: linear-gradient(var(--ribbon-hi), var(--ribbon)); box-shadow: 0 0 14px rgba(198,42,42,0.6); }
+    .ribbon .tab { position: absolute; left: -4px; width: 11px; height: 30px; top: 0; background: var(--ribbon);
+      clip-path: polygon(0 0, 100% 0, 100% 100%, 50% 78%, 0 100%); box-shadow: 0 6px 14px rgba(0,0,0,0.5); }
+    .ribbon .folio { position: absolute; left: 16px; top: 6px; font-family: var(--mono); font-size: 10px;
+      letter-spacing: 0.1em; color: var(--foil); white-space: nowrap; opacity: 0.9; }
+
+    /* ============ HEADER ============ */
+    header { position: fixed; top: 0; inset-inline: 0; z-index: 80; transition: background .4s var(--ease), border-color .4s; border-bottom: 1px solid transparent; }
+    header.scrolled { background: rgba(23,19,28,0.78); backdrop-filter: blur(14px) saturate(1.1); -webkit-backdrop-filter: blur(14px) saturate(1.1); border-color: var(--edge); }
+    .nav { display: flex; align-items: center; justify-content: space-between; height: 72px; }
+    .brand { display: flex; align-items: center; gap: 11px; }
+    .brand .wm { font-family: var(--display); font-weight: 600; font-size: 22px; letter-spacing: -0.01em; color: var(--ink-hi); }
+    .nav-mid { display: flex; gap: 4px; }
+    .nav-mid a { display: inline-flex; align-items: center; gap: 8px; min-height: 44px; padding: 0 14px; font-family: var(--mono);
+      font-size: 12px; letter-spacing: 0.06em; color: var(--ink-soft); border-radius: 4px; transition: color .2s, background .2s; }
+    .nav-mid a .fo { color: var(--foil); opacity: 0.8; }
+    .nav-mid a:hover { color: var(--ink-hi); background: rgba(255,255,255,0.04); }
+    .nav-right { display: flex; align-items: center; gap: 12px; }
+
+    /* Botões */
+    .btn { display: inline-flex; align-items: center; justify-content: center; gap: 9px; cursor: pointer; border: none;
+      font: 600 14.5px/1 var(--sans); padding: 13px 22px; border-radius: 3px; transition: transform .25s var(--ease), box-shadow .3s var(--ease), background .25s; white-space: nowrap; }
+    .btn svg { width: 17px; height: 17px; transition: transform .25s var(--ease); }
+    .btn-primary:hover svg { transform: translateX(3px); }
+    .btn-line:active { transform: translateY(0) scale(.985); }
+    .btn-primary { color: #fff; background: linear-gradient(135deg, var(--indigo-d), var(--violet));
+      box-shadow: 0 0 0 1px rgba(124,58,237,0.5), 0 10px 26px -10px rgba(79,70,229,0.7), inset 0 1px 0 rgba(255,255,255,0.22); }
+    .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 0 0 1px rgba(124,58,237,0.7), 0 16px 34px -12px rgba(79,70,229,0.8), inset 0 1px 0 rgba(255,255,255,0.28); }
+    .btn-primary:active { transform: translateY(0) scale(.985); }
+    .btn-line { color: var(--ink-hi); background: transparent; box-shadow: inset 0 0 0 1px var(--edge); }
+    .btn-line:hover { background: rgba(198,161,91,0.08); box-shadow: inset 0 0 0 1px var(--foil); transform: translateY(-2px); }
+
+    .nav-toggle { display: none; background: transparent; border: 1px solid var(--edge); color: var(--ink-hi); border-radius: 4px; padding: 9px; cursor: pointer; }
+    .nav-toggle svg { width: 22px; height: 22px; }
+    .mobile-menu { position: fixed; inset: 72px 0 auto 0; z-index: 79; background: rgba(23,19,28,0.98); backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px); border-bottom: 1px solid var(--edge); padding: 14px var(--gutter) 26px; display: flex; flex-direction: column; gap: 2px;
+      visibility: hidden; opacity: 0; transform: translateY(-10px);
+      transition: opacity .22s var(--ease), transform .22s var(--ease), visibility 0s linear .22s; }
+    .mobile-menu.open { visibility: visible; opacity: 1; transform: none;
+      transition: opacity .3s var(--ease), transform .3s var(--ease), visibility 0s; }
+    .mobile-menu a { font-family: var(--mono); font-size: 14px; color: var(--ink-soft); padding: 14px 6px; border-bottom: 1px solid var(--edge-soft); }
+    .mobile-menu a:hover { color: var(--ink-hi); }
+    .mobile-menu .btn { margin-top: 16px; }
+
+    /* ============ HERO / COVER (centralizado) ============ */
+    .hero { min-height: 100vh; display: flex; flex-direction: column; align-items: center; justify-content: center;
+      text-align: center; padding: 130px var(--gutter) 90px; position: relative; }
+    .hero-copy { max-width: 840px; margin-inline: auto; }
+    .hero-copy .kicker { justify-content: center; }
+    .hero h1 { text-wrap: balance; }
+    .hero .sub { margin-inline: auto; }
+    .hero-actions { justify-content: center; }
+    .hero-meta { justify-content: center; }
+    .hero-corner { position: absolute; width: 34px; height: 34px; border: 1px solid var(--foil); opacity: 0.5; }
+    .hc-tl { top: 96px; left: var(--gutter); border-right: 0; border-bottom: 0; }
+    .hc-br { bottom: 40px; right: var(--gutter); border-left: 0; border-top: 0; }
+
+    .hero-copy { position: relative; z-index: 2; }
+    .hero-copy .kicker { margin-bottom: 26px; }
+    .hero h1 { font-family: var(--display); font-weight: 900; color: var(--ink-hi);
+      font-size: clamp(1.9rem, 5.2vw, 3.75rem); line-height: 1.06; letter-spacing: -0.03em; }
+    .hero h1 .gold { color: var(--foil); }
+    .hero h1 .line { display: block; overflow: hidden; }
+    .hero h1 .line > span { display: block; transform: translateY(110%); }
+    .hero h1 em { font-style: italic; font-weight: 400; }
+    .measured { position: relative; display: inline-block; }
+    .measured .rule { position: absolute; left: 0; bottom: 0.06em; height: 3px; width: 100%; transform: scaleX(0); transform-origin: left;
+      background: linear-gradient(90deg, var(--foil-hi), var(--foil)); }
+    .hero .sub { font-family: var(--serif); font-size: clamp(1.1rem, 1.9vw, 1.35rem); color: var(--ink-soft);
+      max-width: 54ch; margin-top: 28px; line-height: 1.55; }
+    .hero-actions { display: flex; gap: 14px; margin-top: 38px; flex-wrap: wrap; align-items: center; }
+    .hero-meta { margin-top: 26px; display: flex; gap: 22px; flex-wrap: wrap; font-family: var(--mono); font-size: 11.5px; letter-spacing: 0.05em; color: var(--ink-faint); }
+    .hero-meta span { display: inline-flex; align-items: center; gap: 7px; }
+    .hero-meta .dot { width: 6px; height: 6px; border-radius: 50%; background: var(--foil); }
+
+    /* Reveal load-state */
+    .pre .hero h1 .line > span { transform: translateY(110%); }
+    .pre .hero .sub, .pre .hero-actions, .pre .hero-meta { opacity: 0; transform: translateY(18px); }
+
+    /* ============ ESTANTE-GRÁFICO (assinatura) ============ */
+    .shelf { position: relative; z-index: 2; align-self: center; }
+    .shelf-frame { border: 1px solid var(--edge); background: linear-gradient(180deg, rgba(31,24,38,0.6), rgba(23,19,28,0.3)); padding: 26px 26px 0; position: relative; }
+    .shelf-cap { display: flex; justify-content: space-between; align-items: baseline; font-family: var(--mono); font-size: 10.5px;
+      letter-spacing: 0.14em; text-transform: uppercase; color: var(--ink-faint); margin-bottom: 18px; }
+    .shelf-cap .foil-text { letter-spacing: 0.14em; }
+    .bars { display: flex; align-items: flex-end; gap: clamp(5px, 1vw, 12px); height: clamp(220px, 34vh, 340px); }
+    .spine { position: relative; flex: 1; border-radius: 2px 2px 0 0; transform-origin: bottom; transform: scaleY(0);
+      height: var(--h); box-shadow: inset -3px 0 6px rgba(0,0,0,0.35), inset 2px 0 0 rgba(255,255,255,0.06);
+      display: flex; align-items: flex-start; justify-content: center; padding-top: 8px; cursor: default; transition: filter .25s; }
+    .spine::after { content: ""; position: absolute; top: 12%; bottom: 8px; left: 50%; width: 1px; background: rgba(255,255,255,0.09); }
+    .spine .cloth-title { writing-mode: vertical-rl; font-family: var(--mono); font-size: 8.5px; letter-spacing: 0.12em; color: rgba(255,255,255,0.42); text-transform: uppercase; }
+    .spine:hover { filter: brightness(1.22); }
+    .spine .tip { position: absolute; bottom: calc(100% + 10px); left: 50%; transform: translateX(-50%) translateY(4px); background: var(--cloth-3);
+      border: 1px solid var(--edge); padding: 7px 10px; border-radius: 4px; font-family: var(--mono); font-size: 10.5px; color: var(--ink-hi);
+      white-space: nowrap; opacity: 0; pointer-events: none; transition: opacity .2s, transform .2s; z-index: 5; }
+    .spine .tip b { color: var(--foil); }
+    .spine:hover .tip { opacity: 1; transform: translateX(-50%) translateY(0); }
+    .spine.now .ribbon-flag { position: absolute; top: -2px; left: 50%; transform: translateX(-50%); width: 10px; height: 30px;
+      background: var(--ribbon); clip-path: polygon(0 0, 100% 0, 100% 100%, 50% 74%, 0 100%); box-shadow: 0 5px 10px rgba(0,0,0,0.4); z-index: 3; }
+    .shelf-base { height: 8px; background: linear-gradient(180deg, var(--foil), #8a6f34); box-shadow: 0 8px 20px -6px rgba(0,0,0,0.6); margin-top: 0; }
+    .shelf-axis { display: flex; justify-content: space-between; font-family: var(--mono); font-size: 9px; color: var(--ink-faint); padding: 8px 2px 22px; letter-spacing: 0.1em; }
+
+    /* ============ SECTIONS base ============ */
+    .section { padding-block: clamp(88px, 13vh, 168px); position: relative; }
+    .sec-head { max-width: 760px; margin-bottom: clamp(48px, 7vh, 88px); }
+    .sec-head.center { margin-inline: auto; text-align: center; }
+    .sec-head .kicker { margin-bottom: 22px; }
+    .sec-head h2 { font-family: var(--display); font-weight: 900; color: var(--ink-hi);
+      font-size: clamp(2.1rem, 5.2vw, 3.8rem); line-height: 1.0; letter-spacing: -0.03em; }
+    .sec-head h2 em { font-style: italic; font-weight: 400; }
+    .sec-head p { font-family: var(--serif); font-size: clamp(1.05rem, 1.7vw, 1.28rem); color: var(--ink-soft); margin-top: 20px; max-width: 60ch; }
+    .rule-gold { height: 1px; background: var(--edge); }
+
+    /* ============ MANIFESTO — reveal por scroll ============ */
+    .manifesto { padding-block: clamp(100px, 18vh, 220px); }
+    .manifesto .q { font-family: var(--display); font-weight: 400; font-style: italic; color: var(--ink-hi);
+      font-size: clamp(1.8rem, 4.6vw, 3.6rem); line-height: 1.28; letter-spacing: -0.02em; max-width: 20ch; margin-inline: auto; text-align: center; }
+    .manifesto .q .w { display: inline-block; opacity: 0.12; transition: opacity .1s linear; }
+    .manifesto .q .em { color: var(--foil); font-style: italic; }
+    .manifesto .sign { display: block; text-align: center; margin-top: 40px; font-family: var(--mono); font-size: 11px;
+      letter-spacing: 0.28em; text-transform: uppercase; color: var(--ink-faint); }
+
+    /* ============ REEL — filmstrip horizontal fixado ============ */
+    .reel { position: relative; height: 460vh; }
+    .reel-sticky { position: sticky; top: 0; height: 100vh; overflow: hidden; display: flex; flex-direction: column; justify-content: center; }
+    .reel-head { position: absolute; top: clamp(84px, 12vh, 130px); left: var(--gutter); right: var(--gutter); display: flex; justify-content: space-between; align-items: flex-end; z-index: 3; }
+    .reel-head h2 { font-family: var(--display); font-weight: 900; font-size: clamp(1.8rem, 4vw, 3rem); color: var(--ink-hi); letter-spacing: -0.03em; line-height: 1; }
+    .reel-prog { font-family: var(--mono); font-size: 11px; color: var(--ink-faint); letter-spacing: 0.1em; }
+    .reel-prog b { color: var(--foil); }
+    .reel-track { display: flex; gap: clamp(18px, 2.2vw, 34px); padding-inline: var(--gutter); will-change: transform; }
+    .fcard { flex: 0 0 min(84vw, 440px); min-height: 400px; background: linear-gradient(180deg, var(--cloth-2), rgba(23,19,28,0.4));
+      border: 1px solid var(--edge); padding: 32px; display: flex; flex-direction: column; position: relative; overflow: hidden; }
+    .fcard .fo { font-family: var(--mono); font-size: 11px; color: var(--foil); letter-spacing: 0.2em; }
+    .fcard .ic { width: 46px; height: 46px; margin: 24px 0 20px; color: var(--foil); }
+    .fcard .ic svg { width: 100%; height: 100%; }
+    .fcard h3 { font-family: var(--display); font-weight: 600; font-size: 1.7rem; color: var(--ink-hi); letter-spacing: -0.01em; line-height: 1.05; }
+    .fcard p { font-family: var(--serif); color: var(--ink-soft); font-size: 1.02rem; margin-top: 14px; }
+    .fcard .tag { margin-top: auto; font-family: var(--mono); font-size: 10.5px; letter-spacing: 0.14em; text-transform: uppercase; color: var(--ink-faint); padding-top: 22px; border-top: 1px solid var(--edge-soft); }
+    .fcard::before { content: ""; position: absolute; right: -60px; bottom: -60px; width: 200px; height: 200px; border-radius: 50%;
+      background: radial-gradient(circle, rgba(124,58,237,0.18), transparent 68%); }
+
+    /* ============ RITMO — dados que ganham forma ============ */
+    .ritmo-grid { display: grid; grid-template-columns: 1.1fr 1fr; gap: 56px; align-items: center; }
+    .kpis { display: grid; grid-template-columns: 1fr 1fr; gap: 1px; background: var(--edge); border: 1px solid var(--edge); }
+    .kpi { background: var(--cloth); padding: 26px 24px; }
+    /* entrada em cascata dos KPIs (stagger de lista, não fade de seção) */
+    .rise .kpi { opacity: 0; transform: translateY(16px); transition: opacity .6s var(--ease), transform .6s var(--ease); }
+    .rise.in .kpi { opacity: 1; transform: none; }
+    .rise.in .kpi:nth-child(2) { transition-delay: 70ms; }
+    .rise.in .kpi:nth-child(3) { transition-delay: 140ms; }
+    .rise.in .kpi:nth-child(4) { transition-delay: 210ms; }
+    .kpi .v { font-family: var(--display); font-weight: 900; font-size: clamp(2.4rem, 5vw, 3.4rem); color: var(--ink-hi); line-height: 1; letter-spacing: -0.03em; }
+    .kpi .v small { font-family: var(--mono); font-size: 0.9rem; font-weight: 500; color: var(--foil); letter-spacing: 0; }
+    .kpi .k { font-family: var(--mono); font-size: 11px; letter-spacing: 0.14em; text-transform: uppercase; color: var(--ink-faint); margin-top: 12px; }
+    .chart-wrap { border: 1px solid var(--edge); background: var(--cloth-2); padding: 24px; }
+    .chart-cap { display: flex; justify-content: space-between; font-family: var(--mono); font-size: 10.5px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--ink-faint); margin-bottom: 16px; }
+    .chart-cap .foil-text { letter-spacing: 0.12em; }
+    svg.chart { width: 100%; height: auto; display: block; overflow: visible; }
+    .chart .grid line { stroke: var(--edge-soft); stroke-width: 1; }
+    .chart .area { fill: url(#areaGrad); opacity: 0; transition: opacity .6s var(--ease); }
+    .chart .line { fill: none; stroke: var(--foil); stroke-width: 2.2; stroke-linecap: round; stroke-linejoin: round; }
+    .chart .axis { font-family: var(--mono); font-size: 9px; fill: var(--ink-faint); letter-spacing: 0.08em; }
+    .chart .dot { fill: var(--ribbon); opacity: 0; }
+
+    /* mensagens humanas — progresso sem culpa */
+    .msgs { margin-top: 60px; }
+    .msgs-lead { font-family: var(--serif); font-size: 1.12rem; color: var(--ink-soft); max-width: 54ch; }
+    .msg-row { display: flex; flex-wrap: wrap; gap: 12px; margin-top: 22px; }
+    .msg { font-family: var(--serif); font-style: italic; font-size: 1rem; color: var(--ink);
+      border: 1px solid var(--edge); background: var(--cloth-2); padding: 12px 18px; border-radius: 3px 18px 18px 18px; }
+    .msg.gentle { border-color: rgba(198,161,91,0.4); background: rgba(198,161,91,0.08); }
+    .gentle-label { font-family: var(--mono); font-size: 10.5px; letter-spacing: 0.14em; text-transform: uppercase;
+      color: var(--ink-faint); margin-top: 30px; }
+    .msgs .cap-line { margin-top: 30px; font-family: var(--mono); font-size: 11.5px; letter-spacing: 0.24em;
+      text-transform: uppercase; color: var(--foil); }
+
+    /* ============ SEQUÊNCIA ============ */
+    .seq-grid { display: grid; grid-template-columns: 1fr 1.2fr; gap: 56px; align-items: center; }
+    .ring-box { display: flex; align-items: center; gap: 26px; border: 1px solid var(--edge); background: var(--cloth-2); padding: 28px; }
+    .ring-box svg { width: 128px; height: 128px; flex-shrink: 0; }
+    .ring-box .rtxt .big { font-family: var(--display); font-weight: 900; font-size: 2rem; color: var(--ink-hi); line-height: 1; }
+    .ring-box .rtxt .lbl { font-family: var(--mono); font-size: 11px; letter-spacing: 0.1em; text-transform: uppercase; color: var(--ink-faint); margin-top: 8px; }
+    .streak { display: grid; grid-template-columns: repeat(14, 1fr); gap: 7px; margin-top: 24px; }
+    .streak i { aspect-ratio: 1; border: 1px solid var(--edge); display: flex; align-items: center; justify-content: center;
+      font-family: var(--mono); font-size: 11px; color: var(--foil); background: var(--cloth); opacity: 0; transform: scale(0.6); }
+    .streak i.on { background: rgba(198,161,91,0.14); border-color: var(--foil); }
+    .streak i.today { border-color: var(--ribbon); color: var(--ribbon-hi); box-shadow: 0 0 0 1px var(--ribbon);
+      animation: todayGlow 2.8s ease-in-out infinite; }
+    @keyframes todayGlow {
+      0%, 100% { box-shadow: 0 0 0 1px var(--ribbon); }
+      50% { box-shadow: 0 0 0 1px var(--ribbon), 0 0 12px rgba(198, 42, 42, 0.45); }
+    }
+    .metas-list { margin-top: 8px; }
+    .meta-row { padding: 20px 0; border-bottom: 1px solid var(--edge-soft); }
+    .meta-row .top { display: flex; justify-content: space-between; align-items: baseline; }
+    .meta-row .name { font-family: var(--serif); font-size: 1.1rem; color: var(--ink-hi); }
+    .meta-row .val { font-family: var(--mono); font-size: 12px; color: var(--foil); }
+    .meta-row .track { height: 4px; background: var(--edge-soft); margin-top: 12px; position: relative; }
+    .meta-row .track i { position: absolute; inset: 0 auto 0 0; width: 0; background: linear-gradient(90deg, var(--indigo-d), var(--violet)); }
+
+    /* ============ PÁGINA (privacidade) — vira a página ============ */
+    .leaf { background: var(--paper); color: #2a2521; position: relative; }
+    .leaf .wrap { padding-block: clamp(88px, 13vh, 168px); }
+    .leaf .kicker { color: #8a6f34; }
+    .leaf .kicker::before { background: #8a6f34; }
+    .leaf .drop { float: left; font-family: var(--display); font-weight: 900; font-size: 5.4rem; line-height: 0.72; margin: 8px 16px 0 0; color: var(--ribbon); }
+    .leaf h2 { font-family: var(--display); font-weight: 900; font-size: clamp(2rem, 4.6vw, 3.2rem); letter-spacing: -0.03em; color: #241f1b; line-height: 1.02; margin-bottom: 24px; }
+    .leaf p { font-family: var(--serif); font-size: 1.18rem; line-height: 1.7; color: #4a423a; max-width: 62ch; }
+    .leaf .marks { display: flex; gap: 40px; flex-wrap: wrap; margin-top: 40px; }
+    .leaf .mk { display: flex; align-items: center; gap: 12px; font-family: var(--mono); font-size: 12px; letter-spacing: 0.06em; color: #3a332c; }
+    .leaf .mk svg { width: 22px; height: 22px; color: #8a6f34; }
+    .leaf-folio { position: absolute; bottom: 26px; left: 50%; transform: translateX(-50%); font-family: var(--mono); font-size: 11px; letter-spacing: 0.2em; color: #9a8a6a; }
+
+    /* ============ DOWNLOAD — cólofon ============ */
+    .colophon { text-align: center; }
+    .colophon .wrap { border: 1px solid var(--edge); padding-block: clamp(64px, 9vh, 110px); position: relative; }
+    .colophon h2 { font-family: var(--display); font-weight: 900; font-size: clamp(2.4rem, 6vw, 4.4rem); color: var(--ink-hi); letter-spacing: -0.035em; line-height: 0.98; }
+    .colophon h2 em { font-style: italic; font-weight: 400; }
+    .colophon .lead { font-family: var(--serif); font-size: 1.2rem; color: var(--ink-soft); margin: 20px auto 0; max-width: 46ch; }
+    .cta-row { display: flex; justify-content: center; gap: 16px; flex-wrap: wrap; margin-top: 42px; }
+    .btn-big { padding: 19px 34px; font-size: 16.5px; border-radius: 4px; }
+    .cta-points { display: flex; justify-content: center; gap: 28px; flex-wrap: wrap; margin-top: 30px;
+      font-family: var(--mono); font-size: 11.5px; letter-spacing: 0.06em; color: var(--ink-faint); }
+    .cta-points span { display: inline-flex; align-items: center; gap: 8px; }
+    .cta-points .dot { width: 5px; height: 5px; border-radius: 50%; background: var(--foil); }
+
+    /* ============ FAQ ============ */
+    .faq { max-width: 820px; margin-inline: auto; }
+    .faq details { border-top: 1px solid var(--edge); }
+    .faq details:last-child { border-bottom: 1px solid var(--edge); }
+    .faq summary { cursor: pointer; list-style: none; display: flex; justify-content: space-between; align-items: center; gap: 20px;
+      padding: 26px 4px; font-family: var(--display); font-weight: 600; font-size: 1.25rem; color: var(--ink-hi); }
+    .faq summary::-webkit-details-marker { display: none; }
+    .faq summary .q-no { font-family: var(--mono); font-size: 12px; color: var(--foil); font-weight: 500; margin-right: 4px; }
+    .faq summary .pm { font-family: var(--mono); font-size: 22px; color: var(--foil); transition: transform .3s var(--ease), color .2s; font-weight: 400; }
+    .faq details[open] summary .pm { transform: rotate(45deg); }
+    .faq details.closing summary .pm { transform: rotate(0deg); }
+    .faq summary:hover .pm { color: var(--foil-hi); }
+    .faq details p { font-family: var(--serif); color: var(--ink-soft); font-size: 1.06rem; padding: 0 4px 26px; max-width: 68ch; }
+
+    /* ============ FOOTER ============ */
+    footer { border-top: 1px solid var(--edge); padding-block: 56px 44px; }
+    .foot { display: flex; justify-content: space-between; gap: 40px; flex-wrap: wrap; }
+    .foot .about { max-width: 320px; }
+    .foot .about .wm { font-family: var(--display); font-weight: 600; font-size: 20px; color: var(--ink-hi); }
+    .foot .about p { font-family: var(--serif); color: var(--ink-faint); font-size: 14px; margin-top: 12px; }
+    .foot-cols { display: flex; gap: 60px; flex-wrap: wrap; }
+    .foot-col h4 { font-family: var(--mono); font-size: 10.5px; letter-spacing: 0.18em; text-transform: uppercase; color: var(--foil); margin-bottom: 16px; }
+    .foot-col a { display: block; font-family: var(--sans); color: var(--ink-soft); font-size: 14px; margin-bottom: 11px; transition: color .2s; }
+    .foot-col a:hover { color: var(--ink-hi); }
+    .foot-bot { display: flex; justify-content: space-between; flex-wrap: wrap; gap: 14px; margin-top: 46px; padding-top: 24px; border-top: 1px solid var(--edge-soft);
+      font-family: var(--mono); font-size: 11px; letter-spacing: 0.06em; color: var(--ink-faint); }
+
+    /* ============ Livro folheável — vira páginas no scroll + flutua ============ */
+    .bookstage { position: relative; height: 340vh; }
+    .bookstage-sticky { position: sticky; top: 0; height: 100vh; overflow: hidden;
+      display: grid; grid-template-columns: 1.05fr 0.95fr; align-items: center;
+      gap: clamp(24px, 4vw, 64px); max-width: var(--maxw); margin-inline: auto; padding-inline: var(--gutter); }
+    .bsteps-col { order: 1; }
+    .book-col { order: 2; position: relative; display: grid; place-items: center; pointer-events: none; user-select: none; }
+    .bsteps-col .kicker { margin-bottom: 30px; }
+    .bsteps { position: relative; min-height: clamp(220px, 34vh, 320px); }
+    .bstep { position: absolute; left: 0; right: 0; top: 50%; transform: translateY(calc(-50% + 36px)); opacity: 0;
+      transition: opacity .38s var(--ease), transform .38s var(--ease); pointer-events: none; }
+    .bstep.active { opacity: 1; transform: translateY(-50%);
+      transition: opacity .55s var(--ease), transform .55s var(--ease); }
+    .bstep.passed { transform: translateY(calc(-50% - 36px)); }
+    .bstep .cap { font-family: var(--mono); font-size: 11px; letter-spacing: 0.24em; text-transform: uppercase; color: var(--foil); }
+    .bstep h3 { font-family: var(--display); font-weight: 900; font-size: clamp(1.8rem, 3.6vw, 2.9rem); color: var(--ink-hi); letter-spacing: -0.025em; line-height: 1.02; margin: 14px 0; }
+    .bstep p { font-family: var(--serif); font-size: 1.12rem; color: var(--ink-soft); max-width: 46ch; }
+    .bdots { display: flex; gap: 18px; margin-top: 38px; font-family: var(--mono); font-size: 11.5px; letter-spacing: 0.08em; }
+    .bdots span { color: var(--ink-faint); transition: color .3s; }
+    .bdots span.on { color: var(--foil); }
+    .book-wrap { perspective: 2000px; perspective-origin: 50% 42%; }
+    .book-shadow { position: absolute; left: 50%; bottom: 8%; width: min(440px, 38vw); height: 28px; transform: translateX(-50%);
+      background: radial-gradient(ellipse, rgba(0,0,0,0.55), transparent 70%); filter: blur(9px); animation: shadowFloat 6s ease-in-out infinite; }
+    .book-float { animation: bookFloat 6s ease-in-out infinite; transform-style: preserve-3d; }
+    .book { position: relative; --pw: min(235px, 19vw); --ph: min(330px, 44vh); width: calc(var(--pw) * 2); height: var(--ph);
+      transform-style: preserve-3d; transform: rotateX(11deg); }
+    .page-base { position: absolute; top: 0; height: 100%; width: var(--pw); background: var(--paper); display: flex; align-items: center; justify-content: center; }
+    .page-base.left { left: 0; border-radius: 5px 2px 2px 5px; box-shadow: inset -22px 0 34px -22px rgba(0,0,0,0.45), 0 34px 60px -30px rgba(0,0,0,0.7); }
+    .page-base.right { left: var(--pw); border-radius: 2px 5px 5px 2px; box-shadow: inset 22px 0 34px -22px rgba(0,0,0,0.45), 0 34px 60px -30px rgba(0,0,0,0.7); }
+    .book-spine { position: absolute; top: 0; left: calc(var(--pw) - 1px); width: 2px; height: 100%; background: rgba(42,37,33,0.5); z-index: 2; }
+    .basepage-inner { text-align: center; padding: 30px; display: flex; flex-direction: column; align-items: center; gap: 9px; }
+    .tp-k { font-family: var(--mono); font-size: 10px; letter-spacing: 0.28em; text-transform: uppercase; color: #9a8a6a; }
+    .tp-name { font-family: var(--display); font-weight: 900; font-size: clamp(2rem, 4.5vw, 3rem); color: #241f1b; line-height: 0.98; letter-spacing: -0.02em; }
+    .tp-sub { font-family: var(--serif); font-style: italic; color: #6a5f52; }
+    .tp-rule { width: 58px; height: 2px; background: #c6a15b; margin-top: 6px; }
+    .basepage-inner.close .tp-name { color: var(--ribbon); }
+    .leaf3 { position: absolute; top: 0; left: var(--pw); width: var(--pw); height: 100%; transform-origin: left center; transform-style: preserve-3d; will-change: transform; }
+    .leaf3 .face { position: absolute; inset: 0; backface-visibility: hidden; -webkit-backface-visibility: hidden; overflow: hidden;
+      background: var(--paper); background-image: repeating-linear-gradient(transparent 0 22px, rgba(42,37,33,0.07) 22px 23px);
+      display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 24px; }
+    .leaf3 .face.front { border-radius: 2px 5px 5px 2px; box-shadow: inset 22px 0 30px -24px rgba(0,0,0,0.4); }
+    .leaf3 .face.back { transform: rotateY(180deg); border-radius: 5px 2px 2px 5px; box-shadow: inset -22px 0 30px -24px rgba(0,0,0,0.4); }
+    /* sombreamento dinâmico: a página escurece no meio do giro (--shade setado no tick) */
+    .leaf3 .face::after { content: ""; position: absolute; inset: 0; pointer-events: none;
+      background: linear-gradient(100deg, rgba(23,19,28,0.34), rgba(23,19,28,0.06) 70%); opacity: var(--shade, 0); }
+    .leaf3 .orn { font-family: var(--serif); font-size: 1.5rem; color: rgba(138, 111, 52, 0.38); line-height: 1; }
+    .leaf3 .fol { position: absolute; bottom: 14px; left: 0; right: 0; text-align: center; font-family: var(--mono); font-size: 10px; color: #a5967a; }
+    @keyframes bookFloat { 0%,100% { transform: translateY(0) rotateZ(-1.2deg); } 50% { transform: translateY(-22px) rotateZ(1.2deg); } }
+    @keyframes shadowFloat { 0%,100% { transform: translateX(-50%) scale(1); opacity: 0.5; } 50% { transform: translateX(-50%) scale(0.84); opacity: 0.34; } }
+
+    /* ============ Cena de leitura (lâmpada + livro) — dissipa no scroll ============ */
+    .reading-scene { position: absolute; z-index: 1; top: 0; right: 0; width: min(560px, 54%); height: 100%;
+      opacity: 0.62; pointer-events: none; will-change: opacity, transform, filter; }
+    .reading-scene svg { width: 100%; height: 100%; }
+    .reading-scene .lampglow { animation: lampPulse 5s ease-in-out infinite; transform-origin: 171px 270px; transform-box: fill-box; }
+    @keyframes lampPulse { 0%,100% { opacity: 0.78; transform: scale(0.95); } 50% { opacity: 1; transform: scale(1.05); } }
+
+    /* ============ Barras que crescem no scroll ============ */
+    .grow-wrap { margin-top: 32px; border: 1px solid var(--edge); background: var(--cloth-2); padding: 24px; }
+    .grow-cap { display: flex; justify-content: space-between; align-items: baseline; font-family: var(--mono);
+      font-size: 10.5px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--ink-faint); margin-bottom: 16px; }
+    .grow-cap .foil-text { letter-spacing: 0.12em; }
+    .grow-bars { display: flex; align-items: flex-end; gap: clamp(6px, 1.2vw, 16px); height: clamp(150px, 22vh, 210px); }
+    .grow-bar { flex: 1; height: var(--h); border-radius: 2px 2px 0 0; transform: scaleY(0); transform-origin: bottom;
+      box-shadow: inset -2px 0 4px rgba(0,0,0,0.3), inset 2px 0 0 rgba(255,255,255,0.06); }
+    .grow-axis { display: flex; justify-content: space-between; margin-top: 10px; font-family: var(--mono); font-size: 9px; color: var(--ink-faint); letter-spacing: 0.1em; }
+
+    /* ============ Orbe de ouro líquido (herói) ============ */
+    .hero { overflow: hidden; }
+    .hero-orb { position: absolute; left: 50%; bottom: -40%; transform: translateX(-50%);
+      width: min(900px, 96vw); aspect-ratio: 1.7; z-index: 0; pointer-events: none; }
+    .hero-orb .halo { position: absolute; inset: -12%; border-radius: 50%; filter: blur(90px);
+      background: radial-gradient(50% 45% at 50% 42%, rgba(198,161,91,0.34), rgba(124,58,237,0.16) 55%, transparent 75%); }
+    .hero-orb .core { position: absolute; inset: 0; overflow: hidden;
+      border-radius: 48% 52% 55% 45% / 60% 55% 45% 40%;
+      background:
+        radial-gradient(58% 52% at 30% 26%, rgba(230,205,143,0.85), rgba(198,161,91,0.22) 46%, transparent 70%),
+        radial-gradient(48% 48% at 74% 58%, rgba(124,58,237,0.5), transparent 66%),
+        radial-gradient(66% 58% at 54% 78%, rgba(79,70,229,0.45), transparent 70%),
+        radial-gradient(100% 100% at 50% 50%, #261c31, #17131c 76%);
+      box-shadow: inset 0 -30px 90px rgba(0,0,0,0.6), inset 0 18px 60px rgba(230,205,143,0.16), 0 -30px 140px -40px rgba(198,161,91,0.4);
+      animation: orbMorph 16s ease-in-out infinite alternate;
+    }
+    .hero-orb .core::before { content: ""; position: absolute; inset: -1px; border-radius: inherit; mix-blend-mode: screen;
+      background: radial-gradient(75% 38% at 28% 100%, rgba(244,224,166,0.5), transparent 62%); }
+    @keyframes orbMorph {
+      0%   { border-radius: 48% 52% 55% 45% / 60% 55% 45% 40%; transform: rotate(-2deg) scale(1); }
+      50%  { border-radius: 56% 44% 42% 58% / 48% 60% 40% 54%; }
+      100% { border-radius: 45% 55% 60% 40% / 55% 45% 58% 42%; transform: rotate(2deg) scale(1.04); }
+    }
+    .orb-chip { position: absolute; z-index: 1; display: inline-flex; align-items: center; gap: 8px;
+      font-family: var(--mono); font-size: 11px; letter-spacing: 0.04em; color: var(--ink-hi);
+      background: rgba(23,19,28,0.6); border: 1px solid var(--edge); padding: 9px 13px; border-radius: 4px;
+      backdrop-filter: blur(6px); -webkit-backdrop-filter: blur(6px); animation: chipFloat 7s ease-in-out infinite; }
+    .orb-chip b { color: var(--foil-hi); font-weight: 600; }
+    .orb-chip .ok { color: var(--ribbon-hi); }
+    .chip-a { left: 14%; bottom: 63%; }
+    .chip-b { right: 13%; bottom: 68%; animation-delay: -3.4s; }
+    @keyframes chipFloat { 0%,100% { transform: translateY(0); } 50% { transform: translateY(-12px); } }
+
+    /* ============ Livros flutuando no herói (capas abstratas) ============ */
+    .hero-books { position: absolute; inset: 0; z-index: 0; pointer-events: none; perspective: 1100px; }
+    .fbk { position: absolute; left: var(--bx); top: var(--by, 56%);
+      animation: bookBob var(--bt, 8s) ease-in-out infinite; animation-delay: var(--bd, 0s); }
+    .fbk i { display: block; width: var(--bw, 88px); aspect-ratio: 2 / 3; border-radius: 3px 7px 7px 3px; opacity: 0.9;
+      background: linear-gradient(150deg, var(--bg1, #4f46e5), var(--bg2, #312e81));
+      transform: rotateY(var(--br, -50deg)) rotateZ(var(--bz, 0deg));
+      box-shadow: -16px 22px 36px rgba(0, 0, 0, 0.55); }
+    @keyframes bookBob { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-16px); } }
+
+    /* ============ Demonstração mesclada — telas atrás do manifesto ============ */
+    .demo-merged { position: relative; overflow: hidden; padding-block: clamp(70px, 10vh, 130px); }
+    .demo-merged .mq { position: absolute; inset: 0; z-index: 3; display: grid; place-items: center;
+      pointer-events: none; padding-inline: var(--gutter); }
+    .demo-merged .q { position: relative; text-align: center; padding: clamp(28px, 6vw, 64px) clamp(36px, 8vw, 100px); }
+    .demo-merged .q::before { content: ""; position: absolute; inset: -12%; z-index: -1;
+      background: radial-gradient(55% 65% at 50% 50%, rgba(23,19,28,0.9), rgba(23,19,28,0.48) 62%, transparent 78%); }
+
+    /* ============ Demonstração — laptop em cena física ============ */
+    .demo-scene { position: relative; overflow: hidden; display: grid; place-items: center;
+      padding: clamp(44px, 8vw, 96px) clamp(18px, 5vw, 80px);
+      background: linear-gradient(158deg, #cfc8bb, #b5ac9d 55%, #a69c8d); }
+    .demo-light, .demo-shadow { position: absolute; inset: -25%; pointer-events: none; }
+    .demo-light { mix-blend-mode: soft-light; animation: lightDrift 18s ease-in-out infinite alternate;
+      background:
+        radial-gradient(38% 55% at 72% 16%, rgba(255,250,232,0.85), transparent 62%),
+        radial-gradient(30% 42% at 30% 60%, rgba(255,246,224,0.5), transparent 60%); }
+    .demo-shadow { filter: blur(16px); animation: shadowDrift 24s ease-in-out infinite alternate;
+      background:
+        radial-gradient(24% 60% at 12% 30%, rgba(44,36,28,0.3), transparent 70%),
+        radial-gradient(16% 44% at 34% 10%, rgba(44,36,28,0.24), transparent 70%),
+        radial-gradient(30% 52% at 88% 78%, rgba(44,36,28,0.26), transparent 70%),
+        radial-gradient(12% 34% at 58% 6%, rgba(44,36,28,0.2), transparent 70%); }
+    @keyframes lightDrift  { from { transform: translate3d(-2.5%, -1.5%, 0); } to { transform: translate3d(2.5%, 1.5%, 0); } }
+    @keyframes shadowDrift { from { transform: translate3d(2%, -2%, 0) rotate(0.4deg); } to { transform: translate3d(-2.5%, 2%, 0) rotate(-0.6deg); } }
+    .laptop { position: relative; z-index: 2; width: min(760px, 100%); filter: drop-shadow(0 34px 44px rgba(30,24,18,0.38)); }
+    .lap-screen { background: #0e1015; border: 2px solid #2b2e37; border-bottom: none; border-radius: 14px 14px 0 0; padding: 9px 9px 0; }
+    .lap-viewport { background: var(--bg-app, #15171c); background: #15171c; border-radius: 6px 6px 0 0; overflow: hidden; }
+    .lap-base { height: 15px; background: linear-gradient(#3b3f49, #23262d); border-radius: 0 0 16px 16px; position: relative; }
+    .lap-base::after { content: ""; position: absolute; left: 50%; top: 0; transform: translateX(-50%);
+      width: 118px; height: 6px; background: #171a20; border-radius: 0 0 8px 8px; }
+
+    /* fluxo flutuante de telas (demonstração cinematográfica) */
+    .float-stage { position: relative; z-index: 2; width: 100%; perspective: 1400px; overflow: hidden; padding: 34px 0 50px; }
+    .float-track { display: flex; align-items: flex-start; gap: clamp(20px, 3vw, 44px); width: max-content;
+      transform: rotateX(7deg) rotateZ(-3deg); transform-style: preserve-3d; padding-inline: 6vw;
+      animation: streamDrift 26s linear infinite alternate; }
+    .float-stage:hover .float-track { animation-play-state: paused; }
+    @keyframes streamDrift {
+      from { transform: rotateX(7deg) rotateZ(-3deg) translateX(0); }
+      to   { transform: rotateX(7deg) rotateZ(-3deg) translateX(-26%); }
+    }
+    .shot { position: relative; flex: 0 0 min(430px, 74vw); border-radius: 10px; overflow: hidden;
+      border: 1px solid rgba(23,19,28,0.35); background: #15171c;
+      box-shadow: 0 34px 54px -18px rgba(30,24,18,0.5), 0 4px 12px rgba(30,24,18,0.25);
+      transform: translateZ(var(--z, 0px)) translateY(var(--dy, 0px)) rotateY(var(--ry, 0deg));
+      animation: shotBob var(--bt, 7s) ease-in-out infinite; animation-delay: var(--bd, 0s); }
+    @keyframes shotBob {
+      0%, 100% { transform: translateZ(var(--z, 0px)) translateY(var(--dy, 0px)) rotateY(var(--ry, 0deg)); }
+      50%      { transform: translateZ(var(--z, 0px)) translateY(calc(var(--dy, 0px) - 12px)) rotateY(var(--ry, 0deg)); }
+    }
+    .shot img { display: block; width: 100%; height: auto; }
+    .shot .shot-fb { display: none; }
+    .shot.noimg img { display: none; }
+    .shot.noimg .shot-fb { display: block; }
+    .shot .cap { position: absolute; left: 10px; bottom: 10px; z-index: 3; font-family: var(--mono); font-size: 9.5px;
+      letter-spacing: 0.12em; text-transform: uppercase; color: rgba(244,237,226,0.9);
+      background: rgba(23,19,28,0.68); padding: 4px 9px; border-radius: 3px; }
+    .shot-fb .fb-top { display: flex; align-items: center; gap: 8px; padding: 9px 12px;
+      border-bottom: 1px solid rgba(148,163,184,0.14); font: 500 10px/1 var(--sans); color: #9aa3b2; }
+    .shot-fb .fb-dot { width: 9px; height: 9px; border-radius: 2.5px; background: linear-gradient(135deg, #4f46e5, #7c3aed); }
+    .shot-fb .fb-body { padding: 14px; display: flex; flex-direction: column; gap: 9px; min-height: 210px; }
+    .fb-row { height: 10px; border-radius: 4px; background: rgba(255,255,255,0.07); }
+    .fb-row.w60 { width: 60%; } .fb-row.w80 { width: 80%; } .fb-row.w40 { width: 40%; }
+    .fb-bars { display: flex; align-items: flex-end; gap: 6px; height: 84px; margin-top: auto; }
+    .fb-bars i { flex: 1; background: linear-gradient(180deg, #818cf8, rgba(124,58,237,0.5)); border-radius: 3px 3px 0 0; }
+    .fb-ring { width: 64px; height: 64px; border-radius: 50%; margin: 10px auto;
+      border: 6px solid rgba(255,255,255,0.1); border-top-color: #818cf8; border-right-color: #818cf8; }
+    .fb-timer { text-align: center; font: 700 22px/1 var(--sans); color: #f1f5f9; letter-spacing: 0.04em; }
+    .fb-quote { font-family: var(--serif); font-style: italic; font-size: 12px; color: #ddd3c6;
+      padding: 9px 11px; border: 1px solid rgba(198,161,91,0.3); border-radius: 6px; background: rgba(198,161,91,0.07); }
+
+    /* mini-app Sapien dentro do laptop */
+    .sap { font-family: var(--sans); color: #f1f5f9; font-size: 11px; }
+    .sap-top { display: flex; align-items: center; gap: 10px; padding: 9px 12px; border-bottom: 1px solid rgba(148,163,184,0.14); }
+    .sap-pills { display: flex; gap: 3px; }
+    .sap-pills span { padding: 4px 9px; border-radius: 6px; color: #9aa3b2; font-size: 10px; }
+    .sap-pills .on { color: #fff; background: rgba(99,102,241,0.18); box-shadow: inset 0 0 0 1px rgba(99,102,241,0.35); }
+    .sap-search { margin-left: auto; font-size: 9.5px; color: #64748b; background: rgba(255,255,255,0.04);
+      border: 1px solid rgba(148,163,184,0.14); border-radius: 7px; padding: 4px 9px; }
+    .sap-body { display: grid; grid-template-columns: 1.35fr 1fr; gap: 10px; padding: 12px; }
+    .sap-now { border-radius: 10px; padding: 12px; background: linear-gradient(135deg, #1e1b4b, #4c1d95); border: 1px solid rgba(124,58,237,0.4); }
+    .sap-now .lbl { font-size: 8px; letter-spacing: 0.14em; text-transform: uppercase; color: rgba(255,255,255,0.6); font-weight: 600; }
+    .sap-flex { display: flex; gap: 10px; margin-top: 8px; }
+    .sap-cover { width: 46px; height: 66px; border-radius: 5px; flex-shrink: 0; background: linear-gradient(160deg, #1e293b, #0f172a);
+      display: flex; align-items: flex-end; padding: 5px; box-shadow: 0 8px 16px -4px rgba(0,0,0,0.6); }
+    .sap-cover i { font-family: var(--serif); font-style: normal; font-size: 7.5px; font-weight: 600; color: #fff; line-height: 1.1; }
+    .sap-meta h5 { font-size: 11.5px; color: #fff; margin: 0; }
+    .sap-meta .a { font-size: 9px; color: rgba(255,255,255,0.65); }
+    .sap-track { margin-top: 8px; height: 5px; border-radius: 99px; background: rgba(255,255,255,0.15); overflow: hidden; }
+    .sap-track i { display: block; height: 100%; width: 64%; background: linear-gradient(90deg, #a5b4fc, #f0abfc); border-radius: 99px; }
+    .sap-nums { display: flex; gap: 12px; margin-top: 8px; font-size: 8px; color: rgba(255,255,255,0.7); }
+    .sap-nums b { display: block; font-size: 11px; color: #fff; }
+    .sap-side { display: flex; flex-direction: column; gap: 10px; }
+    .sap-kpis { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+    .sap-kpi { background: rgba(255,255,255,0.045); border: 1px solid rgba(148,163,184,0.14); border-radius: 8px; padding: 8px 10px; }
+    .sap-kpi .k { font-size: 8px; color: #64748b; }
+    .sap-kpi .v { font-size: 13px; font-weight: 700; color: #f1f5f9; }
+    .sap-ring { display: flex; align-items: center; gap: 10px; background: rgba(255,255,255,0.045);
+      border: 1px solid rgba(148,163,184,0.14); border-radius: 8px; padding: 9px 10px; }
+    .sap-ring svg { width: 38px; height: 38px; flex-shrink: 0; }
+    .sap-ring .t { font-size: 9px; color: #9aa3b2; }
+    .sap-ring .n { font-size: 11px; font-weight: 700; color: #f1f5f9; }
+    .sap-shelf { grid-column: 1 / -1; display: grid; grid-template-columns: repeat(8, 1fr); gap: 7px; }
+    .sap-spine { aspect-ratio: 2/3; border-radius: 4px; box-shadow: 0 5px 10px -4px rgba(0,0,0,0.5); overflow: hidden; }
+    .sap-spine img { width: 100%; height: 100%; object-fit: cover; display: block; }
+    .sap-cover { position: relative; }
+    .sap-cover img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; border-radius: 5px; }
+
+    /* telas ricas: estatísticas / notas / sessão */
+    .sapx-kpis { display: flex; gap: 8px; padding: 10px 12px 0; }
+    .sapx-kpis .sap-kpi { flex: 1; }
+    .sapx-bars { display: flex; align-items: flex-end; gap: 7px; height: 92px; padding: 12px 12px 0; }
+    .sapx-bars i { flex: 1; border-radius: 4px 4px 0 0; background: linear-gradient(180deg, #818cf8, rgba(124,58,237,0.55)); }
+    .sapx-axis { display: flex; justify-content: space-between; padding: 6px 12px 12px; font: 500 8px var(--mono); color: #64748b; letter-spacing: 0.08em; }
+    .sapx-quote { margin: 10px 12px 0; padding: 10px 12px; border: 1px solid rgba(198,161,91,0.3); border-radius: 8px;
+      background: rgba(198,161,91,0.06); font-family: var(--serif); font-style: italic; font-size: 10.5px; color: #ddd3c6; }
+    .sapx-quote small { display: block; margin-top: 5px; font: 500 7.5px var(--mono); color: #c6a15b; font-style: normal; letter-spacing: 0.1em; }
+    .sapx-note { margin: 10px 12px 12px; padding: 9px 11px; border: 1px solid rgba(148,163,184,0.14); border-radius: 8px;
+      background: rgba(255,255,255,0.03); font: 400 9.5px/1.5 var(--sans); color: #9aa3b2; }
+    .sapx-note b { color: #f1f5f9; font-size: 10px; display: block; }
+    .sapx-timer { display: grid; place-items: center; padding: 14px 0 4px; }
+    .sapx-timer svg { width: 108px; height: 108px; }
+    .sapx-tnum { font: 700 20px var(--sans); fill: #f1f5f9; }
+    .sapx-controls { display: flex; justify-content: center; gap: 8px; padding: 8px 0 4px; }
+    .sapx-controls span { font: 600 9px var(--sans); color: #f1f5f9; padding: 6px 14px; border-radius: 99px;
+      background: rgba(99,102,241,0.18); box-shadow: inset 0 0 0 1px rgba(99,102,241,0.35); }
+    .sapx-controls .ghost { background: rgba(255,255,255,0.05); box-shadow: inset 0 0 0 1px rgba(148,163,184,0.2); color: #9aa3b2; }
+
+    /* ============ Reveal genérico ============ */
+    .rise { opacity: 0; transform: translateY(30px); transition: opacity .8s var(--ease), transform .8s var(--ease); }
+    .rise.in { opacity: 1; transform: none; }
+
+    /* ============ Responsivo ============ */
+    @media (max-width: 940px) {
+      .nav-mid, .nav-right .btn-line { display: none; }
+      .nav-toggle { display: inline-flex; }
+      .hero { grid-template-columns: 1fr; min-height: auto; padding-top: 118px; gap: 48px; }
+      .hc-tl, .hc-br { display: none; }
+      .ritmo-grid, .seq-grid { grid-template-columns: 1fr; gap: 36px; }
+      .reel { height: auto; }
+      .reel-sticky { position: static; height: auto; overflow-x: auto; padding-block: 100px 20px; scroll-snap-type: x mandatory; }
+      .reel-head { position: static; padding: 0 var(--gutter) 26px; }
+      .reel-track { transform: none !important; }
+      .fcard { scroll-snap-align: start; flex-basis: 78vw; min-height: 360px; }
+      .streak { grid-template-columns: repeat(7, 1fr); }
+      .ribbon { display: none; }
+      .orb-chip { display: none; }
+      .fbk { --bw: 54px !important; }
+      .fbk:nth-child(n+5) { display: none; }
+      .demo-merged .mq { position: static; display: block; padding: 0; margin-bottom: 6px; }
+      .demo-merged .q::before { display: none; }
+      .float-stage { overflow-x: auto; -webkit-overflow-scrolling: touch; scroll-snap-type: x proximity; perspective: 900px; }
+      .float-track { animation: none; transform: rotateX(3deg) rotateZ(-1deg); padding-inline: 24px; }
+      .shot { scroll-snap-align: center; animation: none; flex-basis: 80vw;
+        transform: translateY(calc(var(--dy, 0px) * 0.35)); }
+      .bookstage-sticky { grid-template-columns: 1fr; align-content: center; gap: 18px; padding-top: 76px; }
+      .book-col { order: 0; }
+      .book { --pw: min(150px, 32vw); --ph: min(210px, 44vw); }
+      .bsteps { min-height: 210px; }
+      .bdots { margin-top: 14px; }
+    }
+    @media (max-width: 560px) {
+      .cta-row .btn { width: 100%; }
+      .kpis { grid-template-columns: 1fr; }
+      .leaf .drop { font-size: 4rem; }
+      .sap-body { grid-template-columns: 1fr; }
+      .sap-shelf { grid-template-columns: repeat(6, 1fr); }
+      .sap-pills span:nth-child(n+4) { display: none; }
+    }
+
+    /* ============ Reduced motion ============ */
+    @media (prefers-reduced-motion: reduce) {
+      * { animation: none !important; scroll-behavior: auto; transition-duration: 0.01ms !important; }
+      .hero h1 .line > span { transform: none; }
+      .pre .hero .sub, .pre .hero-actions, .pre .hero-meta { opacity: 1; transform: none; }
+      .spine { transform: scaleY(1); }
+      .measured .rule { transform: scaleX(1); }
+      .rise { opacity: 1; transform: none; }
+      .rise .kpi { opacity: 1; transform: none; }
+      .leaf3 .face::after { opacity: 0 !important; }
+      .manifesto .q .w { opacity: 1; }
+      .streak i { opacity: 1; transform: none; }
+      .chart .area { opacity: 1; }
+      .grow-bar { transform: scaleY(1) !important; }
+      .float-stage { overflow-x: auto; }
+      .chart .line { stroke-dashoffset: 0 !important; }
+      .chart .dot { opacity: 1 !important; }
+      .reading-scene { opacity: 0.5 !important; transform: none !important; filter: none !important; }
+      .book-float, .book-shadow, .reading-scene .lampglow { animation: none !important; }
+      .book { transform: rotateX(6deg); }
+      .bookstage { height: auto; padding-block: 120px; }
+      .bookstage-sticky { position: static; height: auto; min-height: 0; }
+      .bsteps { min-height: 0; }
+      .bstep { position: static; opacity: 1; transform: none; margin-bottom: 30px; }
+      .bdots { display: none; }
+    }
+  </style>
+</head>
+<body class="pre">
+  <a href="#cover" class="skip-link">Pular para o conteúdo</a>
+  <div class="weave" aria-hidden="true"></div>
+
+  <!-- Fita de progresso -->
+  <div class="ribbon" aria-hidden="true">
+    <div class="rail"></div>
+    <div class="fill" id="ribbonFill"></div>
+    <div class="tab" id="ribbonTab"></div>
+    <div class="folio" id="ribbonFolio">p.00</div>
+  </div>
+
+  <!-- HEADER -->
+  <header id="header">
+    <div class="wrap nav">
+      <a href="#cover" class="brand" aria-label="Sapien — início">
+        <svg width="30" height="30" viewBox="0 0 100 100" aria-hidden="true">
+          <defs><linearGradient id="lg" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#4f46e5"/><stop offset="1" stop-color="#7c3aed"/></linearGradient></defs>
+          <rect x="4" y="4" width="92" height="92" rx="22" fill="url(#lg)"/>
+          <path d="M26 71 L26 39 A11 11 0 0 1 48 39 L48 71 Z" fill="#fff"/>
+          <path d="M52 71 L52 39 A11 11 0 0 1 74 39 L74 71 Z" fill="#fff"/>
+          <path d="M32 53 Q37 58.5 42 53" fill="none" stroke="url(#lg)" stroke-width="3.4" stroke-linecap="round"/>
+          <path d="M58 53 Q63 58.5 68 53" fill="none" stroke="url(#lg)" stroke-width="3.4" stroke-linecap="round"/>
+        </svg>
+        <span class="wm">Sapien</span>
+      </a>
+      <nav class="nav-mid" aria-label="Navegação principal">
+        <a href="#demo">Como funciona</a>
+        <a href="#ritmo">Evolução</a>
+        <a href="#reservado">Segurança</a>
+      </nav>
+      <div class="nav-right">
+        <a href="#assinar" class="btn btn-primary">Assinar agora</a>
+        <button class="nav-toggle" id="navToggle" aria-label="Abrir menu" aria-expanded="false" aria-controls="mobileMenu">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M4 6h16M4 12h16M4 18h16"/></svg>
+        </button>
+      </div>
+    </div>
+  </header>
+  <div class="mobile-menu" id="mobileMenu">
+    <a href="#demo">Como funciona</a>
+    <a href="#ritmo">Evolução</a>
+    <a href="#reservado">Segurança</a>
+    <a href="#faq">Antes de começar</a>
+    <a href="#assinar" class="btn btn-primary">Assinar agora</a>
+  </div>
+
+  <!-- HERO / COVER -->
+  <section class="hero" id="cover">
+    <span class="hero-corner hc-tl" aria-hidden="true"></span>
+    <span class="hero-corner hc-br" aria-hidden="true"></span>
+
+    <!-- Orbe de ouro líquido + chips flutuantes -->
+    <div class="hero-orb" aria-hidden="true">
+      <div class="halo"></div>
+      <div class="core"></div>
+      <span class="orb-chip chip-a"><b>38</b> pág/h · ritmo medido</span>
+      <span class="orb-chip chip-b"><span class="ok">✓</span> sequência · <b>12 dias</b></span>
+    </div>
+
+    <!-- Livros flutuando (capas reais — Open Library) -->
+    <div class="hero-books" aria-hidden="true">
+      <span class="fbk" style="--bx:3%; --by:28%; --br:-55deg; --bw:82px; --bt:8s; --bg1:#4f46e5; --bg2:#312e81"><i></i></span>
+      <span class="fbk" style="--bx:11%; --by:52%; --br:-48deg; --bw:96px; --bt:9.5s; --bd:-2.5s; --bg1:#7c3aed; --bg2:#4c1d95"><i></i></span>
+      <span class="fbk" style="--bx:6%; --by:74%; --br:-58deg; --bz:-3deg; --bw:70px; --bt:7.5s; --bd:-5s; --bg1:#0ea5e9; --bg2:#0c4a6e"><i></i></span>
+      <span class="fbk" style="--bx:21%; --by:20%; --br:-40deg; --bw:58px; --bt:10s; --bd:-4s; --bg1:#f59e0b; --bg2:#92400e"><i></i></span>
+      <span class="fbk" style="--bx:85%; --by:26%; --br:52deg; --bz:2deg; --bw:78px; --bt:8.6s; --bd:-1.2s; --bg1:#ec4899; --bg2:#831843"><i></i></span>
+      <span class="fbk" style="--bx:88%; --by:52%; --br:46deg; --bw:96px; --bt:9s; --bd:-3.8s; --bg1:#10b981; --bg2:#064e3b"><i></i></span>
+      <span class="fbk" style="--bx:81%; --by:73%; --br:55deg; --bz:3deg; --bw:68px; --bt:7.8s; --bd:-6.2s; --bg1:#c6a15b; --bg2:#7a5c26"><i></i></span>
+      <span class="fbk" style="--bx:73%; --by:16%; --br:42deg; --bw:60px; --bt:10.5s; --bd:-7s; --bg1:#64748b; --bg2:#1e293b"><i></i></span>
+    </div>
+
+    <div class="hero-copy" data-parallax="0.12">
+      <span class="kicker">Um instrumento de leitura</span>
+      <h1>
+        <span class="line"><span>O Sapien não gerencia livros.</span></span>
+        <span class="line"><span>Ele desenvolve <em class="gold">leitores</em><span class="measured"><span class="dotmark">.</span><span class="rule" id="heroRule"></span></span></span></span>
+      </h1>
+      <p class="sub">O Sapien transforma sua leitura solta em um hábito consistente. Acompanhe seu progresso página por página, mantenha sua constância e veja sua evolução como leitor.</p>
+      <div class="hero-actions">
+        <a href="#assinar" class="btn btn-primary">
+          Assinar agora
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14m0 0l-6-6m6 6l-6 6"/></svg>
+        </a>
+        <a href="#demo" class="btn btn-line">Ver como funciona</a>
+      </div>
+      <div class="hero-meta">
+        <span><span class="dot"></span> Direto no navegador</span>
+        <span><span class="dot"></span> Privado por padrão</span>
+        <span><span class="dot"></span> Sem anúncios</span>
+      </div>
+    </div>
+
+  </section>
+
+  <!-- LIVRO FOLHEÁVEL (decorativo) + CAPÍTULOS -->
+  <section class="bookstage" id="livro" aria-label="O Sapien em cinco capítulos">
+    <div class="bookstage-sticky">
+      <div class="book-col" aria-hidden="true">
+        <div class="book-shadow"></div>
+        <div class="book-wrap">
+          <div class="book-float">
+            <div class="book" id="book">
+              <div class="page-base left">
+                <div class="basepage-inner title">
+                  <span class="tp-k">Vol. MMXXVI</span>
+                  <span class="tp-name">Sapien</span>
+                  <span class="tp-sub">um instrumento de leitura</span>
+                  <span class="tp-rule"></span>
+                </div>
+              </div>
+              <div class="page-base right">
+                <div class="basepage-inner close"><span class="tp-name">Boa<br>leitura.</span></div>
+              </div>
+              <div class="book-spine"></div>
+              <!-- folhas injetadas via JS -->
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="bsteps-col">
+        <span class="kicker">O Sapien em cinco capítulos</span>
+        <div class="bsteps" id="bsteps"><!-- capítulos via JS --></div>
+        <div class="bdots" id="bdots" aria-hidden="true"></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- DEMONSTRAÇÃO — telas do Sapien atrás do manifesto -->
+  <section class="manifesto demo-merged" id="demo" aria-label="Feito por leitores para leitores — telas do Sapien">
+        <div class="float-stage">
+          <div class="float-track">
+            <figure class="shot noimg" style="--z:42px; --ry:-6deg; --dy:0px; --bt:7s">
+              <div class="shot-fb">
+              <div class="sap">
+                <div class="sap-top">
+                  <svg width="16" height="16" viewBox="0 0 100 100" aria-hidden="true"><rect x="4" y="4" width="92" height="92" rx="22" fill="url(#lg)"/><path d="M26 71 L26 39 A11 11 0 0 1 48 39 L48 71 Z" fill="#fff"/><path d="M52 71 L52 39 A11 11 0 0 1 74 39 L74 71 Z" fill="#fff"/></svg>
+                  <div class="sap-pills"><span class="on">Biblioteca</span><span>Lendo</span><span>Sessão</span><span>Metas</span><span>Notas</span></div>
+                  <span class="sap-search">Buscar livro…</span>
+                </div>
+                <div class="sap-body">
+                  <div class="sap-now">
+                    <span class="lbl">Lendo agora</span>
+                    <div class="sap-flex">
+                      <div class="sap-cover"><i>O Peso da Luz</i></div>
+                      <div class="sap-meta">
+                        <h5>O Peso da Luz</h5><span class="a">Helena Vasques</span>
+                        <div class="sap-track"><i></i></div>
+                        <div class="sap-nums"><span><b>288</b>de 451 pág.</span><span><b>~4h</b>restantes</span><span><b>38</b>pág/h</span></div>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="sap-side">
+                    <div class="sap-kpis">
+                      <div class="sap-kpi"><div class="k">Lidos em 2026</div><div class="v">17</div></div>
+                      <div class="sap-kpi"><div class="k">Páginas no mês</div><div class="v">1.240</div></div>
+                    </div>
+                    <div class="sap-ring">
+                      <svg viewBox="0 0 36 36"><circle cx="18" cy="18" r="15.5" fill="none" stroke="rgba(255,255,255,0.1)" stroke-width="4"/><circle cx="18" cy="18" r="15.5" fill="none" stroke="url(#lg)" stroke-width="4" stroke-linecap="round" stroke-dasharray="97.4" stroke-dashoffset="30" transform="rotate(-90 18 18)"/></svg>
+                      <div><div class="n">17 / 24 livros</div><div class="t">Meta anual · 71%</div></div>
+                    </div>
+                  </div>
+                  <div class="sap-shelf">
+                    <div class="sap-spine" style="background:linear-gradient(160deg,#4f46e5,#312e81)"></div>
+                    <div class="sap-spine" style="background:linear-gradient(160deg,#7c3aed,#4c1d95)"></div>
+                    <div class="sap-spine" style="background:linear-gradient(160deg,#0ea5e9,#0c4a6e)"></div>
+                    <div class="sap-spine" style="background:linear-gradient(160deg,#f59e0b,#92400e)"></div>
+                    <div class="sap-spine" style="background:linear-gradient(160deg,#ec4899,#831843)"></div>
+                    <div class="sap-spine" style="background:linear-gradient(160deg,#10b981,#064e3b)"></div>
+                    <div class="sap-spine" style="background:linear-gradient(160deg,#c6a15b,#7a5c26)"></div>
+                    <div class="sap-spine" style="background:linear-gradient(160deg,#64748b,#1e293b)"></div>
+                  </div>
+                </div>
+              </div>
+              </div>
+              <figcaption class="cap">Painel</figcaption>
+            </figure>
+
+            <figure class="shot noimg" style="--z:-30px; --ry:5deg; --dy:28px; --bt:8.5s; --bd:-2.1s">
+              <div class="shot-fb">
+                <div class="sap">
+                  <div class="sap-top">
+                    <svg width="16" height="16" viewBox="0 0 100 100" aria-hidden="true"><rect x="4" y="4" width="92" height="92" rx="22" fill="url(#lg)"/><path d="M26 71 L26 39 A11 11 0 0 1 48 39 L48 71 Z" fill="#fff"/><path d="M52 71 L52 39 A11 11 0 0 1 74 39 L74 71 Z" fill="#fff"/></svg>
+                    <div class="sap-pills"><span>Biblioteca</span><span class="on">Estatísticas</span><span>Metas</span></div>
+                  </div>
+                  <div class="sapx-kpis">
+                    <div class="sap-kpi"><div class="k">Páginas lidas</div><div class="v">32.410</div></div>
+                    <div class="sap-kpi"><div class="k">Nota média</div><div class="v">4,3★</div></div>
+                    <div class="sap-kpi"><div class="k">Ritmo</div><div class="v">38 pág/h</div></div>
+                  </div>
+                  <div class="sapx-bars"><i style="height:34%"></i><i style="height:52%"></i><i style="height:44%"></i><i style="height:70%"></i><i style="height:58%"></i><i style="height:88%"></i><i style="height:64%"></i><i style="height:96%"></i></div>
+                  <div class="sapx-axis"><span>MAI</span><span>JUN</span><span>JUL</span><span>AGO</span><span>SET</span><span>OUT</span><span>NOV</span><span>DEZ</span></div>
+                </div>
+              </div>
+              <figcaption class="cap">Estatísticas</figcaption>
+            </figure>
+
+            <figure class="shot noimg" style="--z:22px; --ry:-4deg; --dy:54px; --bt:9s; --bd:-4.4s">
+              <div class="shot-fb">
+                <div class="sap">
+                  <div class="sap-top">
+                    <svg width="16" height="16" viewBox="0 0 100 100" aria-hidden="true"><rect x="4" y="4" width="92" height="92" rx="22" fill="url(#lg)"/><path d="M26 71 L26 39 A11 11 0 0 1 48 39 L48 71 Z" fill="#fff"/><path d="M52 71 L52 39 A11 11 0 0 1 74 39 L74 71 Z" fill="#fff"/></svg>
+                    <div class="sap-pills"><span>Biblioteca</span><span class="on">Notas</span><span>Sessão</span></div>
+                  </div>
+                  <div class="sapx-quote">"Cada página lida devolve um pedaço de tempo que era só nosso."<small>O PESO DA LUZ · P. 112</small></div>
+                  <div class="sapx-note"><b>Ideia central do cap. 4</b>Guardar os trechos que ficaram — retomar no clube de leitura.</div>
+                  <div class="sapx-quote">"Ler é alargar a casa por dentro."<small>CARTAS AO SILÊNCIO · P. 47</small></div>
+                </div>
+              </div>
+              <figcaption class="cap">Notas</figcaption>
+            </figure>
+
+            <figure class="shot noimg" style="--z:-46px; --ry:6deg; --dy:14px; --bt:7.8s; --bd:-1.3s">
+              <div class="shot-fb">
+                <div class="sap">
+                  <div class="sap-top">
+                    <svg width="16" height="16" viewBox="0 0 100 100" aria-hidden="true"><rect x="4" y="4" width="92" height="92" rx="22" fill="url(#lg)"/><path d="M26 71 L26 39 A11 11 0 0 1 48 39 L48 71 Z" fill="#fff"/><path d="M52 71 L52 39 A11 11 0 0 1 74 39 L74 71 Z" fill="#fff"/></svg>
+                    <div class="sap-pills"><span>Lendo</span><span class="on">Sessão</span><span>Metas</span></div>
+                  </div>
+                  <div class="sapx-timer">
+                    <svg viewBox="0 0 120 120">
+                      <circle cx="60" cy="60" r="52" fill="none" stroke="rgba(255,255,255,0.09)" stroke-width="7"/>
+                      <circle cx="60" cy="60" r="52" fill="none" stroke="url(#lg)" stroke-width="7" stroke-linecap="round"
+                        stroke-dasharray="326.7" stroke-dashoffset="98" transform="rotate(-90 60 60)"/>
+                      <text class="sapx-tnum" x="60" y="67" text-anchor="middle">17:32</text>
+                    </svg>
+                  </div>
+                  <div class="sapx-controls"><span>Pausar</span><span class="ghost">Encerrar</span></div>
+                  <div class="sapx-note" style="text-align:center"><b>O Peso da Luz · Helena Vasques</b>hoje: 3 sessões · 42 páginas</div>
+                </div>
+              </div>
+              <figcaption class="cap">Sessão</figcaption>
+            </figure>
+          </div>
+        </div>
+        <div class="mq">
+          <p class="q" id="manifesto" data-manifesto>
+            Feito por <span class="em">leitores</span> para <span class="em">leitores</span>.
+          </p>
+        </div>
+  </section>
+
+  <!-- 01 · ACERVO (reel horizontal) -->
+  <section class="reel" id="acervo">
+    <div class="reel-sticky">
+      <div class="reel-head">
+        <h2><span class="kicker" style="display:block;margin-bottom:14px">p.01 — O Acervo</span>Tudo o que sustenta<br>o hábito</h2>
+        <span class="reel-prog mono"><b id="reelPct">00</b> / 06</span>
+      </div>
+      <div class="reel-track" id="reelTrack">
+        <article class="fcard">
+          <span class="fo">i.</span>
+          <div class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4-4"/></svg></div>
+          <h3>Cadastro sem digitar</h3>
+          <p>Busca combinada no Google Books e na Open Library, priorizando edições em português — capa, páginas e dados vêm prontos e editáveis.</p>
+          <span class="tag">Preenchimento automático</span>
+        </article>
+        <article class="fcard">
+          <span class="fo">ii.</span>
+          <div class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg></div>
+          <h3>Prateleiras vivas</h3>
+          <p>Desejo, fila, lendo, pausado, lido, abandonado. Mova entre prateleiras num clique; veja em grade, lista ou tabela.</p>
+          <span class="tag">Seis status</span>
+        </article>
+        <article class="fcard">
+          <span class="fo">iii.</span>
+          <div class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg></div>
+          <h3>Pomodoro de leitura</h3>
+          <p>Um timer circular. Ao terminar o foco, registre páginas e tempo — a sessão avança o progresso e mede seu ritmo real.</p>
+          <span class="tag">Foco cronometrado</span>
+        </article>
+        <article class="fcard">
+          <span class="fo">iv.</span>
+          <div class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M3 3v18h18"/><path d="M7 15l4-4 3 3 5-6"/></svg></div>
+          <h3>Estatísticas de verdade</h3>
+          <p>Livros por mês, páginas, nota média e ritmo. Painéis por gênero e por autor, com detalhamento ao clicar.</p>
+          <span class="tag">Recharts · tema-aware</span>
+        </article>
+        <article class="fcard">
+          <span class="fo">v.</span>
+          <div class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M12 20h9M3 20l9-9 3 3-9 9H3v-3z"/><path d="M14 5l3 3"/></svg></div>
+          <h3>Notas &amp; trechos</h3>
+          <p>Guarde notas, citações e destaques por livro, com a página de referência. As citações ganham serifada em itálico.</p>
+          <span class="tag">Marginalia</span>
+        </article>
+        <article class="fcard">
+          <span class="fo">vi.</span>
+          <div class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M4 21v-7M4 10V3M12 21v-9M12 8V3M20 21v-5M20 12V3"/><path d="M1 14h6M9 8h6M17 16h6"/></svg></div>
+          <h3>Personalização do seu painel</h3>
+          <p>Escolha cores, intensidade das animações e uma experiência visual compatível com o seu dispositivo e com a forma como você prefere acompanhar suas leituras.</p>
+          <span class="tag">Do seu jeito</span>
+        </article>
+      </div>
+    </div>
+  </section>
+
+  <!-- 02 · RITMO -->
+  <section class="section" id="ritmo">
+    <div class="wrap">
+      <div class="sec-head rise">
+        <span class="kicker">p.02 — O Ritmo</span>
+        <h2>Cada sessão vira <em>medida</em>.</h2>
+        <p>Você lê; o Sapien conta. Páginas, minutos e o ritmo em páginas por hora se acumulam sozinhos — e o gráfico se desenha conforme você rola.</p>
+      </div>
+      <div class="ritmo-grid">
+        <div class="kpis rise">
+          <div class="kpi"><div class="v num" data-count="17">0</div><div class="k">Lidos em 2026</div></div>
+          <div class="kpi"><div class="v num" data-count="32410">0</div><div class="k">Páginas lidas</div></div>
+          <div class="kpi"><div class="v num" data-count="38">0</div><small>pág/h</small><div class="k">Ritmo médio</div></div>
+          <div class="kpi"><div class="v num" data-count="4" data-suffix=",3">0</div><small>★</small><div class="k">Nota média</div></div>
+        </div>
+        <div class="chart-wrap rise" data-chart>
+          <div class="chart-cap"><span class="foil-text">Páginas por dia</span><span>últimos 14 dias</span></div>
+          <svg class="chart" viewBox="0 0 520 220" preserveAspectRatio="none" aria-label="Gráfico de área das páginas lidas por dia nos últimos 14 dias">
+            <defs>
+              <linearGradient id="areaGrad" x1="0" y1="0" x2="0" y2="1">
+                <stop offset="0" stop-color="#c6a15b" stop-opacity="0.34"/>
+                <stop offset="1" stop-color="#c6a15b" stop-opacity="0"/>
+              </linearGradient>
+            </defs>
+            <g class="grid">
+              <line x1="0" y1="55" x2="520" y2="55"/><line x1="0" y1="110" x2="520" y2="110"/><line x1="0" y1="165" x2="520" y2="165"/>
+            </g>
+            <path class="area" id="chartArea" d=""/>
+            <path class="line" id="chartLine" d="" pathLength="1"/>
+            <circle class="dot" id="chartDot" r="4"/>
+          </svg>
+        </div>
+      </div>
+
+      <!-- Barras que crescem conforme o scroll -->
+      <div class="grow-wrap rise">
+        <div class="grow-cap"><span class="foil-text">Livros lidos por mês</span><span>crescendo mês a mês</span></div>
+        <div class="grow-bars" id="growBars" role="img" aria-label="Barras de livros lidos por mês em 2026 que crescem conforme a página é rolada."></div>
+        <div class="grow-axis">
+          <span>J</span><span>F</span><span>M</span><span>A</span><span>M</span><span>J</span><span>J</span><span>A</span><span>S</span><span>O</span><span>N</span><span>D</span>
+        </div>
+      </div>
+
+      <!-- Evolução em palavras, não só números -->
+      <div class="msgs rise">
+        <p class="msgs-lead">Os números não falam sozinhos. O Sapien traduz seus dados em mensagens que incentivam — nunca que cobram:</p>
+        <div class="msg-row">
+          <span class="msg">"Você está lendo 24% mais do que no mês passado."</span>
+          <span class="msg">"Seu ritmo de leitura está mais constante nesta semana."</span>
+          <span class="msg">"Este é o seu melhor mês até agora."</span>
+          <span class="msg">"Você está cada vez mais perto da sua meta."</span>
+          <span class="msg">"Cada página de hoje mantém o seu hábito em movimento."</span>
+        </div>
+        <p class="gentle-label">E quando a semana aperta:</p>
+        <div class="msg-row">
+          <span class="msg gentle">"Uma pausa faz parte. Retome no seu ritmo."</span>
+          <span class="msg gentle">"Pequenas leituras também contam."</span>
+          <span class="msg gentle">"Seu progresso continua. Hoje pode ser um novo começo."</span>
+        </div>
+        <p class="cap-line">Progresso sem culpa.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- 03 · SEQUÊNCIA -->
+  <section class="section" id="sequencia">
+    <div class="wrap">
+      <div class="rule-gold" style="margin-bottom:64px"></div>
+      <div class="seq-grid">
+        <div class="rise">
+          <div class="ring-box">
+            <svg viewBox="0 0 36 36" id="ringSvg" aria-hidden="true">
+              <circle cx="18" cy="18" r="15.9" fill="none" stroke="rgba(198,161,91,0.16)" stroke-width="2.4"/>
+              <circle cx="18" cy="18" r="15.9" fill="none" stroke="url(#lg)" stroke-width="2.4" stroke-linecap="round"
+                id="ringArc" pathLength="1" stroke-dasharray="1" stroke-dashoffset="1" transform="rotate(-90 18 18)"/>
+            </svg>
+            <div class="rtxt">
+              <div class="big num"><span data-count="17">0</span> / 24</div>
+              <div class="lbl">Meta anual · no ritmo</div>
+            </div>
+          </div>
+          <div class="streak" id="streak" role="img" aria-label="Sequência de leitura: 12 dos últimos 14 dias com leitura registrada; hoje incluído."></div>
+        </div>
+        <div class="rise">
+          <span class="kicker">p.03 — A Sequência</span>
+          <h2 style="font-family:var(--display);font-weight:900;font-size:clamp(1.9rem,4.4vw,3rem);color:var(--ink-hi);letter-spacing:-0.03em;line-height:1.02;margin:20px 0 14px">Uma linha que você<br>não quer quebrar.</h2>
+          <p style="font-family:var(--serif);color:var(--ink-soft);font-size:1.12rem;max-width:52ch">Cada dia lido acende um quadrado. Defina um tempo mínimo de sessão para que só leituras de verdade contem — nada de inflar números.</p>
+          <div class="metas-list">
+            <div class="meta-row"><div class="top"><span class="name">Livros no mês</span><span class="val num">3 / 4</span></div><div class="track"><i data-fill="75"></i></div></div>
+            <div class="meta-row"><div class="top"><span class="name">Páginas por dia</span><span class="val num">42 / 40</span></div><div class="track"><i data-fill="100"></i></div></div>
+            <div class="meta-row"><div class="top"><span class="name">Minutos por dia</span><span class="val num">48 / 60</span></div><div class="track"><i data-fill="80"></i></div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 04 · RESERVADO (privacidade — vira a página) -->
+  <section class="leaf" id="reservado">
+    <div class="wrap">
+      <span class="kicker">p.04 — Reservado</span>
+      <h2 style="margin-top:22px">Seus livros ficam<br>com você.</h2>
+      <p><span class="drop">O</span> Sapien é o seu caderno de leituras na web: a conta é sua, os dados são seus. Sem anúncios, sem venda de dados, sem feed disputando a sua atenção — e você exporta o acervo inteiro quando quiser. O que você lê é só seu.</p>
+      <div class="marks">
+        <span class="mk"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><circle cx="12" cy="12" r="10"/><path d="M2 12h20M12 2a15.3 15.3 0 0 1 0 20 15.3 15.3 0 0 1 0-20z"/></svg> No navegador</span>
+        <span class="mk"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M12 2l8 4v6c0 5-3.5 8-8 10-4.5-2-8-5-8-10V6z"/></svg> Privado por padrão</span>
+        <span class="mk"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M12 3v12m0 0l-4-4m4 4l4-4M4 21h16"/></svg> Exportação livre</span>
+      </div>
+    </div>
+    <span class="leaf-folio">— 4 —</span>
+  </section>
+
+  <!-- ASSINATURA -->
+  <section class="section colophon" id="assinar">
+    <div class="wrap">
+      <h2>O hábito começa<br>com <em>uma página</em>.</h2>
+      <p class="lead">No navegador, crie sua conta, registre a primeira sessão e acenda o primeiro dia da sua sequência.</p>
+      <div class="cta-row">
+        <!-- TODO: conectar ao checkout do Asaas -->
+        <a href="#" class="btn btn-primary btn-big">
+          Assinar agora
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14m0 0l-6-6m6 6l-6 6"/></svg>
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <!-- FAQ -->
+  <section class="section" id="faq">
+    <div class="wrap">
+      <div class="sec-head center rise">
+        <h2>Antes de começar</h2>
+      </div>
+      <div class="faq rise">
+        <details open>
+          <summary><span><span class="q-no">01</span> Como funciona a assinatura?</span><span class="pm">+</span></summary>
+          <p>Ao clicar em "Assinar agora", você será direcionado ao ambiente de pagamento. Após a confirmação, o acesso ao Sapien será liberado na sua conta.</p>
+        </details>
+        <details>
+          <summary><span><span class="q-no">02</span> Meus dados estão seguros?</span><span class="pm">+</span></summary>
+          <p>Seus dados ficam vinculados à sua conta e são armazenados em infraestrutura segura. O Sapien não vende informações pessoais e não utiliza anúncios para disputar a sua atenção.</p>
+        </details>
+      </div>
+    </div>
+  </section>
+
+  <!-- FOOTER -->
+  <footer>
+    <div class="wrap">
+      <div class="foot">
+        <div class="about">
+          <div class="wm">Sapien</div>
+          <p>Um instrumento de leitura na web. Catalogue, leia e meça — com foco e privacidade.</p>
+        </div>
+      </div>
+      <div class="foot-bot">
+        <span>© <span id="year">2026</span> Sapien — feito para quem lê.</span>
+        <a href="#reservado" style="color:inherit">Privacidade</a>
+      </div>
+    </div>
+  </footer>
+
+  <script>
+    'use strict';
+    const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    const hasHover = window.matchMedia('(hover: hover)').matches;
+    const isMobile = window.matchMedia('(max-width: 940px)').matches;
+
+    /* ---------- Streak ---------- */
+    const streakEl = document.getElementById('streak');
+    const streakPattern = [1,1,1,0,1,1,1,1,1,0,1,1,1,1]; // últimos 14 dias
+    streakPattern.forEach((on, i) => {
+      const c = document.createElement('i');
+      const today = i === streakPattern.length - 1;
+      if (on) c.classList.add('on');
+      if (today) c.classList.add('today');
+      c.textContent = on ? '✓' : '';
+      c.style.transition = 'opacity .5s var(--ease) ' + (i*45) + 'ms, transform .5s var(--ease) ' + (i*45) + 'ms';
+      streakEl.appendChild(c);
+    });
+
+    /* ---------- Barras "livros por mês" que crescem no scroll ---------- */
+    const booksMonth = [1,2,1,3,2,4,3,4,2,5,4,3];
+    const gmax = Math.max(...booksMonth);
+    const growBars = document.getElementById('growBars');
+    booksMonth.forEach((v, i) => {
+      const b = document.createElement('div');
+      b.className = 'grow-bar';
+      b.style.setProperty('--h', Math.round(v / gmax * 100) + '%');
+      b.style.background = (i === 9)
+        ? 'linear-gradient(180deg, var(--ribbon-hi), #7a1717)'
+        : 'linear-gradient(180deg, var(--foil-hi), #8a6f34)';
+      growBars.appendChild(b);
+    });
+    const growBarEls = [...growBars.children];
+
+    /* ---------- Livro folheável (decorativo) + capítulos laterais ---------- */
+    const romans = ['I','II','III','IV','V'];
+    const chapters = [
+      { t:'Comece com 25 minutos', s:'Uma sessão de foco por dia. O timer cuida do tempo; você cuida da página. Ao final, o Sapien registra tudo.' },
+      { t:'Veja seu ritmo aparecer', s:'Páginas por hora medidas de verdade, sessão a sessão — quanto falta e quando você termina, sem achismo.' },
+      { t:'Acenda o dia de hoje', s:'Cada dia lido acende um quadrado na sua sequência. Metas de páginas, minutos e livros, no seu ritmo.' },
+      { t:'A estante cresce sozinha', s:'Busque pelo título e a edição certa chega pronta — capa, autor, páginas. Em português primeiro.' },
+      { t:'Fique com o que importa', s:'Notas, citações e trechos guardados com a página de referência. O que você leu continua seu.' }
+    ];
+    const bookEl = document.getElementById('book');
+    const bookStageEl = document.getElementById('livro');
+    const bstepsEl = document.getElementById('bsteps');
+    const bdotsEl = document.getElementById('bdots');
+    chapters.forEach((c, i) => {
+      const leaf = document.createElement('div');
+      leaf.className = 'leaf3';
+      leaf.style.zIndex = String(chapters.length - i);
+      leaf.innerHTML =
+        '<div class="face front"><span class="orn">❦</span><span class="fol">' + (2*i+1) + '</span></div>' +
+        '<div class="face back"><span class="fol">' + (2*i+2) + '</span></div>';
+      bookEl.appendChild(leaf);
+
+      const step = document.createElement('div');
+      step.className = 'bstep' + (i === 0 ? ' active' : '');
+      step.innerHTML = '<span class="cap">Capítulo ' + romans[i] + '</span><h3>' + c.t + '</h3><p>' + c.s + '</p>';
+      bstepsEl.appendChild(step);
+
+      const dot = document.createElement('span');
+      dot.textContent = romans[i];
+      if (i === 0) dot.classList.add('on');
+      bdotsEl.appendChild(dot);
+    });
+    const leafEls = [...bookEl.querySelectorAll('.leaf3')];
+    const stepEls = [...bstepsEl.children];
+    const dotEls = [...bdotsEl.children];
+
+    /* ---------- Reveal do herói — via reflow, sem depender de rAF/onload ---------- */
+    function reveal(){
+      const lines = document.querySelectorAll('.hero h1 .line > span');
+      const sub = document.querySelector('.hero .sub');
+      const acts = document.querySelector('.hero-actions');
+      const meta = document.querySelector('.hero-meta');
+      const rule = document.getElementById('heroRule');
+      const spines = document.querySelectorAll('.spine');
+      lines.forEach((el, i) => el.style.transition = 'transform 1s var(--ease) ' + (0.15 + i*0.12) + 's');
+      [ [sub,0.5],[acts,0.62],[meta,0.74] ].forEach(([el,d]) => { if (el) el.style.transition = 'opacity .9s var(--ease) '+d+'s, transform .9s var(--ease) '+d+'s'; });
+      spines.forEach(s => s.style.transition = 'transform .9s var(--ease)');
+      if (rule) rule.style.transition = 'transform .8s var(--ease) 1s';
+      void document.body.offsetHeight;              // pinta o estado inicial (escondido)
+      document.body.classList.remove('pre');        // libera sub/ações/meta
+      lines.forEach(el => el.style.transform = 'translateY(0)');
+      spines.forEach(s => s.style.transform = 'scaleY(1)');
+      if (rule) rule.style.transform = 'scaleX(1)';
+    }
+    if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', reveal);
+    else reveal();
+
+    /* ---------- Header + fita de progresso ---------- */
+    const header = document.getElementById('header');
+    const rf = document.getElementById('ribbonFill'), rt = document.getElementById('ribbonTab'), rfolio = document.getElementById('ribbonFolio');
+    const sections = [...document.querySelectorAll('section[id]')];
+    const folioMap = { cover:'p.00', livro:'p.00', demo:'p.00', acervo:'p.01', ritmo:'p.02', sequencia:'p.03', reservado:'p.04', assinar:'p.05', faq:'p.06' };
+
+    /* ---------- Chart geometry (páginas/dia, 14 dias) ---------- */
+    const daily = [22,34,0,41,28,55,60,18,47,52,63,30,58,72];
+    const cw = 520, ch = 220, maxV = Math.max(...daily);
+    const px = i => (i/(daily.length-1))*cw;
+    const py = v => ch - (v/maxV)*(ch-30) - 10;
+    let linePts = daily.map((v,i)=> px(i)+','+py(v));
+    const lineD = 'M' + linePts.join(' L');
+    const areaD = 'M0,'+ch+' L' + linePts.join(' L') + ' L'+cw+','+ch+' Z';
+    document.getElementById('chartLine').setAttribute('d', lineD);
+    document.getElementById('chartArea').setAttribute('d', areaD);
+    const chartLine = document.getElementById('chartLine');
+    const chartArea = document.getElementById('chartArea');
+    const chartDot = document.getElementById('chartDot');
+    chartLine.style.strokeDasharray = '1'; chartLine.style.strokeDashoffset = '1';
+    const lastX = px(daily.length-1), lastY = py(daily[daily.length-1]);
+    chartDot.setAttribute('cx', lastX); chartDot.setAttribute('cy', lastY);
+
+    /* ---------- Reel (filmstrip horizontal) ---------- */
+    const reel = document.getElementById('acervo');
+    const reelTrack = document.getElementById('reelTrack');
+    const reelPct = document.getElementById('reelPct');
+
+    /* ---------- Parallax targets ---------- */
+    const parallax = [...document.querySelectorAll('[data-parallax]')];
+
+    /* ---------- Cena de leitura (dissipa) ---------- */
+    const scene = document.getElementById('readingScene');
+    const heroEl = document.getElementById('cover');
+
+    /* ---------- Manifesto words ---------- */
+    const man = document.getElementById('manifesto');
+    (function splitWords(){
+      const walk = (node) => {
+        [...node.childNodes].forEach(n => {
+          if (n.nodeType === 3) {
+            const frag = document.createDocumentFragment();
+            n.textContent.split(/(\s+)/).forEach(t => {
+              if (/^\s+$/.test(t)) frag.appendChild(document.createTextNode(t));
+              else if (t) { const s=document.createElement('span'); s.className='w'; s.textContent=t; frag.appendChild(s); }
+            });
+            n.replaceWith(frag);
+          } else if (n.nodeType === 1) { n.classList.add('w-host'); walk(n); }
+        });
+      };
+      walk(man);
+    })();
+    const manWords = [...man.querySelectorAll('.w')];
+
+    /* ---------- Scroll engine ---------- */
+    let ticking = false;
+    function onScroll(){ if(!ticking){ ticking = true; requestAnimationFrame(tick); } }
+    function tick(){
+      ticking = false;
+      const y = window.scrollY, vh = window.innerHeight, doc = document.documentElement.scrollHeight - vh;
+      const prog = doc > 0 ? y / doc : 0;
+
+      header.classList.toggle('scrolled', y > 20);
+
+      // fita
+      if (rf){ rf.style.height = (prog*100).toFixed(2) + '%'; rt.style.top = (prog*100).toFixed(2) + '%'; }
+
+      // fólio atual
+      let curId = 'cover';
+      for (const s of sections){ if (s.getBoundingClientRect().top <= vh*0.42) curId = s.id; }
+      if (rfolio) rfolio.textContent = folioMap[curId] || 'p.00';
+
+      // parallax
+      if (!reduce) parallax.forEach(el => {
+        const r = el.getBoundingClientRect();
+        if (r.bottom > 0 && r.top < vh){
+          const rel = (r.top + r.height/2 - vh/2) / vh; // -0.5..0.5
+          el.style.transform = 'translateY(' + (rel * parseFloat(el.dataset.parallax) * 160).toFixed(1) + 'px)';
+        }
+      });
+
+      // manifesto reveal
+      if (manWords.length){
+        const r = man.getBoundingClientRect();
+        const p = clamp((vh*0.85 - r.top) / (vh*0.6), 0, 1);
+        const lit = Math.floor(p * manWords.length);
+        manWords.forEach((w,i) => w.style.opacity = i < lit ? '1' : (i === lit ? String(0.12 + (p*manWords.length - lit)*0.88) : '0.12'));
+      }
+
+      // (gráfico e barras agora animam uma única vez via IntersectionObserver)
+
+      // dissipa a cena de leitura (lâmpada + livro) conforme sai do herói
+      if (scene && !reduce){
+        const hh = heroEl.offsetHeight || vh;
+        const hp = clamp(y / (hh * 0.85), 0, 1);
+        scene.style.opacity = (0.62 * (1 - hp)).toFixed(3);
+        scene.style.transform = 'translateY(' + (-hp * 72).toFixed(1) + 'px) scale(' + (1 - hp * 0.08).toFixed(3) + ')';
+        scene.style.filter = hp > 0.002 ? 'blur(' + (hp * 8).toFixed(1) + 'px)' : 'none';
+      }
+
+      // livro folheável — vira páginas e troca o capítulo lateral conforme o scroll
+      if (leafEls.length && !reduce){
+        const rb = bookStageEl.getBoundingClientRect();
+        const totalB = bookStageEl.offsetHeight - vh;
+        const bp = clamp(-rb.top / totalB, 0, 1);
+        const pp = clamp((bp - 0.08) / 0.86, 0, 1);   // margem antes/depois do folhear
+        const n = leafEls.length;
+        for (let i = 0; i < n; i++){
+          const lp = clamp(pp * n - i, 0, 1);
+          const e = lp < 0.5 ? 2*lp*lp : 1 - Math.pow(-2*lp + 2, 2) / 2; // easeInOut
+          leafEls[i].style.transform = 'rotateY(' + (-180 * e).toFixed(2) + 'deg)';
+          leafEls[i].style.zIndex = String(e > 0.5 ? i + 1 : n - i);
+          // página escurece no ápice do giro e clareia ao assentar
+          leafEls[i].style.setProperty('--shade', (Math.sin(e * Math.PI) * 0.85).toFixed(3));
+        }
+        // capítulo ativo = folha atualmente à mostra (troca na metade do giro)
+        const idx = clamp(Math.floor(pp * n + 0.5), 0, n - 1);
+        for (let i = 0; i < stepEls.length; i++){
+          stepEls[i].classList.toggle('active', i === idx);
+          stepEls[i].classList.toggle('passed', i < idx);
+          dotEls[i].classList.toggle('on', i <= idx);
+        }
+      }
+
+      // reel horizontal
+      if (!isMobile){
+        const rr = reel.getBoundingClientRect();
+        const total = reel.offsetHeight - vh;
+        const p = clamp(-rr.top / total, 0, 1);
+        const maxX = Math.max(0, reelTrack.scrollWidth - window.innerWidth);
+        reelTrack.style.transform = 'translateX(' + (-p * maxX).toFixed(1) + 'px)';
+        if (reelPct) reelPct.textContent = String(Math.round(p*6)).padStart(2,'0');
+      }
+    }
+    function clamp(v,a,b){ return Math.min(b, Math.max(a, v)); }
+    window.addEventListener('scroll', onScroll, { passive: true });
+    window.addEventListener('resize', onScroll);
+    tick(); // estado inicial síncrono (fita, fólio, reel) sem esperar frame
+
+    /* ---------- IntersectionObserver: reveals, counters, ring, streak, metas ---------- */
+    const io = new IntersectionObserver((entries) => {
+      entries.forEach(e => {
+        if (!e.isIntersecting) return;
+        const el = e.target;
+        el.classList.add('in');
+        if (el.matches('.kpis')) el.querySelectorAll('[data-count]').forEach(countUp);
+        if (el.matches('[data-chart]')) drawChart();
+        if (el.querySelector && el.querySelector('#growBars')) growUp();
+        if (el.querySelector && el.querySelector('#ringArc')) drawRing();
+        if (el.querySelector && el.querySelector('#streak')) revealStreak();
+        if (el.querySelector && el.querySelector('[data-fill]')) el.querySelectorAll('[data-fill]').forEach(fillMeta);
+        io.unobserve(el);
+      });
+    }, { threshold: 0.25 });
+    document.querySelectorAll('.rise').forEach(el => io.observe(el));
+
+    function countUp(el){
+      const target = parseFloat(el.dataset.count), suffix = el.dataset.suffix || '';
+      if (reduce){ el.textContent = target.toLocaleString('pt-BR') + suffix; return; }
+      const dur = 1500, t0 = performance.now();
+      (function step(t){
+        const p = clamp((t - t0)/dur, 0, 1), eased = 1 - Math.pow(1-p, 3);
+        el.textContent = Math.round(target*eased).toLocaleString('pt-BR') + (p>0.99?suffix:'');
+        if (p < 1) requestAnimationFrame(step);
+      })(t0);
+    }
+    function drawChart(){
+      if (!chartLine) return;
+      if (reduce){ chartLine.style.strokeDashoffset = '0'; chartArea.style.opacity = '1'; chartDot.style.opacity = '1'; return; }
+      chartLine.style.transition = 'stroke-dashoffset 1.8s cubic-bezier(0.22, 1, 0.36, 1)';
+      chartArea.style.transition = 'opacity 1.5s ease 0.5s';
+      chartDot.style.transition = 'opacity 0.4s ease 1.7s';
+      requestAnimationFrame(() => {
+        chartLine.style.strokeDashoffset = '0';
+        chartArea.style.opacity = '1';
+        chartDot.style.opacity = '1';
+      });
+    }
+    function growUp(){
+      growBarEls.forEach((b, i) => {
+        if (reduce){ b.style.transform = 'scaleY(1)'; return; }
+        b.style.transition = 'transform 0.9s cubic-bezier(0.22, 1, 0.36, 1) ' + (i * 70) + 'ms';
+        requestAnimationFrame(() => { b.style.transform = 'scaleY(1)'; });
+      });
+    }
+    function drawRing(){
+      const arc = document.getElementById('ringArc'); if(!arc) return;
+      const val = 17/24;
+      if (reduce){ arc.style.strokeDashoffset = String(1-val); return; }
+      arc.style.transition = 'stroke-dashoffset 1.4s var(--ease)';
+      requestAnimationFrame(()=> arc.style.strokeDashoffset = String(1 - val));
+    }
+    function revealStreak(){
+      document.querySelectorAll('#streak i').forEach(i => { i.style.opacity='1'; i.style.transform='scale(1)'; });
+    }
+    function fillMeta(el){
+      const v = el.dataset.fill;
+      if (reduce){ el.style.width = v+'%'; return; }
+      el.style.transition = 'width 1.1s var(--ease)';
+      requestAnimationFrame(()=> el.style.width = v+'%');
+    }
+
+    /* ---------- Menu mobile ---------- */
+    const toggle = document.getElementById('navToggle'), menu = document.getElementById('mobileMenu');
+    const setMenu = (o) => { menu.classList.toggle('open', o); toggle.setAttribute('aria-expanded', String(o)); };
+    toggle.addEventListener('click', () => setMenu(!menu.classList.contains('open')));
+    menu.querySelectorAll('a').forEach(a => a.addEventListener('click', () => setMenu(false)));
+    document.addEventListener('keydown', e => { if (e.key === 'Escape') setMenu(false); });
+
+    /* ---------- FAQ: abrir/fechar animado (entrada 300ms, saída 220ms) ---------- */
+    document.querySelectorAll('.faq details').forEach(d => {
+      const sum = d.querySelector('summary');
+      const body = d.querySelector('p');
+      let busy = false;
+      const once = (fn) => { let ran = false; return () => { if (!ran){ ran = true; fn(); } }; };
+      sum.addEventListener('click', (ev) => {
+        ev.preventDefault();
+        if (busy) return;
+        if (reduce) { d.open = !d.open; return; }
+        busy = true;
+        body.style.overflow = 'hidden';
+        if (d.open){
+          d.classList.add('closing');
+          const h = body.offsetHeight;
+          const anim = body.animate(
+            [{ height: h + 'px', opacity: 1, paddingBottom: '26px' }, { height: '0px', opacity: 0, paddingBottom: '0px' }],
+            { duration: 220, easing: 'cubic-bezier(0.22, 1, 0.36, 1)' });
+          const finish = once(() => { d.open = false; d.classList.remove('closing'); body.style.cssText = ''; busy = false; });
+          anim.onfinish = finish; setTimeout(finish, 320);
+        } else {
+          d.open = true;
+          const h = body.offsetHeight;
+          const anim = body.animate(
+            [{ height: '0px', opacity: 0, paddingBottom: '0px' }, { height: h + 'px', opacity: 1, paddingBottom: '26px' }],
+            { duration: 300, easing: 'cubic-bezier(0.22, 1, 0.36, 1)' });
+          const finish = once(() => { body.style.cssText = ''; busy = false; });
+          anim.onfinish = finish; setTimeout(finish, 400);
+        }
+      });
+    });
+
+    // fallback das capturas: se a imagem já falhou (cache) ou falhar depois, mostra o mock
+    document.querySelectorAll('.shot img').forEach(img => {
+      if (img.complete && img.naturalWidth === 0) img.closest('.shot').classList.add('noimg');
+    });
+
+    document.getElementById('year').textContent = new Date().getFullYear();
+  </script>
+</body>
+</html>
