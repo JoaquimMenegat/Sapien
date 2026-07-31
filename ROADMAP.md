@@ -1,7 +1,7 @@
 # Sapien — Roadmap para SaaS de Assinatura
 
 **Objetivo:** lançar o Sapien como um **serviço de assinatura mensal**, hospedado em
-Vercel (frontend) + Supabase (banco/auth) + Resend (e-mails) + Stripe (pagamentos).
+Vercel (frontend) + Supabase (banco/auth) + Resend (e-mails) + Asaas (pagamentos).
 
 **Legenda de execução:**
 - **[Você]** = cliques em painéis que só você pode fazer (eu te guio passo a passo)
@@ -140,20 +140,21 @@ começando **no cadastro** (sem cartão). **IA "Achar um livro": descartada por 
 
 - [x] **[Eu]** Tabela `subscriptions` + RLS (`supabase/subscriptions.sql`) — usuário só LÊ o
       próprio status; escrita só via service_role (webhook). Trigger dá 7 dias de trial no cadastro.
-- [ ] **[Você]** Rodar `supabase/subscriptions.sql` no SQL Editor
-- [ ] **[Você]** Criar conta no Asaas + pegar chave de **sandbox**
-      *(⚠️ a chave NÃO vem pro chat — vai como **secret** no servidor; eu só referencio)*
-- [ ] **[Eu]** Plumbing de estado: `billing.status()` + `isPremium` no app (web lê a tabela;
+- [x] **[Você]** Rodar `supabase/subscriptions.sql` no SQL Editor
+- [x] **[Você]** Criar conta no Asaas + pegar chave de **sandbox** (secret na Vercel)
+- [x] **[Você]** Webhook do Asaas configurado e **Ativado** (`/api/asaas-webhook` + token)
+- [x] **[Eu]** Plumbing de estado: `billing.status()` + `isPremium` no app (web lê a tabela;
       desktop = sempre Premium, pois é o app pessoal)
-- [ ] **[Eu]** Backend (função de servidor): criar assinatura no Asaas + receber webhooks de status
-- [ ] **[Eu]** Tela **"Assinar Premium"** (Pix/boleto/cartão via Asaas)
-- [ ] **[Eu]** Área **"Minha assinatura"** (em Personalização): plano atual, status, data de
-      renovação / fim do trial, **cancelar**, trocar plano (mensal↔anual), histórico de pagamentos
-- [ ] **[Eu]** Construir o **Exportar dados** (CSV/JSON) — recurso Premium novo
-- [ ] **[Eu]** **Gating** das 5 áreas pagas com **prévia borrada** + paywall por cima (mais
-      tentador). Nav mantém as áreas visíveis com selo/cadeado. Banner de "teste acaba em X dias"
-      durante o trial. Só ativa quando o fluxo de assinar existir (p/ não trancar antes da hora)
-- [ ] **[Juntos]** Testar tudo no **sandbox** do Asaas antes de ativar cobrança real
+- [x] **[Eu]** Backend (funções de servidor `/api/*`): criar assinatura no Asaas +
+      receber webhooks + cancelar + detalhes/histórico. CPF/CNPJ coletado (o Asaas exige).
+- [x] **[Eu]** Tela **"Assinar Premium"** (Pix/boleto/cartão via Asaas)
+- [x] **[Eu]** Área **"Gerenciar assinatura"**: plano, status, renovação/fim do trial,
+      valor, forma de pagamento, adesão, tempo restante, **cancelar** e **histórico de pagamentos**
+- [ ] **[Eu]** Construir o **Exportar dados** (CSV/JSON) — recurso Premium novo *(pendente)*
+- [x] **[Eu]** **Gating** das áreas pagas com **prévia borrada** + paywall (Gêneros, Autores,
+      Metas, Estatísticas). Livre durante o trial; teste do bloqueio via `?lockpremium=1`.
+- [ ] **[Juntos]** Testar tudo no **sandbox** do Asaas antes de ativar cobrança real *(próximo)*
+- [ ] **[Eu]** Reverter o `/api/health` (hoje expõe *presença* das env vars — usado no diagnóstico)
 
 ## Fase 6 — Lançamento
 - [ ] **[Você/Eu]** **E-mail de suporte** `suporte@sapienapp.com.br` — decisão: **Zoho Mail
