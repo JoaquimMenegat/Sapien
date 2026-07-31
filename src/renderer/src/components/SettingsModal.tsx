@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react'
-import { Check, Palette, Camera, Trash2, Timer, ShieldAlert, Crown } from 'lucide-react'
+import { Check, Palette, Camera, Trash2, Timer, ShieldAlert, Crown, Download } from 'lucide-react'
 import { useApp, ACCENTS, APPEARANCES, type AnimStyle } from '../store/app'
+import { exportJSON, exportBooksCSV } from '../lib/exportData'
 import { Modal } from './ui/Modal'
 import { ManageSubscriptionModal } from './ManageSubscriptionModal'
 
@@ -364,6 +365,76 @@ function SubscriptionSection(): JSX.Element | null {
   )
 }
 
+// --- Exportar dados (recurso Premium) ---
+
+function ExportSection(): JSX.Element {
+  const isPremium = useApp((s) => s.isPremium)
+  const previewLock = useApp((s) => s.previewLock)
+  const [busy, setBusy] = useState<'json' | 'csv' | null>(null)
+  const [err, setErr] = useState<string | null>(null)
+  const [manageOpen, setManageOpen] = useState(false)
+  const locked = !isPremium || previewLock
+
+  async function run(kind: 'json' | 'csv', fn: () => Promise<void>): Promise<void> {
+    setBusy(kind)
+    setErr(null)
+    try {
+      await fn()
+    } catch (e) {
+      setErr(e instanceof Error ? e.message : 'Não foi possível exportar.')
+    } finally {
+      setBusy(null)
+    }
+  }
+
+  return (
+    <section>
+      <h3 className="mb-2 flex items-center gap-2 text-sm font-semibold text-ink">
+        <Download size={15} className="text-ink-faint" /> Exportar dados
+      </h3>
+
+      {locked ? (
+        <div className="rounded-xl border border-accent/30 bg-accent/[0.05] p-3">
+          <p className="text-sm font-medium text-ink">Exportar seus dados é um recurso Premium.</p>
+          <p className="mt-0.5 text-xs text-ink-soft">
+            Baixe um backup completo (JSON) ou o acervo em planilha (CSV) assinando o Premium.
+          </p>
+          <button onClick={() => setManageOpen(true)} className="btn-primary mt-2 py-1.5 text-sm">
+            Assinar Premium
+          </button>
+          <ManageSubscriptionModal open={manageOpen} onClose={() => setManageOpen(false)} />
+        </div>
+      ) : (
+        <>
+          <p className="mb-2 text-xs text-ink-soft">
+            Leve seus dados com você — um backup completo ou o acervo como planilha.
+          </p>
+          <div className="flex flex-wrap gap-2">
+            <button
+              onClick={() => run('json', exportJSON)}
+              disabled={!!busy}
+              className="btn-ghost py-1.5 text-sm"
+            >
+              {busy === 'json' ? 'Exportando…' : 'Backup completo (JSON)'}
+            </button>
+            <button
+              onClick={() => run('csv', exportBooksCSV)}
+              disabled={!!busy}
+              className="btn-ghost py-1.5 text-sm"
+            >
+              {busy === 'csv' ? 'Exportando…' : 'Acervo (CSV)'}
+            </button>
+          </div>
+          <p className="mt-1.5 text-[11px] text-ink-faint">
+            O JSON inclui livros, sessões, metas e notas. O CSV traz o acervo (abre no Excel/Sheets).
+          </p>
+          {err && <p className="mt-1.5 text-xs text-red-500">{err}</p>}
+        </>
+      )}
+    </section>
+  )
+}
+
 const ANIMS: { id: AnimStyle; label: string; desc: string }[] = [
   { id: 'sutil', label: 'Sutil', desc: 'Transições suaves (padrão)' },
   { id: 'rico', label: 'Rico', desc: 'Cartões ganham leve elevação ao passar o mouse' },
@@ -387,6 +458,8 @@ export function SettingsModal({
         <SubscriptionSection />
 
         <AccountSection />
+
+        <ExportSection />
 
         <SessionSection />
 
