@@ -3,5 +3,8 @@
   "buildCommand": "npm run build:web",
   "outputDirectory": "dist-web",
   "installCommand": "npm install",
-  "rewrites": [{ "source": "/((?!assets/|api/).*)", "destination": "/index.html" }]
+  "rewrites": [
+    { "source": "/app", "destination": "/app/index.html" },
+    { "source": "/app/:path*", "destination": "/app/index.html" }
+  ]
 }

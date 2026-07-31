@@ -159,7 +159,22 @@
     .hc-tl { top: 96px; left: var(--gutter); border-right: 0; border-bottom: 0; }
     .hc-br { bottom: 40px; right: var(--gutter); border-left: 0; border-top: 0; }
 
-    .hero-copy { position: relative; z-index: 2; }
+    .hero-copy { position: relative; z-index: 3; }
+    .hero-books { position: absolute; inset: 0; z-index: 1; pointer-events: none; overflow: hidden; }
+    .hero-books::before,
+    .hero-books::after { content: ""; position: absolute; inset: 0; z-index: 2; }
+    .hero-books::before {
+      background:
+        linear-gradient(180deg, var(--cloth) 0%, rgba(23,19,28,0.34) 22%, rgba(23,19,28,0.2) 58%, var(--cloth) 100%),
+        radial-gradient(ellipse at center, rgba(23,19,28,0.12) 0%, rgba(23,19,28,0.72) 78%);
+    }
+    .hero-books::after { background: radial-gradient(ellipse at 50% 46%, transparent 20%, rgba(23,19,28,0.38) 68%, var(--cloth) 100%); }
+    .hero-books img { width: 100%; height: 100%; object-fit: cover; object-position: center 58%; opacity: 0.68;
+      filter: saturate(0.9) contrast(1.08) brightness(0.78); transform: scale(1.05); animation: heroBooksDrift 10s ease-in-out infinite alternate; }
+    @keyframes heroBooksDrift {
+      from { transform: scale(1.05) translate3d(-1.5%, 1.2%, 0) rotate(-0.35deg); }
+      to { transform: scale(1.11) translate3d(1.4%, -1.7%, 0) rotate(0.45deg); }
+    }
     .hero-copy .kicker { margin-bottom: 26px; }
     .hero h1 { font-family: var(--display); font-weight: 900; color: var(--ink-hi);
       font-size: clamp(1.9rem, 5.2vw, 3.75rem); line-height: 1.06; letter-spacing: -0.03em; }
@@ -216,7 +231,9 @@
     .rule-gold { height: 1px; background: var(--edge); }
 
     /* ============ MANIFESTO — reveal por scroll ============ */
-    .manifesto { padding-block: clamp(100px, 18vh, 220px); }
+    .manifesto { min-height: 100vh; padding-block: clamp(100px, 18vh, 220px); display: grid; place-items: center;
+      position: relative; z-index: 4; overflow: hidden; background: transparent; pointer-events: none; }
+    .manifesto .wrap { position: relative; z-index: 5; }
     .manifesto .q { font-family: var(--display); font-weight: 400; font-style: italic; color: var(--ink-hi);
       font-size: clamp(1.8rem, 4.6vw, 3.6rem); line-height: 1.28; letter-spacing: -0.02em; max-width: 20ch; margin-inline: auto; text-align: center; }
     .manifesto .q .w { display: inline-block; opacity: 0.12; transition: opacity .1s linear; }
@@ -226,13 +243,14 @@
 
     /* ============ REEL — filmstrip horizontal fixado ============ */
     .reel { position: relative; height: 460vh; }
-    .reel-sticky { position: sticky; top: 0; height: 100vh; overflow: hidden; display: flex; flex-direction: column; justify-content: center; }
-    .reel-head { position: absolute; top: clamp(84px, 12vh, 130px); left: var(--gutter); right: var(--gutter); display: flex; justify-content: space-between; align-items: flex-end; z-index: 3; }
-    .reel-head h2 { font-family: var(--display); font-weight: 900; font-size: clamp(1.8rem, 4vw, 3rem); color: var(--ink-hi); letter-spacing: -0.03em; line-height: 1; }
+    .reel-sticky { position: sticky; top: 0; height: 100vh; overflow: hidden; display: flex; flex-direction: column; justify-content: flex-start; }
+    .reel-head { position: absolute; top: clamp(28px, 5vh, 52px); left: var(--gutter); right: var(--gutter); display: flex; justify-content: center; align-items: center; text-align: center; z-index: 3; }
+    .reel-head h2 { font-family: var(--display); font-weight: 900; font-size: clamp(1.65rem, 3.5vw, 2.6rem); color: var(--ink-hi); letter-spacing: -0.03em; line-height: 1; }
+    .reel-head h2 br { display: none; }
     .reel-prog { font-family: var(--mono); font-size: 11px; color: var(--ink-faint); letter-spacing: 0.1em; }
     .reel-prog b { color: var(--foil); }
-    .reel-track { display: flex; gap: clamp(18px, 2.2vw, 34px); padding-inline: var(--gutter); will-change: transform; }
-    .fcard { flex: 0 0 min(84vw, 440px); min-height: 400px; background: linear-gradient(180deg, var(--cloth-2), rgba(23,19,28,0.4));
+    .reel-track { display: flex; gap: clamp(18px, 2.2vw, 34px); padding-inline: var(--gutter); margin-top: clamp(130px, 18vh, 168px); will-change: transform; }
+    .fcard { flex: 0 0 min(84vw, 440px); min-height: min(400px, calc(100vh - 150px)); background: linear-gradient(180deg, var(--cloth-2), rgba(23,19,28,0.4));
       border: 1px solid var(--edge); padding: 32px; display: flex; flex-direction: column; position: relative; overflow: hidden; }
     .fcard .fo { font-family: var(--mono); font-size: 11px; color: var(--foil); letter-spacing: 0.2em; }
     .fcard .ic { width: 46px; height: 46px; margin: 24px 0 20px; color: var(--foil); }
@@ -424,7 +442,7 @@
 
     /* ============ Orbe de ouro líquido (herói) ============ */
     .hero { overflow: hidden; }
-    .hero-orb { position: absolute; left: 50%; bottom: -40%; transform: translateX(-50%);
+    .hero-orb { position: absolute; left: 50%; bottom: -46%; transform: translateX(-50%);
       width: min(900px, 96vw); aspect-ratio: 1.7; z-index: 0; pointer-events: none; }
     .hero-orb .halo { position: absolute; inset: -12%; border-radius: 50%; filter: blur(90px);
       background: radial-gradient(50% 45% at 50% 42%, rgba(198,161,91,0.34), rgba(124,58,237,0.16) 55%, transparent 75%); }
@@ -455,34 +473,20 @@
     .chip-b { right: 13%; bottom: 68%; animation-delay: -3.4s; }
     @keyframes chipFloat { 0%,100% { transform: translateY(0); } 50% { transform: translateY(-12px); } }
 
-    /* ============ Livros flutuando no herói (capas abstratas) ============ */
-    .hero-books { position: absolute; inset: 0; z-index: 0; pointer-events: none; perspective: 1100px; }
-    .fbk { position: absolute; left: var(--bx); top: var(--by, 56%);
-      animation: bookBob var(--bt, 8s) ease-in-out infinite; animation-delay: var(--bd, 0s); }
-    .fbk i { display: block; width: var(--bw, 88px); aspect-ratio: 2 / 3; border-radius: 3px 7px 7px 3px; opacity: 0.9;
-      background: linear-gradient(150deg, var(--bg1, #4f46e5), var(--bg2, #312e81));
-      transform: rotateY(var(--br, -50deg)) rotateZ(var(--bz, 0deg));
-      box-shadow: -16px 22px 36px rgba(0, 0, 0, 0.55); }
-    @keyframes bookBob { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-16px); } }
-
-    /* ============ Demonstração mesclada — telas atrás do manifesto ============ */
-    .demo-merged { position: relative; overflow: hidden; padding-block: clamp(70px, 10vh, 130px); }
-    .demo-merged .mq { position: absolute; inset: 0; z-index: 3; display: grid; place-items: center;
-      pointer-events: none; padding-inline: var(--gutter); }
-    .demo-merged .q { position: relative; text-align: center; padding: clamp(28px, 6vw, 64px) clamp(36px, 8vw, 100px); }
-    .demo-merged .q::before { content: ""; position: absolute; inset: -12%; z-index: -1;
-      background: radial-gradient(55% 65% at 50% 50%, rgba(23,19,28,0.9), rgba(23,19,28,0.48) 62%, transparent 78%); }
-
     /* ============ Demonstração — laptop em cena física ============ */
-    .demo-scene { position: relative; overflow: hidden; display: grid; place-items: center;
+    #demo { isolation: isolate; height: 0; padding: 0 !important; }
+    .demo-scene { position: absolute; overflow: hidden; display: grid; place-items: center;
+      left: 0; right: 0; top: -100vh; height: 100vh; z-index: -1;
       padding: clamp(44px, 8vw, 96px) clamp(18px, 5vw, 80px);
-      background: linear-gradient(158deg, #cfc8bb, #b5ac9d 55%, #a69c8d); }
+      background:
+        radial-gradient(ellipse at 50% 50%, rgba(74,48,96,0.28), transparent 62%),
+        linear-gradient(180deg, #17131c, #100d14 50%, #17131c); }
     .demo-light, .demo-shadow { position: absolute; inset: -25%; pointer-events: none; }
-    .demo-light { mix-blend-mode: soft-light; animation: lightDrift 18s ease-in-out infinite alternate;
+    .demo-light { mix-blend-mode: screen; opacity: 0.24; animation: lightDrift 12s ease-in-out infinite alternate;
       background:
         radial-gradient(38% 55% at 72% 16%, rgba(255,250,232,0.85), transparent 62%),
         radial-gradient(30% 42% at 30% 60%, rgba(255,246,224,0.5), transparent 60%); }
-    .demo-shadow { filter: blur(16px); animation: shadowDrift 24s ease-in-out infinite alternate;
+    .demo-shadow { filter: blur(16px); animation: shadowDrift 16s ease-in-out infinite alternate;
       background:
         radial-gradient(24% 60% at 12% 30%, rgba(44,36,28,0.3), transparent 70%),
         radial-gradient(16% 44% at 34% 10%, rgba(44,36,28,0.24), transparent 70%),
@@ -498,10 +502,11 @@
       width: 118px; height: 6px; background: #171a20; border-radius: 0 0 8px 8px; }
 
     /* fluxo flutuante de telas (demonstração cinematográfica) */
-    .float-stage { position: relative; z-index: 2; width: 100%; perspective: 1400px; overflow: hidden; padding: 34px 0 50px; }
+    .float-stage { position: relative; z-index: 2; width: 100%; perspective: 1400px; overflow: hidden; padding: 34px 0 50px;
+      opacity: 0.74; filter: saturate(0.92) brightness(0.76); }
     .float-track { display: flex; align-items: flex-start; gap: clamp(20px, 3vw, 44px); width: max-content;
       transform: rotateX(7deg) rotateZ(-3deg); transform-style: preserve-3d; padding-inline: 6vw;
-      animation: streamDrift 26s linear infinite alternate; }
+      animation: streamDrift 22s linear infinite alternate; }
     .float-stage:hover .float-track { animation-play-state: paused; }
     @keyframes streamDrift {
       from { transform: rotateX(7deg) rotateZ(-3deg) translateX(0); }
@@ -569,30 +574,7 @@
     .sap-ring .t { font-size: 9px; color: #9aa3b2; }
     .sap-ring .n { font-size: 11px; font-weight: 700; color: #f1f5f9; }
     .sap-shelf { grid-column: 1 / -1; display: grid; grid-template-columns: repeat(8, 1fr); gap: 7px; }
-    .sap-spine { aspect-ratio: 2/3; border-radius: 4px; box-shadow: 0 5px 10px -4px rgba(0,0,0,0.5); overflow: hidden; }
-    .sap-spine img { width: 100%; height: 100%; object-fit: cover; display: block; }
-    .sap-cover { position: relative; }
-    .sap-cover img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; border-radius: 5px; }
-
-    /* telas ricas: estatísticas / notas / sessão */
-    .sapx-kpis { display: flex; gap: 8px; padding: 10px 12px 0; }
-    .sapx-kpis .sap-kpi { flex: 1; }
-    .sapx-bars { display: flex; align-items: flex-end; gap: 7px; height: 92px; padding: 12px 12px 0; }
-    .sapx-bars i { flex: 1; border-radius: 4px 4px 0 0; background: linear-gradient(180deg, #818cf8, rgba(124,58,237,0.55)); }
-    .sapx-axis { display: flex; justify-content: space-between; padding: 6px 12px 12px; font: 500 8px var(--mono); color: #64748b; letter-spacing: 0.08em; }
-    .sapx-quote { margin: 10px 12px 0; padding: 10px 12px; border: 1px solid rgba(198,161,91,0.3); border-radius: 8px;
-      background: rgba(198,161,91,0.06); font-family: var(--serif); font-style: italic; font-size: 10.5px; color: #ddd3c6; }
-    .sapx-quote small { display: block; margin-top: 5px; font: 500 7.5px var(--mono); color: #c6a15b; font-style: normal; letter-spacing: 0.1em; }
-    .sapx-note { margin: 10px 12px 12px; padding: 9px 11px; border: 1px solid rgba(148,163,184,0.14); border-radius: 8px;
-      background: rgba(255,255,255,0.03); font: 400 9.5px/1.5 var(--sans); color: #9aa3b2; }
-    .sapx-note b { color: #f1f5f9; font-size: 10px; display: block; }
-    .sapx-timer { display: grid; place-items: center; padding: 14px 0 4px; }
-    .sapx-timer svg { width: 108px; height: 108px; }
-    .sapx-tnum { font: 700 20px var(--sans); fill: #f1f5f9; }
-    .sapx-controls { display: flex; justify-content: center; gap: 8px; padding: 8px 0 4px; }
-    .sapx-controls span { font: 600 9px var(--sans); color: #f1f5f9; padding: 6px 14px; border-radius: 99px;
-      background: rgba(99,102,241,0.18); box-shadow: inset 0 0 0 1px rgba(99,102,241,0.35); }
-    .sapx-controls .ghost { background: rgba(255,255,255,0.05); box-shadow: inset 0 0 0 1px rgba(148,163,184,0.2); color: #9aa3b2; }
+    .sap-spine { aspect-ratio: 2/3; border-radius: 4px; box-shadow: 0 5px 10px -4px rgba(0,0,0,0.5); }
 
     /* ============ Reveal genérico ============ */
     .rise { opacity: 0; transform: translateY(30px); transition: opacity .8s var(--ease), transform .8s var(--ease); }
@@ -608,15 +590,12 @@
       .reel { height: auto; }
       .reel-sticky { position: static; height: auto; overflow-x: auto; padding-block: 100px 20px; scroll-snap-type: x mandatory; }
       .reel-head { position: static; padding: 0 var(--gutter) 26px; }
-      .reel-track { transform: none !important; }
+      .reel-track { transform: none !important; margin-top: 0; }
       .fcard { scroll-snap-align: start; flex-basis: 78vw; min-height: 360px; }
       .streak { grid-template-columns: repeat(7, 1fr); }
       .ribbon { display: none; }
       .orb-chip { display: none; }
-      .fbk { --bw: 54px !important; }
-      .fbk:nth-child(n+5) { display: none; }
-      .demo-merged .mq { position: static; display: block; padding: 0; margin-bottom: 6px; }
-      .demo-merged .q::before { display: none; }
+      .hero-books img { object-position: center 62%; opacity: 0.5; }
       .float-stage { overflow-x: auto; -webkit-overflow-scrolling: touch; scroll-snap-type: x proximity; perspective: 900px; }
       .float-track { animation: none; transform: rotateX(3deg) rotateZ(-1deg); padding-inline: 24px; }
       .shot { scroll-snap-align: center; animation: none; flex-basis: 80vw;
@@ -634,6 +613,8 @@
       .sap-body { grid-template-columns: 1fr; }
       .sap-shelf { grid-template-columns: repeat(6, 1fr); }
       .sap-pills span:nth-child(n+4) { display: none; }
+      .hero-books { inset: 12% -34% 0; }
+      .hero-books img { opacity: 0.42; }
     }
 
     /* ============ Reduced motion ============ */
@@ -693,10 +674,10 @@
       <nav class="nav-mid" aria-label="Navegação principal">
         <a href="#demo">Como funciona</a>
         <a href="#ritmo">Evolução</a>
-        <a href="#reservado">Segurança</a>
+        <a href="#faq">Segurança</a>
       </nav>
       <div class="nav-right">
-        <a href="#assinar" class="btn btn-primary">Assinar agora</a>
+        <a href="/app" class="btn btn-primary">Criar conta grátis</a>
         <button class="nav-toggle" id="navToggle" aria-label="Abrir menu" aria-expanded="false" aria-controls="mobileMenu">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M4 6h16M4 12h16M4 18h16"/></svg>
         </button>
@@ -706,15 +687,19 @@
   <div class="mobile-menu" id="mobileMenu">
     <a href="#demo">Como funciona</a>
     <a href="#ritmo">Evolução</a>
-    <a href="#reservado">Segurança</a>
+    <a href="#faq">Segurança</a>
     <a href="#faq">Antes de começar</a>
-    <a href="#assinar" class="btn btn-primary">Assinar agora</a>
+    <a href="/app" class="btn btn-primary">Criar conta grátis</a>
   </div>
 
   <!-- HERO / COVER -->
   <section class="hero" id="cover">
     <span class="hero-corner hc-tl" aria-hidden="true"></span>
     <span class="hero-corner hc-br" aria-hidden="true"></span>
+
+    <div class="hero-books" aria-hidden="true">
+      <img src="assets/floating-books-hero.png" alt="" />
+    </div>
 
     <!-- Orbe de ouro líquido + chips flutuantes -->
     <div class="hero-orb" aria-hidden="true">
@@ -724,36 +709,18 @@
       <span class="orb-chip chip-b"><span class="ok">✓</span> sequência · <b>12 dias</b></span>
     </div>
 
-    <!-- Livros flutuando (capas reais — Open Library) -->
-    <div class="hero-books" aria-hidden="true">
-      <span class="fbk" style="--bx:3%; --by:28%; --br:-55deg; --bw:82px; --bt:8s; --bg1:#4f46e5; --bg2:#312e81"><i></i></span>
-      <span class="fbk" style="--bx:11%; --by:52%; --br:-48deg; --bw:96px; --bt:9.5s; --bd:-2.5s; --bg1:#7c3aed; --bg2:#4c1d95"><i></i></span>
-      <span class="fbk" style="--bx:6%; --by:74%; --br:-58deg; --bz:-3deg; --bw:70px; --bt:7.5s; --bd:-5s; --bg1:#0ea5e9; --bg2:#0c4a6e"><i></i></span>
-      <span class="fbk" style="--bx:21%; --by:20%; --br:-40deg; --bw:58px; --bt:10s; --bd:-4s; --bg1:#f59e0b; --bg2:#92400e"><i></i></span>
-      <span class="fbk" style="--bx:85%; --by:26%; --br:52deg; --bz:2deg; --bw:78px; --bt:8.6s; --bd:-1.2s; --bg1:#ec4899; --bg2:#831843"><i></i></span>
-      <span class="fbk" style="--bx:88%; --by:52%; --br:46deg; --bw:96px; --bt:9s; --bd:-3.8s; --bg1:#10b981; --bg2:#064e3b"><i></i></span>
-      <span class="fbk" style="--bx:81%; --by:73%; --br:55deg; --bz:3deg; --bw:68px; --bt:7.8s; --bd:-6.2s; --bg1:#c6a15b; --bg2:#7a5c26"><i></i></span>
-      <span class="fbk" style="--bx:73%; --by:16%; --br:42deg; --bw:60px; --bt:10.5s; --bd:-7s; --bg1:#64748b; --bg2:#1e293b"><i></i></span>
-    </div>
-
     <div class="hero-copy" data-parallax="0.12">
-      <span class="kicker">Um instrumento de leitura</span>
       <h1>
-        <span class="line"><span>O Sapien não gerencia livros.</span></span>
+        <span class="line"><span>O Sapien não gerencia livros,</span></span>
         <span class="line"><span>Ele desenvolve <em class="gold">leitores</em><span class="measured"><span class="dotmark">.</span><span class="rule" id="heroRule"></span></span></span></span>
       </h1>
       <p class="sub">O Sapien transforma sua leitura solta em um hábito consistente. Acompanhe seu progresso página por página, mantenha sua constância e veja sua evolução como leitor.</p>
       <div class="hero-actions">
-        <a href="#assinar" class="btn btn-primary">
-          Assinar agora
+        <a href="/app" class="btn btn-primary">
+          Criar conta grátis
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14m0 0l-6-6m6 6l-6 6"/></svg>
         </a>
         <a href="#demo" class="btn btn-line">Ver como funciona</a>
-      </div>
-      <div class="hero-meta">
-        <span><span class="dot"></span> Direto no navegador</span>
-        <span><span class="dot"></span> Privado por padrão</span>
-        <span><span class="dot"></span> Sem anúncios</span>
       </div>
     </div>
 
@@ -792,8 +759,21 @@
     </div>
   </section>
 
-  <!-- DEMONSTRAÇÃO — telas do Sapien atrás do manifesto -->
-  <section class="manifesto demo-merged" id="demo" aria-label="Feito por leitores para leitores — telas do Sapien">
+  <!-- MANIFESTO -->
+  <section class="manifesto" id="manifesto-view" aria-label="Manifesto">
+    <div class="wrap">
+      <p class="q" id="manifesto" data-manifesto>
+        Feito por <span class="em">leitores</span>, para <span class="em">leitores</span>.
+      </p>
+    </div>
+  </section>
+
+  <!-- DEMONSTRAÇÃO — o Sapien numa cena física -->
+  <section class="section" id="demo" style="padding-top:0;">
+    <div class="wrap">
+      <div class="demo-scene rise">
+        <div class="demo-light" aria-hidden="true"></div>
+        <div class="demo-shadow" aria-hidden="true"></div>
         <div class="float-stage">
           <div class="float-track">
             <figure class="shot noimg" style="--z:42px; --ry:-6deg; --dy:0px; --bt:7s">
@@ -844,18 +824,11 @@
 
             <figure class="shot noimg" style="--z:-30px; --ry:5deg; --dy:28px; --bt:8.5s; --bd:-2.1s">
               <div class="shot-fb">
-                <div class="sap">
-                  <div class="sap-top">
-                    <svg width="16" height="16" viewBox="0 0 100 100" aria-hidden="true"><rect x="4" y="4" width="92" height="92" rx="22" fill="url(#lg)"/><path d="M26 71 L26 39 A11 11 0 0 1 48 39 L48 71 Z" fill="#fff"/><path d="M52 71 L52 39 A11 11 0 0 1 74 39 L74 71 Z" fill="#fff"/></svg>
-                    <div class="sap-pills"><span>Biblioteca</span><span class="on">Estatísticas</span><span>Metas</span></div>
-                  </div>
-                  <div class="sapx-kpis">
-                    <div class="sap-kpi"><div class="k">Páginas lidas</div><div class="v">32.410</div></div>
-                    <div class="sap-kpi"><div class="k">Nota média</div><div class="v">4,3★</div></div>
-                    <div class="sap-kpi"><div class="k">Ritmo</div><div class="v">38 pág/h</div></div>
-                  </div>
-                  <div class="sapx-bars"><i style="height:34%"></i><i style="height:52%"></i><i style="height:44%"></i><i style="height:70%"></i><i style="height:58%"></i><i style="height:88%"></i><i style="height:64%"></i><i style="height:96%"></i></div>
-                  <div class="sapx-axis"><span>MAI</span><span>JUN</span><span>JUL</span><span>AGO</span><span>SET</span><span>OUT</span><span>NOV</span><span>DEZ</span></div>
+                <div class="fb-top"><span class="fb-dot"></span> Estatísticas</div>
+                <div class="fb-body">
+                  <div class="fb-row w60"></div>
+                  <div class="fb-row w80"></div>
+                  <div class="fb-bars"><i style="height:34%"></i><i style="height:52%"></i><i style="height:44%"></i><i style="height:70%"></i><i style="height:58%"></i><i style="height:88%"></i><i style="height:64%"></i><i style="height:96%"></i></div>
                 </div>
               </div>
               <figcaption class="cap">Estatísticas</figcaption>
@@ -863,14 +836,13 @@
 
             <figure class="shot noimg" style="--z:22px; --ry:-4deg; --dy:54px; --bt:9s; --bd:-4.4s">
               <div class="shot-fb">
-                <div class="sap">
-                  <div class="sap-top">
-                    <svg width="16" height="16" viewBox="0 0 100 100" aria-hidden="true"><rect x="4" y="4" width="92" height="92" rx="22" fill="url(#lg)"/><path d="M26 71 L26 39 A11 11 0 0 1 48 39 L48 71 Z" fill="#fff"/><path d="M52 71 L52 39 A11 11 0 0 1 74 39 L74 71 Z" fill="#fff"/></svg>
-                    <div class="sap-pills"><span>Biblioteca</span><span class="on">Notas</span><span>Sessão</span></div>
-                  </div>
-                  <div class="sapx-quote">"Cada página lida devolve um pedaço de tempo que era só nosso."<small>O PESO DA LUZ · P. 112</small></div>
-                  <div class="sapx-note"><b>Ideia central do cap. 4</b>Guardar os trechos que ficaram — retomar no clube de leitura.</div>
-                  <div class="sapx-quote">"Ler é alargar a casa por dentro."<small>CARTAS AO SILÊNCIO · P. 47</small></div>
+                <div class="fb-top"><span class="fb-dot"></span> Notas &amp; trechos</div>
+                <div class="fb-body">
+                  <div class="fb-quote">"A coragem de escrever é a coragem de se expor." — p. 112</div>
+                  <div class="fb-row w80"></div>
+                  <div class="fb-row w60"></div>
+                  <div class="fb-quote">"Ler é reler o mundo com outros olhos." — p. 47</div>
+                  <div class="fb-row w40"></div>
                 </div>
               </div>
               <figcaption class="cap">Notas</figcaption>
@@ -878,39 +850,26 @@
 
             <figure class="shot noimg" style="--z:-46px; --ry:6deg; --dy:14px; --bt:7.8s; --bd:-1.3s">
               <div class="shot-fb">
-                <div class="sap">
-                  <div class="sap-top">
-                    <svg width="16" height="16" viewBox="0 0 100 100" aria-hidden="true"><rect x="4" y="4" width="92" height="92" rx="22" fill="url(#lg)"/><path d="M26 71 L26 39 A11 11 0 0 1 48 39 L48 71 Z" fill="#fff"/><path d="M52 71 L52 39 A11 11 0 0 1 74 39 L74 71 Z" fill="#fff"/></svg>
-                    <div class="sap-pills"><span>Lendo</span><span class="on">Sessão</span><span>Metas</span></div>
-                  </div>
-                  <div class="sapx-timer">
-                    <svg viewBox="0 0 120 120">
-                      <circle cx="60" cy="60" r="52" fill="none" stroke="rgba(255,255,255,0.09)" stroke-width="7"/>
-                      <circle cx="60" cy="60" r="52" fill="none" stroke="url(#lg)" stroke-width="7" stroke-linecap="round"
-                        stroke-dasharray="326.7" stroke-dashoffset="98" transform="rotate(-90 60 60)"/>
-                      <text class="sapx-tnum" x="60" y="67" text-anchor="middle">17:32</text>
-                    </svg>
-                  </div>
-                  <div class="sapx-controls"><span>Pausar</span><span class="ghost">Encerrar</span></div>
-                  <div class="sapx-note" style="text-align:center"><b>O Peso da Luz · Helena Vasques</b>hoje: 3 sessões · 42 páginas</div>
+                <div class="fb-top"><span class="fb-dot"></span> Sessão de foco</div>
+                <div class="fb-body">
+                  <div class="fb-ring"></div>
+                  <div class="fb-timer">25:00</div>
+                  <div class="fb-row w60" style="margin:8px auto 0"></div>
                 </div>
               </div>
               <figcaption class="cap">Sessão</figcaption>
             </figure>
           </div>
         </div>
-        <div class="mq">
-          <p class="q" id="manifesto" data-manifesto>
-            Feito por <span class="em">leitores</span> para <span class="em">leitores</span>.
-          </p>
-        </div>
+      </div>
+    </div>
   </section>
 
   <!-- 01 · ACERVO (reel horizontal) -->
   <section class="reel" id="acervo">
     <div class="reel-sticky">
       <div class="reel-head">
-        <h2><span class="kicker" style="display:block;margin-bottom:14px">p.01 — O Acervo</span>Tudo o que sustenta<br>o hábito</h2>
+        <h2><span class="kicker" style="display:block;margin-bottom:14px">p.01 — O Acervo</span>Tudo o que sustenta o hábito</h2>
         <span class="reel-prog mono"><b id="reelPct">00</b> / 06</span>
       </div>
       <div class="reel-track" id="reelTrack">
@@ -1057,30 +1016,14 @@
     </div>
   </section>
 
-  <!-- 04 · RESERVADO (privacidade — vira a página) -->
-  <section class="leaf" id="reservado">
-    <div class="wrap">
-      <span class="kicker">p.04 — Reservado</span>
-      <h2 style="margin-top:22px">Seus livros ficam<br>com você.</h2>
-      <p><span class="drop">O</span> Sapien é o seu caderno de leituras na web: a conta é sua, os dados são seus. Sem anúncios, sem venda de dados, sem feed disputando a sua atenção — e você exporta o acervo inteiro quando quiser. O que você lê é só seu.</p>
-      <div class="marks">
-        <span class="mk"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><circle cx="12" cy="12" r="10"/><path d="M2 12h20M12 2a15.3 15.3 0 0 1 0 20 15.3 15.3 0 0 1 0-20z"/></svg> No navegador</span>
-        <span class="mk"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M12 2l8 4v6c0 5-3.5 8-8 10-4.5-2-8-5-8-10V6z"/></svg> Privado por padrão</span>
-        <span class="mk"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M12 3v12m0 0l-4-4m4 4l4-4M4 21h16"/></svg> Exportação livre</span>
-      </div>
-    </div>
-    <span class="leaf-folio">— 4 —</span>
-  </section>
-
   <!-- ASSINATURA -->
   <section class="section colophon" id="assinar">
     <div class="wrap">
       <h2>O hábito começa<br>com <em>uma página</em>.</h2>
       <p class="lead">No navegador, crie sua conta, registre a primeira sessão e acenda o primeiro dia da sua sequência.</p>
       <div class="cta-row">
-        <!-- TODO: conectar ao checkout do Asaas -->
-        <a href="#" class="btn btn-primary btn-big">
-          Assinar agora
+        <a href="/app" class="btn btn-primary btn-big">
+          Criar conta grátis
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14m0 0l-6-6m6 6l-6 6"/></svg>
         </a>
       </div>
@@ -1117,7 +1060,10 @@
       </div>
       <div class="foot-bot">
         <span>© <span id="year">2026</span> Sapien — feito para quem lê.</span>
-        <a href="#reservado" style="color:inherit">Privacidade</a>
+        <span style="display:flex;gap:22px;flex-wrap:wrap">
+          <a href="/politica-de-privacidade.html" style="color:inherit">Política de Privacidade</a>
+          <a href="/termos-de-uso.html" style="color:inherit">Termos de Uso</a>
+        </span>
       </div>
     </div>
   </footer>
@@ -1217,7 +1163,7 @@
     const header = document.getElementById('header');
     const rf = document.getElementById('ribbonFill'), rt = document.getElementById('ribbonTab'), rfolio = document.getElementById('ribbonFolio');
     const sections = [...document.querySelectorAll('section[id]')];
-    const folioMap = { cover:'p.00', livro:'p.00', demo:'p.00', acervo:'p.01', ritmo:'p.02', sequencia:'p.03', reservado:'p.04', assinar:'p.05', faq:'p.06' };
+    const folioMap = { cover:'p.00', livro:'p.00', demo:'p.00', acervo:'p.01', ritmo:'p.02', sequencia:'p.03', assinar:'p.04', faq:'p.05' };
 
     /* ---------- Chart geometry (páginas/dia, 14 dias) ---------- */
     const daily = [22,34,0,41,28,55,60,18,47,52,63,30,58,72];

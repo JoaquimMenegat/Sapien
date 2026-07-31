@@ -10,7 +10,8 @@ export default defineConfig({
   root: resolve('src/renderer'),
   // .env.local fica na raiz do projeto (não em src/renderer).
   envDir: resolve('.'),
-  base: '/',
+  // O app web é servido sob /app (a landing de marketing ocupa a raiz /).
+  base: '/app/',
   resolve: {
     alias: {
       '@renderer': resolve('src/renderer/src'),
@@ -24,7 +25,9 @@ export default defineConfig({
     }
   },
   build: {
-    outDir: resolve('dist-web'),
+    // O SPA é montado em dist-web/app; a landing (landing/) é copiada para a raiz
+    // de dist-web pelo scripts/assemble-site.mjs após o build.
+    outDir: resolve('dist-web/app'),
     emptyOutDir: true
   },
   server: { port: 5199, strictPort: false }

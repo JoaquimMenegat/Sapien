@@ -11,7 +11,7 @@
     "build": "electron-vite build",
     "preview": "electron-vite preview",
     "dev:web": "vite --config vite.web.config.ts",
-    "build:web": "vite build --config vite.web.config.ts",
+    "build:web": "vite build --config vite.web.config.ts && node scripts/assemble-site.mjs",
     "preview:web": "vite preview --config vite.web.config.ts",
     "typecheck:node": "tsc --noEmit -p tsconfig.node.json --composite false",
     "typecheck:web": "tsc --noEmit -p tsconfig.web.json --composite false",

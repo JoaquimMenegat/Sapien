@@ -222,8 +222,8 @@ export function createSupabaseApi(): ReadDeckApi {
         if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(mail)) {
           return { ok: false, error: 'E-mail inválido.' }
         }
-        // O link do e-mail volta para a própria origem com #type=recovery.
-        const redirectTo = `${window.location.origin}/`
+        // O link do e-mail volta para o app (sob /app) com #type=recovery.
+        const redirectTo = `${window.location.origin}/app`
         const { error } = await sb().auth.resetPasswordForEmail(mail, { redirectTo, captchaToken })
         if (error) return { ok: false, error: authError(error.message) }
         return { ok: true }
@@ -278,7 +278,7 @@ export function createSupabaseApi(): ReadDeckApi {
       async googleSignIn(): Promise<AuthResult> {
         const { error } = await sb().auth.signInWithOAuth({
           provider: 'google',
-          options: { redirectTo: `${window.location.origin}/` }
+          options: { redirectTo: `${window.location.origin}/app` }
         })
         if (error) return { ok: false, error: authError(error.message) }
         // A partir daqui o navegador é redirecionado ao Google; a sessão volta na URL.
