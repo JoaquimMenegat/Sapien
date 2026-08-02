@@ -111,10 +111,19 @@ No Supabase isso é controlado por **Row Level Security (RLS)**.
 > Esta parte inteira é **conversa com contador** 👤. O que segue é o mapa pra você chegar
 > na reunião sabendo o que perguntar — não é decisão fechada.
 
-### 3.1 Primeiro passo: contratar um contador
-No Brasil, abrir e manter empresa **exige contador** na prática (obrigações mensais).
-Procure um contador (presencial ou online — Contabilizei, Agilize, MEI Fácil etc.) e leve
-este documento. Custo típico: **R$ 100–400/mês**.
+### 3.1 Primeiro passo: contabilidade (sem contador caro)
+Abrir e manter empresa **exige contabilidade** na prática (obrigações mensais). Mas **não
+precisa ser um escritório tradicional caro**:
+
+- **Durante o Estágio 1 (Pessoa Física): custo contábil ZERO.** Sem empresa, você declara a
+  renda você mesmo no **IRPF via Carnê-Leão**. Só pensa em contador ao abrir a SLU.
+- **Ao abrir a SLU: contabilidade online.** Serviços feitos pra micro/pequenas empresas —
+  **Contabilizei, Agilize, MEI Fácil, Conta Azul**. Custo ~**R$ 50–150/mês**; muitas
+  **abrem a empresa de graça** com o plano. Elas fazem tudo online: CNPJ, DAS, notas
+  fiscais, declarações e a **otimização do pró-labore** (te colocam no Anexo III / 6%).
+  Na prática, **a contabilidade online É o seu contador** — digital e barato.
+- **Regra:** só abra a SLU quando a receita justificar. Aí os ~R$100/mês da contabilidade
+  são fração do que entra. Sem receita → fique como PF (grátis).
 
 ### 3.2 Tipo de empresa escolhido: **SLU (Sociedade Limitada Unipessoal)**
 Decisão inicial do fundador: abrir uma **Sociedade Limitada Unipessoal**. É uma escolha
