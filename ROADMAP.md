@@ -104,10 +104,15 @@ prefixo, que ele completa com `.sapienapp.com.br`):
       Supabase — indisponível no Free. Fica como melhoria se um dia assinar o Pro.)*
 - [x] **[Você]** Usuários de teste apagados
 
-## Fase 3 — Site completo: landing + app
-- [ ] **[Você]** Fornecer o HTML da landing (do chatgpt.site) OU decidir usar a do repo
-- [ ] **[Eu]** Landing na raiz do domínio + app em rota própria + CTA "Criar conta grátis"
-- [ ] **[Eu]** SEO básico (título, descrição, preview em redes/WhatsApp)
+## Fase 3 — Site completo: landing + app ✅ CONCLUÍDA (2026-08-01)
+- [x] **[Você]** Forneceu o HTML da landing (chatgpt.site) — usada como base
+- [x] **[Eu]** Landing na raiz (`/`) + app em `/app` + CTAs "Criar conta grátis" + link "Entrar".
+      Vite `base:'/app/'`, SPA em `dist-web/app`, `scripts/assemble-site.mjs` copia a landing p/ a raiz,
+      `vercel.json` roteia `/app/*`. Páginas legais (termos/privacidade) e hero incluídos.
+- [x] **[Você]** Atualizou as Redirect URLs do Supabase para `/app` (Google/e-mail/reset).
+- [x] **[Eu]** SEO básico: título, descrição, Open Graph + Twitter card, canonical.
+      *(og:image dedicada — card social sem imagem de terceiros — fica como polimento opcional.)*
+- **Sanitização legal:** sem nome pessoal nem obras/capas com direitos autorais (a pedido do usuário).
 
 ## Fase 4 — Paridade do app web ⏳ (quase — IA adiada)
 - [x] **[Eu]** Upload de capas e avatar via Supabase Storage (bucket `media`,
