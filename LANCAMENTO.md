@@ -116,10 +116,23 @@ No Brasil, abrir e manter empresa **exige contador** na prática (obrigações m
 Procure um contador (presencial ou online — Contabilizei, Agilize, MEI Fácil etc.) e leve
 este documento. Custo típico: **R$ 100–400/mês**.
 
-### 3.2 MEI provavelmente **não** serve pra SaaS
-O MEI é barato, mas a lista de ocupações permitidas **não inclui desenvolvimento/
-licenciamento de software**. Um SaaS quase sempre precisa ser **ME (Microempresa)** no
-**Simples Nacional**. 👤 confirmar com o contador.
+### 3.2 Tipo de empresa escolhido: **SLU (Sociedade Limitada Unipessoal)**
+Decisão inicial do fundador: abrir uma **Sociedade Limitada Unipessoal**. É uma escolha
+sólida pra quem começa sozinho:
+- **Responsabilidade limitada** — separa seu patrimônio pessoal do da empresa. Se a
+  empresa for processada ou tiver dívidas, em regra **seus bens pessoais ficam
+  protegidos** (o oposto de operar como PF). Responde direto ao seu receio de risco.
+- **Não exige sócio** nem **capital social mínimo** (vantagem sobre a antiga EIRELI e a
+  LTDA tradicional de 2+ sócios).
+
+Dois conceitos que **não se confundem** e se **combinam**:
+- **Tipo societário** = SLU (define responsabilidade e estrutura).
+- **Porte + regime tributário** = provavelmente **ME (Microempresa)** no **Simples
+  Nacional** (define quanto de imposto). Na prática, uma SLU normalmente **é** uma ME
+  optante pelo Simples.
+
+⚠️ **Por que não MEI:** a lista de ocupações do MEI **não inclui software** — por isso o
+caminho é **SLU + Simples**, não MEI. 👤 confirmar tudo com o contador.
 
 ### 3.3 CNAE (atividade)
 Para SaaS por assinatura, o CNAE clássico é:
