@@ -166,6 +166,48 @@ Para SaaS por assinatura, o CNAE clássico é:
 - [ ] Ligar a **emissão automática de nota fiscal** no Asaas.
 - [ ] Atualizar `ASAAS_API_KEY` (chave de produção da conta PJ) na Vercel.
 
+### 3.8 Custos detalhados (v1 — aprimorar depois) 💵
+> Ordens de grandeza; 👤 o contador fecha os números do seu caso.
+
+**Uma vez só (abertura):**
+| Item | Estimativa |
+| ---- | ---------- |
+| Abertura da SLU (junta comercial + registros) | R$ 0–600 (contabilidade online costuma zerar com plano mensal) |
+| Certificado digital e-CNPJ (p/ emitir nota) | ~R$ 150–250/ano |
+
+**Fixos mensais (mesmo faturando R$ 0):**
+| Item | Estimativa |
+| ---- | ---------- |
+| **Contador** (o principal fixo) | R$ 100–250/mês |
+| Domínio / Vercel / Supabase / Asaas | ~R$ 0 (sem mensalidade) |
+
+→ O "custo de manter a empresa viva" é basicamente **o contador (~R$150/mês)**. Faturou
+R$ 0 no mês, o imposto do Simples também é **R$ 0** (só paga sobre o que entra).
+
+**Impostos (Simples Nacional — só sobre o faturamento):** um único DAS mensal, % do
+faturamento.
+| Anexo | Alíquota inicial | Quando |
+| ----- | ---------------- | ------ |
+| **III** | **~6%** | Fator R ≥ 28% (pró-labore ≥ 28% do faturamento) |
+| **V** | **~15,5%** | pró-labore baixo (Fator R < 28%) |
+
+👤 O contador ajusta o **pró-labore** pra te enquadrar no **Anexo III (6%)** — economia
+grande vs. os 15,5% do V.
+
+**Taxas do Asaas (por transação — não é imposto):** Pix ~R$ 1 · boleto ~R$ 2–3 · cartão
+~1–3% + fixo. Pesa mais no ticket baixo (R$ 19,90) → **incentivar o plano anual** (1
+transação/ano) melhora a margem.
+
+**Exemplo — 100 assinantes mensais a R$ 19,90 = R$ 1.990/mês:**
+| Custo | Aprox. |
+| ----- | ------ |
+| Simples (Anexo III, 6%) | ~R$ 119 |
+| Asaas (100 recebimentos Pix) | ~R$ 100 |
+| Contador | ~R$ 150 |
+| **Total** | **~R$ 370/mês** → sobra **~R$ 1.620** |
+
+*(No Anexo V, o imposto iria a ~R$ 308 e a sobra a ~R$ 1.430 — por isso o Anexo III importa.)*
+
 ---
 
 ## PARTE 4 — Lançamento público 🚀
@@ -181,6 +223,28 @@ Para SaaS por assinatura, o CNAE clássico é:
 - [ ] Abrir ao público. 🎉
 
 ---
+
+## Onde se informar (fontes confiáveis) 📚
+
+Do mais recomendado ao mais específico:
+
+- **SEBRAE** (`sebrae.com.br`) — **melhor ponto de partida gratuito**: cursos, cartilhas e
+  ferramentas sobre abrir empresa, Simples, precificação e plano de negócios. Muitas
+  unidades oferecem **atendimento/consultoria gratuita** pra quem vai abrir MEI/ME.
+- **Portal do Simples Nacional** (Receita Federal, em `gov.br`) — regras oficiais dos
+  Anexos, tabelas de alíquota e o **cálculo do DAS**. É a fonte da verdade sobre imposto.
+- **gov.br → Redesim / "Abrir empresa"** — o processo oficial de registro do CNPJ.
+- **Receita Federal** (`gov.br`) — CNPJ, consulta de CNAE, situação cadastral, Simples.
+- **Junta Comercial do seu estado** (ex.: JUCESP em SP) — onde a SLU é registrada.
+- **Prefeitura do seu município** — ISS, emissão de **NFS-e** e alvará (Home Office costuma
+  ser simples pra software).
+- **Contabilidades online** (Contabilizei, Agilize, MEI Fácil…) — têm **blogs e
+  calculadoras gratuitas** ótimos pra estudar, além do serviço de contador em si.
+- **Um contador** 👤 — a fonte **definitiva** pro seu caso concreto. Vale uma primeira
+  conversa (muitos fazem grátis) levando este documento.
+
+> Dica: comece pelo **SEBRAE** (visão geral gratuita) + **blog de uma contabilidade
+> online** (números práticos), e só então feche com um **contador**.
 
 ## Ordem recomendada
 
