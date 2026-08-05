@@ -52,6 +52,15 @@ function suggestDays(frequency: number): number[] {
   return SUGGESTION_ORDER.slice(0, frequency).sort((a, b) => a - b)
 }
 
+/** 45 → "45 minutos" · 60 → "1 hora" · 90 → "1h30" */
+function fmtDuration(min: number): string {
+  if (min < 60) return `${min} minutos`
+  const h = Math.floor(min / 60)
+  const m = min % 60
+  if (m === 0) return h === 1 ? '1 hora' : `${h} horas`
+  return `${h}h${String(m).padStart(2, '0')}`
+}
+
 function Option({
   selected,
   onClick,
@@ -115,7 +124,8 @@ export function OnboardingFlow(): JSX.Element {
   const [barriers, setBarriers] = useState<string[]>([])
   const [frequency, setFrequency] = useState(0)
   const [duration, setDuration] = useState(0)
-  const [customDuration, setCustomDuration] = useState('')
+  const [customHours, setCustomHours] = useState('')
+  const [customMinutes, setCustomMinutes] = useState('')
   const [organize, setOrganize] = useState('')
   const [days, setDays] = useState<number[]>([])
   const [period, setPeriod] = useState('')
@@ -153,7 +163,10 @@ export function OnboardingFlow(): JSX.Element {
   }
 
   // A rotina proposta a partir das respostas.
-  const finalDuration = duration === -1 ? Math.max(5, parseInt(customDuration, 10) || 0) : duration
+  const finalDuration =
+    duration === -1
+      ? (parseInt(customHours, 10) || 0) * 60 + (parseInt(customMinutes, 10) || 0)
+      : duration
   const weeklyMinutes = frequency * finalDuration
   const routineDays = organize === 'days' && days.length ? [...days].sort((a, b) => a - b) : suggestDays(frequency)
 
@@ -453,21 +466,45 @@ export function OnboardingFlow(): JSX.Element {
                 <Chip selected={duration === -1} onClick={() => setDuration(-1)}>
                   Outro
                 </Chip>
-                {duration === -1 && (
-                  <input
-                    type="number"
-                    min={5}
-                    value={customDuration}
-                    onChange={(e) => setCustomDuration(e.target.value)}
-                    placeholder="min"
-                    className="field w-24"
-                  />
-                )}
               </div>
+
+              {duration === -1 && (
+                <div className="mt-3 flex flex-wrap items-end gap-3">
+                  <label className="block">
+                    <span className="mb-1 block text-xs font-medium text-ink-soft">Horas</span>
+                    <input
+                      type="number"
+                      min={0}
+                      max={12}
+                      value={customHours}
+                      onChange={(e) => setCustomHours(e.target.value)}
+                      placeholder="0"
+                      className="field w-24 text-center"
+                    />
+                  </label>
+                  <label className="block">
+                    <span className="mb-1 block text-xs font-medium text-ink-soft">Minutos</span>
+                    <input
+                      type="number"
+                      min={0}
+                      max={59}
+                      value={customMinutes}
+                      onChange={(e) => setCustomMinutes(e.target.value)}
+                      placeholder="0"
+                      className="field w-24 text-center"
+                    />
+                  </label>
+                  {finalDuration > 0 && (
+                    <span className="pb-2.5 text-sm text-ink-faint">= {fmtDuration(finalDuration)}</span>
+                  )}
+                </div>
+              )}
 
               {frequency > 0 && finalDuration > 0 && (
                 <p className="mt-5 rounded-xl border border-accent/30 bg-accent/[0.06] p-3 text-sm text-ink-soft">
-                  Isso dá <b className="text-ink">{weeklyMinutes} minutos por semana</b>. Um começo
+                  {frequency} {frequency > 1 ? 'leituras' : 'leitura'} de{' '}
+                  <b className="text-ink">{fmtDuration(finalDuration)}</b> dão{' '}
+                  <b className="text-ink">{fmtDuration(weeklyMinutes)} por semana</b>. Um começo
                   possível — dá para ajustar quando quiser.
                 </p>
               )}
@@ -533,11 +570,11 @@ export function OnboardingFlow(): JSX.Element {
                 </div>
                 <div className="flex justify-between gap-4">
                   <dt className="text-sm text-ink-soft">Duração sugerida</dt>
-                  <dd className="text-sm font-semibold text-ink">{finalDuration} minutos</dd>
+                  <dd className="text-sm font-semibold text-ink">{fmtDuration(finalDuration)}</dd>
                 </div>
                 <div className="flex justify-between gap-4">
                   <dt className="text-sm text-ink-soft">Meta semanal</dt>
-                  <dd className="text-sm font-semibold text-ink">{weeklyMinutes} minutos</dd>
+                  <dd className="text-sm font-semibold text-ink">{fmtDuration(weeklyMinutes)}</dd>
                 </div>
                 <div className="flex justify-between gap-4">
                   <dt className="text-sm text-ink-soft">
