@@ -100,7 +100,14 @@ export interface ReadingSession {
   pages_read: number
 }
 
-export type GoalType = 'livros_ano' | 'livros_mes' | 'paginas_dia' | 'minutos_dia'
+export type GoalType =
+  | 'livros_ano'
+  | 'livros_mes'
+  | 'paginas_dia'
+  | 'minutos_dia'
+  // Metas semanais — base do onboarding ("o que cabe numa semana normal").
+  | 'sessoes_semana'
+  | 'minutos_semana'
 
 export interface Goal {
   id: number
@@ -188,6 +195,10 @@ export interface AccountApi {
     captchaToken?: string
   ): Promise<AuthResult>
   logout(): Promise<void>
+  /** Este usuário acabou de se cadastrar e ainda não fez o onboarding? */
+  needsOnboarding(): Promise<boolean>
+  /** Marca o onboarding como concluído (não volta a aparecer). */
+  completeOnboarding(): Promise<void>
   updateProfile(name: string, picture: string | null): Promise<AuthResult>
   /** Troca a senha (reautentica com a atual). Contas Google não têm senha. */
   changePassword(currentPassword: string, newPassword: string): Promise<AuthResult>

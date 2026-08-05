@@ -112,6 +112,12 @@ interface AppState {
   subscribe: (plan: PaidPlan, cpfCnpj: string) => Promise<SubscribeResult>
   cancelSubscription: () => Promise<CancelResult>
 
+  // Onboarding de acolhimento (só para quem acabou de se cadastrar)
+  needsOnboarding: boolean
+  onboardingReady: boolean
+  refreshOnboarding: () => Promise<void>
+  finishOnboarding: () => Promise<void>
+
   // Autenticação
   auth: AuthStatus | null
   authReady: boolean
@@ -206,12 +212,44 @@ export const useApp = create<AppState>((set, get) => ({
     return res
   },
 
+  // `?onboarding=1` força o fluxo (para pré-visualizar sem criar conta nova).
+  needsOnboarding: false,
+  onboardingReady: false,
+  refreshOnboarding: async () => {
+    const forced =
+      typeof window !== 'undefined' &&
+      new URLSearchParams(window.location.search).get('onboarding') === '1'
+    if (forced) {
+      set({ needsOnboarding: true, onboardingReady: true })
+      return
+    }
+    try {
+      set({ needsOnboarding: await window.readdeck.account.needsOnboarding() })
+    } catch {
+      set({ needsOnboarding: false }) // erro técnico nunca trava a entrada
+    } finally {
+      set({ onboardingReady: true })
+    }
+  },
+  finishOnboarding: async () => {
+    try {
+      await window.readdeck.account.completeOnboarding()
+    } finally {
+      set({ needsOnboarding: false })
+    }
+  },
+
   auth: null,
   authReady: false,
   refreshAuth: async () => {
     const auth = await window.readdeck.account.status()
     set({ auth, authReady: true })
-    if (auth.loggedIn) void get().refreshBilling()
+    if (auth.loggedIn) {
+      void get().refreshBilling()
+      void get().refreshOnboarding()
+    } else {
+      set({ onboardingReady: false, needsOnboarding: false })
+    }
   },
   signup: async (email, name, password, remember, captchaToken) => {
     const res = await window.readdeck.account.signup(email, name, password, remember, captchaToken)

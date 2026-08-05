@@ -14,10 +14,35 @@ const GOAL_META: Record<GoalType, { label: string; period: string; unit: string;
   livros_ano: { label: 'Livros no ano', period: `em ${YEAR}`, unit: 'livros', icon: BookOpen },
   livros_mes: { label: 'Livros no mês', period: 'este mês', unit: 'livros', icon: BookOpen },
   paginas_dia: { label: 'Páginas por dia', period: 'hoje', unit: 'páginas', icon: FileText },
-  minutos_dia: { label: 'Minutos por dia', period: 'hoje', unit: 'min', icon: Clock }
+  minutos_dia: { label: 'Minutos por dia', period: 'hoje', unit: 'min', icon: Clock },
+  sessoes_semana: {
+    label: 'Sessões por semana',
+    period: 'nos últimos 7 dias',
+    unit: 'sessões',
+    icon: Flame
+  },
+  minutos_semana: {
+    label: 'Minutos por semana',
+    period: 'nos últimos 7 dias',
+    unit: 'min',
+    icon: Clock
+  }
 }
-const GOAL_ORDER: GoalType[] = ['livros_ano', 'livros_mes', 'paginas_dia', 'minutos_dia']
-const MONTHLY: GoalType[] = ['livros_mes', 'paginas_dia', 'minutos_dia']
+const GOAL_ORDER: GoalType[] = [
+  'sessoes_semana',
+  'minutos_semana',
+  'livros_ano',
+  'livros_mes',
+  'paginas_dia',
+  'minutos_dia'
+]
+const MONTHLY: GoalType[] = [
+  'sessoes_semana',
+  'minutos_semana',
+  'livros_mes',
+  'paginas_dia',
+  'minutos_dia'
+]
 
 function computeStreak(daily: DailyStat[]): number {
   if (!daily.length) return 0
@@ -89,13 +114,17 @@ export function MetasView(): JSX.Element {
 
   const current = useMemo(() => {
     const lido = books.filter((b) => b.status === 'lido')
+    // Semana móvel: os últimos 7 dias da série diária.
+    const week = [...daily].sort((a, b) => a.day.localeCompare(b.day)).slice(-7)
     return {
       livros_ano: lido.filter((b) => b.finished_at?.startsWith(String(YEAR))).length,
       livros_mes: lido.filter((b) => b.finished_at?.startsWith(YM)).length,
       paginas_dia: today?.pages ?? 0,
-      minutos_dia: today?.minutes ?? 0
+      minutos_dia: today?.minutes ?? 0,
+      sessoes_semana: week.reduce((s, d) => s + d.sessions, 0),
+      minutos_semana: week.reduce((s, d) => s + d.minutes, 0)
     } as Record<GoalType, number>
-  }, [books, today])
+  }, [books, today, daily])
 
   const streak = useMemo(() => computeStreak(daily), [daily])
   const lidosAno = current.livros_ano

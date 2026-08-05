@@ -14,6 +14,8 @@ const api: ReadDeckApi = {
     login: (email, password, remember, captchaToken) =>
       ipcRenderer.invoke('account:login', email, password, remember, captchaToken),
     logout: () => ipcRenderer.invoke('account:logout'),
+    needsOnboarding: () => ipcRenderer.invoke('account:needsOnboarding'),
+    completeOnboarding: () => ipcRenderer.invoke('account:completeOnboarding'),
     updateProfile: (name, picture) => ipcRenderer.invoke('account:updateProfile', name, picture),
     changePassword: (current, next) =>
       ipcRenderer.invoke('account:changePassword', current, next),

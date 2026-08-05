@@ -13,6 +13,7 @@ import { PomodoroEngine } from './components/pomodoro/PomodoroEngine'
 import { MetasView } from './components/goals/MetasView'
 import { NotasView } from './components/notes/NotasView'
 import { PremiumGate } from './components/PremiumGate'
+import { OnboardingFlow } from './components/onboarding/OnboardingFlow'
 import { useApp, applyAppearance, loginAppearance, type Section } from './store/app'
 
 const SECTION_TITLES: Record<Section, string> = {
@@ -100,6 +101,8 @@ function App(): JSX.Element {
   const loggedIn = useApp((s) => s.auth?.loggedIn ?? false)
   const recovery = useApp((s) => s.recovery)
   const appearance = useApp((s) => s.appearance)
+  const needsOnboarding = useApp((s) => s.needsOnboarding)
+  const onboardingReady = useApp((s) => s.onboardingReady)
 
   useEffect(() => {
     void initAppearance()
@@ -123,7 +126,12 @@ function App(): JSX.Element {
   // Veio do link de "redefinir senha": pede a senha nova antes de entrar.
   if (recovery) return <ResetPasswordScreen />
 
-  return loggedIn ? <MainLayout /> : <LoginScreen />
+  if (!loggedIn) return <LoginScreen />
+
+  // Quem acabou de se cadastrar passa pelo onboarding antes de entrar no app.
+  if (onboardingReady && needsOnboarding) return <OnboardingFlow />
+
+  return <MainLayout />
 }
 
 export default App

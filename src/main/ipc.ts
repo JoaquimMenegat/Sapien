@@ -122,6 +122,9 @@ export function registerIpcHandlers(): void {
 
   // --- Conta / autenticação ---
   ipcMain.handle('account:status', (): AuthStatus => currentStatus())
+  // Desktop é o app pessoal (conta única já em uso): sem onboarding.
+  ipcMain.handle('account:needsOnboarding', (): boolean => false)
+  ipcMain.handle('account:completeOnboarding', (): void => {})
 
   ipcMain.handle(
     'account:signup',

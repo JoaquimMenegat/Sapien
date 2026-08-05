@@ -172,8 +172,10 @@ export function createSupabaseApi(): ReadDeckApi {
       async signup(email, name, password, _remember, captchaToken): Promise<AuthResult> {
         const { data, error } = await sb().auth.signUp({
           email: email.trim(),
-          password,
-          options: { data: { name: name.trim() }, captchaToken }
+          // `onboarding: 'pending'` fica no perfil do usuário — sobrevive à confirmação
+          // por e-mail, então o fluxo aparece quando ele entrar pela primeira vez.
+          options: { data: { name: name.trim(), onboarding: 'pending' }, captchaToken },
+          password
         })
         if (error) return { ok: false, error: authError(error.message) }
         if (!data.session) {
@@ -192,6 +194,22 @@ export function createSupabaseApi(): ReadDeckApi {
       },
       async logout(): Promise<void> {
         await sb().auth.signOut()
+      },
+      async needsOnboarding(): Promise<boolean> {
+        const { data } = await sb().auth.getSession()
+        const user = data.session?.user
+        if (!user) return false
+        const flag = user.user_metadata?.onboarding as string | undefined
+        if (flag === 'done') return false
+        if (flag === 'pending') return true
+        // Sem marcador: contas antigas não fazem onboarding. A exceção é quem acabou de
+        // criar a conta pelo Google (não passa pelo signup acima) — daí a janela curta.
+        if (user.app_metadata?.provider !== 'google') return false
+        const createdAt = user.created_at ? new Date(user.created_at).getTime() : 0
+        return createdAt > 0 && Date.now() - createdAt < 10 * 60 * 1000
+      },
+      async completeOnboarding(): Promise<void> {
+        await sb().auth.updateUser({ data: { onboarding: 'done' } })
       },
       async updateProfile(name, picture): Promise<AuthResult> {
         const id = await userId()
