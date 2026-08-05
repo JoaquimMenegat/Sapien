@@ -67,6 +67,12 @@ const api: ReadDeckApi = {
     update: (id, patch) => ipcRenderer.invoke('notes:update', id, patch),
     remove: (id) => ipcRenderer.invoke('notes:delete', id)
   },
+  schedule: {
+    list: () => ipcRenderer.invoke('schedule:list'),
+    create: (draft) => ipcRenderer.invoke('schedule:create', draft),
+    update: (id, patch) => ipcRenderer.invoke('schedule:update', id, patch),
+    remove: (id) => ipcRenderer.invoke('schedule:delete', id)
+  },
   billing: {
     status: () => ipcRenderer.invoke('billing:status'),
     details: () => ipcRenderer.invoke('billing:details'),

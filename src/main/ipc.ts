@@ -31,6 +31,7 @@ import {
 } from './db/sessions'
 import { listGoals, setGoal, deleteGoal } from './db/goals'
 import { listNotes, createNote, updateNote, deleteNote } from './db/notes'
+import { listSlots, createSlot, updateSlot, deleteSlot } from './db/schedule'
 import type {
   AppHealth,
   AuthStatus,
@@ -253,4 +254,10 @@ export function registerIpcHandlers(): void {
   )
   ipcMain.handle('notes:update', (_e, id: number, patch: NotePatch): Note => updateNote(id, patch))
   ipcMain.handle('notes:delete', (_e, id: number): void => deleteNote(id))
+
+  // --- Agenda de leitura ---
+  ipcMain.handle('schedule:list', () => listSlots())
+  ipcMain.handle('schedule:create', (_e, draft) => createSlot(draft))
+  ipcMain.handle('schedule:update', (_e, id: number, patch) => updateSlot(id, patch))
+  ipcMain.handle('schedule:delete', (_e, id: number): void => deleteSlot(id))
 }

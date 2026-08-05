@@ -147,6 +147,41 @@ export interface NotesApi {
   remove(id: number): Promise<void>
 }
 
+// --- Agenda de leitura (grade semanal, estilo Google Agenda) ---
+
+export interface ScheduleSlot {
+  id: number
+  /** Livro planejado para o horário (opcional — pode ser "leitura livre"). */
+  book_id: number | null
+  /** 0 = domingo … 6 = sábado. */
+  weekday: number
+  /** Início em minutos desde 00:00 (ex.: 1290 = 21:30). */
+  start_min: number
+  duration_min: number
+  note: string | null
+  created_at: string
+}
+
+/** Slot com o título do livro já resolvido (para exibir na grade). */
+export interface ScheduleSlotWithBook extends ScheduleSlot {
+  book_title: string | null
+}
+
+export interface ScheduleDraft {
+  book_id?: number | null
+  weekday: number
+  start_min: number
+  duration_min: number
+  note?: string | null
+}
+
+export interface ScheduleApi {
+  list(): Promise<ScheduleSlotWithBook[]>
+  create(draft: ScheduleDraft): Promise<ScheduleSlot>
+  update(id: number, patch: Partial<ScheduleDraft>): Promise<ScheduleSlot>
+  remove(id: number): Promise<void>
+}
+
 export interface AppHealth {
   ok: boolean
   dbPath: string
@@ -382,5 +417,6 @@ export interface ReadDeckApi {
   sessions: SessionsApi
   goals: GoalsApi
   notes: NotesApi
+  schedule: ScheduleApi
   billing: BillingApi
 }

@@ -12,12 +12,14 @@ import { PomodoroView } from './components/pomodoro/PomodoroView'
 import { PomodoroEngine } from './components/pomodoro/PomodoroEngine'
 import { MetasView } from './components/goals/MetasView'
 import { NotasView } from './components/notes/NotasView'
+import { AgendaView } from './components/agenda/AgendaView'
 import { PremiumGate } from './components/PremiumGate'
 import { OnboardingFlow } from './components/onboarding/OnboardingFlow'
 import { useApp, applyAppearance, loginAppearance, type Section } from './store/app'
 
 const SECTION_TITLES: Record<Section, string> = {
   biblioteca: 'Biblioteca',
+  agenda: 'Agenda de leitura',
   achar: 'Achar um livro',
   generos: 'Gêneros',
   autores: 'Autores',
@@ -58,6 +60,8 @@ function MainLayout(): JSX.Element {
         <div key={section} className="view-enter">
           {section === 'biblioteca' ? (
             <LibraryView />
+          ) : section === 'agenda' ? (
+            <AgendaView />
           ) : section === 'achar' ? (
             <FindBookView />
           ) : section === 'generos' ? (

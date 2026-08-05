@@ -46,7 +46,15 @@ const DAY_SHORT = ['Dom', 'Seg', 'Ter', 'Qua', 'Qui', 'Sex', 'Sáb']
 // Ordem de sugestão: espalha a semana começando por terça/quinta/domingo.
 const SUGGESTION_ORDER = [2, 4, 0, 6, 1, 3, 5]
 
-const TOTAL_STEPS = 6
+const TOTAL_STEPS = 7
+
+/** Horário sugerido conforme o período preferido — o usuário ajusta livremente. */
+const PERIOD_DEFAULT: Record<string, string> = {
+  manha: '07:00',
+  tarde: '15:00',
+  noite: '21:00',
+  depende: '20:00'
+}
 
 function suggestDays(frequency: number): number[] {
   return SUGGESTION_ORDER.slice(0, frequency).sort((a, b) => a - b)
@@ -129,6 +137,8 @@ export function OnboardingFlow(): JSX.Element {
   const [organize, setOrganize] = useState('')
   const [days, setDays] = useState<number[]>([])
   const [period, setPeriod] = useState('')
+  // Horário escolhido para cada dia da rotina (chave = 0..6).
+  const [times, setTimes] = useState<Record<number, string>>({})
 
   // Livro atual
   const [bookMode, setBookMode] = useState<'' | 'busca' | 'manual' | 'nenhum'>('')
@@ -170,13 +180,16 @@ export function OnboardingFlow(): JSX.Element {
   const weeklyMinutes = frequency * finalDuration
   const routineDays = organize === 'days' && days.length ? [...days].sort((a, b) => a - b) : suggestDays(frequency)
 
+  const timeFor = (d: number): string => times[d] ?? PERIOD_DEFAULT[period] ?? '20:00'
+
   const canAdvance = [
     !!profile,
     !!objective,
     barriers.length > 0,
     bookMode === 'nenhum' || (!!bookTitle && (notStarted || currentPage !== '' || bookMode === 'manual')),
     frequency > 0 && finalDuration > 0,
-    !!organize && (organize !== 'days' || (days.length > 0 && !!period))
+    !!organize && (organize !== 'days' || (days.length > 0 && !!period)),
+    routineDays.every((d) => !!timeFor(d))
   ][step]
 
   /** Salva as respostas e (se aceitar) grava metas + duração do pomodoro. */
@@ -194,15 +207,17 @@ export function OnboardingFlow(): JSX.Element {
       ])
 
       // Cria o livro atual, se houver.
+      let bookId: number | null = null
       if (hasBook) {
         const page = notStarted ? 0 : Math.max(0, parseInt(currentPage, 10) || 0)
-        await window.readdeck.books.create({
+        const created = await window.readdeck.books.create({
           ...(chosen ?? {}),
           title: bookTitle,
           status: 'lendo',
           current_page: page,
           started_at: new Date().toISOString().slice(0, 10)
         })
+        bookId = created?.id ?? null
       }
 
       if (accept) {
@@ -212,6 +227,21 @@ export function OnboardingFlow(): JSX.Element {
           set('pomodoro.focus', String(finalDuration))
         ])
         setFocus(finalDuration)
+
+        // Monta a agenda: um compromisso por dia, no horário escolhido.
+        for (const d of routineDays) {
+          const [h, m] = timeFor(d).split(':').map((n) => parseInt(n, 10) || 0)
+          try {
+            await window.readdeck.schedule.create({
+              weekday: d,
+              start_min: h * 60 + m,
+              duration_min: finalDuration,
+              book_id: bookId
+            })
+          } catch {
+            /* agenda indisponível (ex.: tabela ainda não criada) — não trava o onboarding */
+          }
+        }
       }
     } catch {
       /* nunca travar a entrada por erro ao salvar preferências */
@@ -553,6 +583,40 @@ export function OnboardingFlow(): JSX.Element {
             </>
           )}
 
+          {step === 6 && (
+            <>
+              <h2 className="font-serif text-xl font-bold text-ink">
+                Em que horário você pretende ler?
+              </h2>
+              <p className="mt-1 text-sm text-ink-soft">
+                Escolha o horário de cada dia. Isso vira sua <b>Agenda</b> — e você ajusta quando
+                quiser.
+              </p>
+
+              <div className="mt-5 space-y-2">
+                {routineDays.map((d) => (
+                  <div
+                    key={d}
+                    className="flex items-center justify-between gap-3 rounded-xl border border-edge p-3"
+                  >
+                    <span className="text-sm font-medium text-ink">{DAY_NAMES[d]}</span>
+                    <input
+                      type="time"
+                      value={timeFor(d)}
+                      onChange={(e) => setTimes((t) => ({ ...t, [d]: e.target.value }))}
+                      className="field w-32"
+                    />
+                  </div>
+                ))}
+              </div>
+
+              <p className="mt-4 text-xs text-ink-faint">
+                Cada leitura terá {fmtDuration(finalDuration)}
+                {hasBook ? ` · livro: ${bookTitle}` : ''}. Os horários se repetem toda semana.
+              </p>
+            </>
+          )}
+
           {isResult && (
             <>
               <div className="mb-4 flex items-center gap-2 text-accent">
@@ -582,6 +646,12 @@ export function OnboardingFlow(): JSX.Element {
                   </dt>
                   <dd className="text-right text-sm font-semibold text-ink">
                     {routineDays.map((d) => DAY_NAMES[d].toLowerCase()).join(', ')}
+                  </dd>
+                </div>
+                <div className="flex justify-between gap-4">
+                  <dt className="text-sm text-ink-soft">Horários</dt>
+                  <dd className="text-right text-sm font-semibold text-ink">
+                    {routineDays.map((d) => `${DAY_SHORT[d]} ${timeFor(d)}`).join(' · ')}
                   </dd>
                 </div>
                 {hasBook && (

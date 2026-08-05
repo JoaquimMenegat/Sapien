@@ -8,6 +8,7 @@ import { SettingsModal } from './SettingsModal'
 // seções continua (App.tsx) para reativar no futuro; só não há navegação até elas.
 const NAV: { id: Section; label: string }[] = [
   { id: 'biblioteca', label: 'Biblioteca' },
+  { id: 'agenda', label: 'Agenda' },
   { id: 'generos', label: 'Gêneros' },
   { id: 'autores', label: 'Autores' },
   { id: 'pomodoro', label: 'Sessão' },

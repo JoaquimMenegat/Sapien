@@ -32,7 +32,10 @@ import type {
   SubStatus,
   SubscribeResult,
   CancelResult,
-  BillingDetails
+  BillingDetails,
+  ScheduleSlot,
+  ScheduleSlotWithBook,
+  ScheduleDraft
 } from '../../../shared/types'
 
 const sb = getSupabase
@@ -510,6 +513,48 @@ export function createSupabaseApi(): ReadDeckApi {
       },
       async remove(id: number): Promise<void> {
         must(await sb().from('notes').delete().eq('id', id).select())
+      }
+    },
+
+    schedule: {
+      async list(): Promise<ScheduleSlotWithBook[]> {
+        const rows = must(
+          await sb()
+            .from('schedule_slots')
+            .select('*, books(title)')
+            .order('weekday')
+            .order('start_min')
+        ) as Array<ScheduleSlot & { books?: { title: string } | null }>
+        return rows.map(({ books, ...s }) => ({ ...s, book_title: books?.title ?? null }))
+      },
+      async create(draft: ScheduleDraft): Promise<ScheduleSlot> {
+        const user_id = await userId()
+        return must(
+          await sb()
+            .from('schedule_slots')
+            .insert({
+              user_id,
+              book_id: draft.book_id ?? null,
+              weekday: draft.weekday,
+              start_min: draft.start_min,
+              duration_min: draft.duration_min,
+              note: draft.note ?? null
+            })
+            .select()
+            .single()
+        ) as ScheduleSlot
+      },
+      async update(id: number, patch: Partial<ScheduleDraft>): Promise<ScheduleSlot> {
+        const clean: Record<string, unknown> = {}
+        for (const k of ['book_id', 'weekday', 'start_min', 'duration_min', 'note'] as const) {
+          if (patch[k] !== undefined) clean[k] = patch[k]
+        }
+        return must(
+          await sb().from('schedule_slots').update(clean).eq('id', id).select().single()
+        ) as ScheduleSlot
+      },
+      async remove(id: number): Promise<void> {
+        must(await sb().from('schedule_slots').delete().eq('id', id).select())
       }
     },
 

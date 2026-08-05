@@ -52,6 +52,17 @@ CREATE TABLE IF NOT EXISTS goals (
   created_at TEXT NOT NULL DEFAULT (datetime('now'))
 );
 
+-- Agenda de leitura: grade semanal recorrente (dia da semana + horário).
+CREATE TABLE IF NOT EXISTS schedule_slots (
+  id           INTEGER PRIMARY KEY AUTOINCREMENT,
+  book_id      INTEGER REFERENCES books(id) ON DELETE SET NULL,
+  weekday      INTEGER NOT NULL,
+  start_min    INTEGER NOT NULL,
+  duration_min INTEGER NOT NULL,
+  note         TEXT,
+  created_at   TEXT NOT NULL DEFAULT (datetime('now'))
+);
+
 CREATE TABLE IF NOT EXISTS notes (
   id         INTEGER PRIMARY KEY AUTOINCREMENT,
   book_id    INTEGER NOT NULL REFERENCES books(id) ON DELETE CASCADE,

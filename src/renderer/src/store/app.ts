@@ -11,6 +11,7 @@ import { openedFromRecoveryLink } from '../lib/supabase'
 
 export type Section =
   | 'biblioteca'
+  | 'agenda'
   | 'achar'
   | 'generos'
   | 'autores'
