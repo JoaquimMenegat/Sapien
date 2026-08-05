@@ -251,24 +251,35 @@ function HourGrid({
                   aria-label={`Adicionar leitura ${DAYS[c.weekday]} às ${h}:00`}
                 />
               ))}
-              {slotsFor(c.weekday).map((s) => (
-                <button
-                  key={s.id}
-                  onClick={() => onSlot(s)}
-                  style={{
-                    top: (s.start_min / 60 - startHour) * HOUR_H,
-                    height: Math.max(22, (s.duration_min / 60) * HOUR_H - 3)
-                  }}
-                  className="absolute inset-x-1 overflow-hidden rounded-md border border-accent/40 bg-accent/20 px-1.5 py-1 text-left transition-colors hover:bg-accent/30"
-                >
-                  <span className="block truncate text-[10px] font-semibold text-ink">
-                    {minToHHMM(s.start_min)} · {fmtDur(s.duration_min)}
-                  </span>
-                  <span className="block truncate text-[10px] text-ink-soft">
-                    {s.book_title ?? s.note ?? 'Leitura'}
-                  </span>
-                </button>
-              ))}
+              {slotsFor(c.weekday).map((s) => {
+                const height = Math.max(24, (s.duration_min / 60) * HOUR_H - 3)
+                const label = s.book_title ?? s.note ?? 'Leitura'
+                // Bloco baixo (ex.: 30 min) não cabe em duas linhas: junta tudo numa só,
+                // mantendo o horário à frente e truncando só o título.
+                const compact = height < 42
+                return (
+                  <button
+                    key={s.id}
+                    onClick={() => onSlot(s)}
+                    title={`${minToHHMM(s.start_min)} · ${fmtDur(s.duration_min)} — ${label}`}
+                    style={{ top: (s.start_min / 60 - startHour) * HOUR_H, height }}
+                    className="absolute inset-x-1 flex flex-col justify-center overflow-hidden rounded-md border border-accent/40 bg-accent/20 px-1.5 text-left leading-tight transition-colors hover:bg-accent/30"
+                  >
+                    {compact ? (
+                      <span className="truncate text-[10px] text-ink">
+                        <b className="font-semibold">{minToHHMM(s.start_min)}</b> · {label}
+                      </span>
+                    ) : (
+                      <>
+                        <span className="block truncate text-[10px] font-semibold text-ink">
+                          {minToHHMM(s.start_min)} · {fmtDur(s.duration_min)}
+                        </span>
+                        <span className="block truncate text-[10px] text-ink-soft">{label}</span>
+                      </>
+                    )}
+                  </button>
+                )
+              })}
             </div>
           ))}
         </div>
