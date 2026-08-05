@@ -134,9 +134,7 @@ export function OnboardingFlow(): JSX.Element {
   const hasBook = bookMode === 'nenhum' ? false : !!bookTitle
 
   function toggleBarrier(id: string): void {
-    setBarriers((prev) =>
-      prev.includes(id) ? prev.filter((b) => b !== id) : prev.length >= 2 ? prev : [...prev, id]
-    )
+    setBarriers((prev) => (prev.includes(id) ? prev.filter((b) => b !== id) : [...prev, id]))
   }
   function toggleDay(i: number): void {
     setDays((prev) => (prev.includes(i) ? prev.filter((d) => d !== i) : [...prev, i]))
@@ -291,22 +289,18 @@ export function OnboardingFlow(): JSX.Element {
               <h2 className="font-serif text-xl font-bold text-ink">
                 O que mais costuma atrapalhar sua leitura?
               </h2>
-              <p className="mt-1 text-sm text-ink-soft">Escolha até duas. Sem julgamento — só contexto.</p>
+              <p className="mt-1 text-sm text-ink-soft">
+                Escolha quantas quiser. Sem julgamento — só contexto.
+              </p>
               <div className="mt-5 space-y-2">
                 {BARRIERS.map((b) => {
                   const selected = barriers.includes(b.id)
-                  const blocked = !selected && barriers.length >= 2
                   return (
                     <button
                       key={b.id}
                       onClick={() => toggleBarrier(b.id)}
-                      disabled={blocked}
                       className={`flex w-full items-center gap-3 rounded-xl border p-3.5 text-left transition-colors ${
-                        selected
-                          ? 'border-accent bg-accent/[0.08]'
-                          : blocked
-                            ? 'border-edge opacity-40'
-                            : 'border-edge hover:bg-ink/[0.04]'
+                        selected ? 'border-accent bg-accent/[0.08]' : 'border-edge hover:bg-ink/[0.04]'
                       }`}
                     >
                       <span

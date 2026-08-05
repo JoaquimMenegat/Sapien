@@ -33,7 +33,8 @@ lê com frequência recebe **métricas mais detalhadas**.
 - Entender melhor minha evolução.
 - Criar uma rotina que caiba na minha semana.
 
-### 3. O que mais costuma atrapalhar sua leitura? *(até 2 opções)*
+### 3. O que mais costuma atrapalhar sua leitura? *(múltipla, sem limite)*
+> Era "até 2", mas o limite foi removido: quem tem várias barreiras precisa poder dizer.
 - Falta de tempo · Eu me esqueço de ler · Começo, mas não consigo continuar ·
   Cansaço ou dificuldade de concentração · Metas muito difíceis ·
   Minha rotina muda constantemente · Ainda não encontrei um horário adequado.
