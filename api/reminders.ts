@@ -27,7 +27,15 @@ function fmtDur(min: number): string {
 }
 
 export default async function handler(req: any, res: any): Promise<void> {
-  if (!authorizeCron(req)) return json(res, 401, { error: 'unauthorized' })
+  if (!authorizeCron(req)) {
+    // Diagnóstico seguro: diz apenas se as variáveis EXISTEM no servidor (nunca o valor).
+    // Assim dá para separar "faltou redeploy" de "segredo diferente". Remover depois.
+    return json(res, 401, {
+      error: 'unauthorized',
+      cronSecretConfigured: !!process.env.CRON_SECRET,
+      resendKeyConfigured: !!process.env.RESEND_API_KEY
+    })
+  }
 
   const { weekday, iso } = todayInBR()
   const db = admin()
