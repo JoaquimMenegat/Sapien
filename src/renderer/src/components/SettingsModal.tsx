@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import { Check, Palette, Camera, Trash2, Timer, ShieldAlert, Crown, Download } from 'lucide-react'
+import { Check, Palette, Camera, Trash2, Timer, ShieldAlert, Crown, Download, Bell } from 'lucide-react'
 import { useApp, ACCENTS, APPEARANCES, type AnimStyle } from '../store/app'
 import { exportJSON, exportBooksCSV } from '../lib/exportData'
 import { Modal } from './ui/Modal'
@@ -365,6 +365,63 @@ function SubscriptionSection(): JSX.Element | null {
   )
 }
 
+// Lembretes por e-mail: no dia em que há leitura marcada na Agenda, o Sapien avisa.
+// Só na web (o desktop não envia e-mail).
+function RemindersSection(): JSX.Element | null {
+  const IS_WEB = !!import.meta.env.VITE_SUPABASE_URL
+  const [on, setOn] = useState(true)
+  const [loaded, setLoaded] = useState(false)
+
+  useEffect(() => {
+    if (!IS_WEB) return
+    void window.readdeck.getSetting('reminders.email').then((v) => {
+      setOn(v !== '0')
+      setLoaded(true)
+    })
+  }, [IS_WEB])
+
+  if (!IS_WEB) return null
+
+  function toggle(): void {
+    const next = !on
+    setOn(next)
+    void window.readdeck.setSetting('reminders.email', next ? '1' : '0')
+  }
+
+  return (
+    <section>
+      <h3 className="mb-2 flex items-center gap-2 text-sm font-semibold text-ink">
+        <Bell size={15} className="text-ink-faint" /> Lembretes
+      </h3>
+      <button
+        onClick={toggle}
+        disabled={!loaded}
+        className={`flex w-full items-center gap-3 rounded-xl border p-3 text-left transition-colors ${
+          on ? 'border-accent bg-accent/[0.06]' : 'border-edge hover:bg-ink/[0.03]'
+        }`}
+      >
+        <span
+          className={`relative h-5 w-9 shrink-0 rounded-full transition-colors ${
+            on ? 'bg-accent' : 'bg-ink/25'
+          }`}
+        >
+          <span
+            className={`absolute top-0.5 h-4 w-4 rounded-full bg-white transition-all ${
+              on ? 'left-[18px]' : 'left-0.5'
+            }`}
+          />
+        </span>
+        <span>
+          <span className="block text-sm font-medium text-ink">Avisar por e-mail no dia da leitura</span>
+          <span className="block text-xs text-ink-faint">
+            Um e-mail por dia, só quando houver leitura marcada na Agenda.
+          </span>
+        </span>
+      </button>
+    </section>
+  )
+}
+
 // --- Exportar dados (recurso Premium) ---
 
 function ExportSection(): JSX.Element {
@@ -499,6 +556,8 @@ export function SettingsModal({
         <SubscriptionSection />
 
         <AccountSection />
+
+        <RemindersSection />
 
         <ExportSection />
 
