@@ -435,6 +435,47 @@ function ExportSection(): JSX.Element {
   )
 }
 
+// Barra de salvar. As preferências já são gravadas na hora em que você clica — este
+// botão regrava tudo e confirma, para quem quer a garantia visual de "salvo".
+function SaveBar({ onClose }: { onClose: () => void }): JSX.Element {
+  const appearance = useApp((s) => s.appearance)
+  const accent = useApp((s) => s.accent)
+  const animation = useApp((s) => s.animation)
+  const [state, setState] = useState<'idle' | 'saving' | 'saved'>('idle')
+
+  async function save(): Promise<void> {
+    setState('saving')
+    try {
+      await Promise.all([
+        window.readdeck.setSetting('appearance', appearance),
+        window.readdeck.setSetting('ui.accent', accent),
+        window.readdeck.setSetting('ui.animation', animation)
+      ])
+      setState('saved')
+      window.setTimeout(onClose, 700)
+    } catch {
+      setState('idle')
+    }
+  }
+
+  return (
+    <div className="sticky bottom-0 -mx-5 -mb-5 flex items-center justify-between gap-3 border-t border-edge bg-surface/95 px-5 py-3 backdrop-blur">
+      <p className="text-[11px] text-ink-faint">Suas preferências são salvas automaticamente.</p>
+      <button onClick={save} disabled={state !== 'idle'} className="btn-primary shrink-0 py-1.5 text-sm">
+        {state === 'saved' ? (
+          <>
+            <Check size={14} /> Salvo
+          </>
+        ) : state === 'saving' ? (
+          'Salvando…'
+        ) : (
+          'Salvar alterações'
+        )}
+      </button>
+    </div>
+  )
+}
+
 const ANIMS: { id: AnimStyle; label: string; desc: string }[] = [
   { id: 'sutil', label: 'Sutil', desc: 'Transições suaves (padrão)' },
   { id: 'rico', label: 'Rico', desc: 'Cartões ganham leve elevação ao passar o mouse' },
@@ -546,6 +587,8 @@ export function SettingsModal({
             ))}
           </div>
         </section>
+
+        <SaveBar onClose={onClose} />
       </div>
     </Modal>
   )

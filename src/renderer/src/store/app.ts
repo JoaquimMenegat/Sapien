@@ -22,11 +22,12 @@ export type Section =
 
 export type Appearance = 'executivo' | 'literary-light' | 'literary-dark' | 'moderndark'
 
+// 'executivo' saiu da lista: era visualmente idêntico ao 'moderndark'. O valor continua
+// aceito (contas antigas o têm salvo) e é migrado para 'moderndark' ao carregar.
 export const APPEARANCES: { id: Appearance; label: string }[] = [
-  { id: 'executivo', label: 'Executivo Indigo' },
+  { id: 'moderndark', label: 'Modern Dark' },
   { id: 'literary-light', label: 'Literary claro' },
-  { id: 'literary-dark', label: 'Literary escuro' },
-  { id: 'moderndark', label: 'Modern Dark' }
+  { id: 'literary-dark', label: 'Literary escuro' }
 ]
 
 export function applyAppearance(appearance: Appearance): void {
@@ -44,7 +45,7 @@ export function applyAppearance(appearance: Appearance): void {
 // Aparência usada na tela de login/cadastro: sempre escura (a marca Executivo Indigo).
 // Se o usuário já usa um tema escuro, mantemos o dele; se usa claro, cai no Executivo.
 export function loginAppearance(saved: Appearance): Appearance {
-  return saved === 'literary-light' ? 'executivo' : saved
+  return saved === 'literary-light' ? 'moderndark' : saved
 }
 
 // --- Personalização: cor de acento e estilo de animação ---
@@ -157,7 +158,7 @@ export const useApp = create<AppState>((set, get) => ({
   addBookOpen: false,
   setAddBookOpen: (addBookOpen) => set({ addBookOpen }),
 
-  appearance: 'executivo',
+  appearance: 'moderndark',
   setAppearance: (appearance) => {
     applyAppearance(appearance)
     void window.readdeck.setSetting('appearance', appearance)
@@ -169,7 +170,9 @@ export const useApp = create<AppState>((set, get) => ({
       window.readdeck.getSetting('ui.accent'),
       window.readdeck.getSetting('ui.animation')
     ])
-    const appearance: Appearance = (savedApp as Appearance) ?? 'executivo'
+    // 'executivo' foi absorvido pelo 'moderndark' (eram idênticos).
+    const raw = (savedApp as Appearance) ?? 'moderndark'
+    const appearance: Appearance = raw === 'executivo' ? 'moderndark' : raw
     const accent = savedAccent ?? 'tema'
     const animation = (savedAnim as AnimStyle) ?? 'sutil'
     applyAppearance(appearance)
