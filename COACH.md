@@ -53,7 +53,10 @@ concreto** do app.
 | Já leio com frequência | Métricas densas: ritmo, comparativos, evolução. |
 | Começando o hábito | Passos pequenos, explica o porquê de cada coisa. |
 
-### Q2 · Objetivo → **o que lidera a tela**
+### Q2 · Objetivos (múltipla escolha) → **o que lidera a tela**
+> O usuário pode marcar vários. O app trata **um de cada vez**, por prioridade:
+> `terminar` → `retomar` → `regularidade` → `evolucao` → `rotina` (do mais concreto ao
+> mais amplo). Falar de todos ao mesmo tempo viraria ruído.
 | Objetivo | O painel abre com |
 | -------- | ----------------- |
 | Retomar o hábito | Sequência + "qualquer leitura conta" |

@@ -8,8 +8,8 @@ import type { Book } from '../../../shared/types'
 export interface CoachAnswers {
   /** retomando | intermitente | frequente | iniciando */
   profile: string
-  /** retomar | terminar | regularidade | evolucao | rotina */
-  objective: string
+  /** retomar | terminar | regularidade | evolucao | rotina (o usuário pode marcar vários) */
+  objectives: string[]
   barriers: string[]
   /** days | flexible | suggest */
   organize: string
@@ -18,7 +18,7 @@ export interface CoachAnswers {
 
 export const EMPTY_COACH: CoachAnswers = {
   profile: '',
-  objective: '',
+  objectives: [],
   barriers: [],
   organize: '',
   loaded: false
@@ -35,7 +35,7 @@ export async function loadCoachAnswers(): Promise<CoachAnswers> {
   ])
   return {
     profile: profile ?? '',
-    objective: objective ?? '',
+    objectives: (objective ?? '').split(',').filter(Boolean),
     barriers: (barriers ?? '').split(',').filter(Boolean),
     organize: organize ?? '',
     loaded: true
@@ -96,13 +96,23 @@ export function coachMessages(a: CoachAnswers, ctx: CoachContext): string[] {
     }
   }
 
-  // --- Objetivo: o que importa para esta pessoa ---
-  if (a.objective === 'terminar' && reading?.total_pages) {
+  // --- Objetivos: o usuário pode marcar vários, mas o app trata um de cada vez.
+  // Ordem de prioridade: do mais concreto (uma meta com fim) ao mais amplo.
+  const OBJECTIVE_PRIORITY = ['terminar', 'retomar', 'regularidade', 'evolucao', 'rotina']
+  const topObjective = OBJECTIVE_PRIORITY.find((o) => a.objectives.includes(o))
+
+  if (topObjective === 'terminar' && reading?.total_pages) {
     const left = Math.max(0, reading.total_pages - reading.current_page)
     if (left > 0) out.push(`Faltam ${left} páginas para você terminar ${reading.title}.`)
   }
-  if (a.objective === 'retomar' && ctx.streak > 0) {
+  if (topObjective === 'retomar' && ctx.streak > 0) {
     out.push(`Você está de volta — ${ctx.streak} ${ctx.streak > 1 ? 'dias' : 'dia'} de leitura já contam.`)
+  }
+  if (topObjective === 'regularidade' && ctx.streak > 1) {
+    out.push(`${ctx.streak} dias seguidos. Regularidade é exatamente o que você pediu.`)
+  }
+  if (topObjective === 'evolucao' && ctx.pace) {
+    out.push(`Seu ritmo medido é de ${ctx.pace} páginas por hora. Em Estatísticas dá para ver a evolução.`)
   }
 
   // --- Perfil: o tom ---

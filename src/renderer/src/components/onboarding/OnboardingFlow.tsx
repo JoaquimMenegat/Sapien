@@ -128,7 +128,7 @@ export function OnboardingFlow(): JSX.Element {
 
   // Respostas
   const [profile, setProfile] = useState('')
-  const [objective, setObjective] = useState('')
+  const [objectives, setObjectives] = useState<string[]>([])
   const [barriers, setBarriers] = useState<string[]>([])
   const [frequency, setFrequency] = useState(0)
   const [duration, setDuration] = useState(0)
@@ -155,6 +155,9 @@ export function OnboardingFlow(): JSX.Element {
 
   function toggleBarrier(id: string): void {
     setBarriers((prev) => (prev.includes(id) ? prev.filter((b) => b !== id) : [...prev, id]))
+  }
+  function toggleObjective(id: string): void {
+    setObjectives((prev) => (prev.includes(id) ? prev.filter((o) => o !== id) : [...prev, id]))
   }
   function toggleDay(i: number): void {
     setDays((prev) => (prev.includes(i) ? prev.filter((d) => d !== i) : [...prev, i]))
@@ -184,7 +187,7 @@ export function OnboardingFlow(): JSX.Element {
 
   const canAdvance = [
     !!profile,
-    !!objective,
+    objectives.length > 0,
     barriers.length > 0,
     bookMode === 'nenhum' || (!!bookTitle && (notStarted || currentPage !== '' || bookMode === 'manual')),
     frequency > 0 && finalDuration > 0,
@@ -199,7 +202,7 @@ export function OnboardingFlow(): JSX.Element {
       const set = window.readdeck.setSetting
       await Promise.all([
         set('onboarding.profile', profile),
-        set('onboarding.objective', objective),
+        set('onboarding.objective', objectives.join(',')),
         set('onboarding.barriers', barriers.join(',')),
         set('onboarding.organize', organize),
         set('onboarding.days', routineDays.join(',')),
@@ -316,13 +319,31 @@ export function OnboardingFlow(): JSX.Element {
               <h2 className="font-serif text-xl font-bold text-ink">
                 O que você mais quer conquistar neste momento?
               </h2>
-              <p className="mt-1 text-sm text-ink-soft">Escolha só um — o que mais importa agora.</p>
+              <p className="mt-1 text-sm text-ink-soft">
+                Escolha quantos quiser — o Sapien cuida de um de cada vez.
+              </p>
               <div className="mt-5 space-y-2">
-                {OBJECTIVES.map((o) => (
-                  <Option key={o.id} selected={objective === o.id} onClick={() => setObjective(o.id)}>
-                    {o.label}
-                  </Option>
-                ))}
+                {OBJECTIVES.map((o) => {
+                  const selected = objectives.includes(o.id)
+                  return (
+                    <button
+                      key={o.id}
+                      onClick={() => toggleObjective(o.id)}
+                      className={`flex w-full items-center gap-3 rounded-xl border p-3.5 text-left transition-colors ${
+                        selected ? 'border-accent bg-accent/[0.08]' : 'border-edge hover:bg-ink/[0.04]'
+                      }`}
+                    >
+                      <span
+                        className={`flex h-4 w-4 shrink-0 items-center justify-center rounded border ${
+                          selected ? 'border-accent bg-accent' : 'border-ink-faint'
+                        }`}
+                      >
+                        {selected && <Check size={11} className="text-white" strokeWidth={3} />}
+                      </span>
+                      <span className="text-sm text-ink">{o.label}</span>
+                    </button>
+                  )
+                })}
               </div>
             </>
           )}
