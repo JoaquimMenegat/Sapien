@@ -90,7 +90,8 @@ export function coachMessages(a: CoachAnswers, ctx: CoachContext): string[] {
         out.push('Sua rotina pode mudar. Sua meta semanal continua flexível.')
         break
       case 'horario':
-        out.push('Ainda procurando seu horário? Vá testando — o Sapien registra quando você rende mais.')
+        // Promessa cumprida: o Diagnóstico (Estatísticas) mostra o horário de fato.
+        out.push('Ainda procurando seu horário? Em Estatísticas, o diagnóstico mostra quando você rende mais.')
         break
     }
   }

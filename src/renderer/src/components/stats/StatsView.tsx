@@ -18,6 +18,7 @@ import type { Book, BookStatus, DailyStat } from '../../../../shared/types'
 import { useBooks } from '../../store/books'
 import { useApp } from '../../store/app'
 import { STATUS_META, STATUS_ORDER, FORMAT_META, FORMAT_ORDER } from '../library/constants'
+import { MonthlyDiagnosis } from './MonthlyDiagnosis'
 
 const STATUS_HEX: Record<BookStatus, string> = {
   wishlist: '#ec4899',
@@ -247,6 +248,9 @@ export function StatsView(): JSX.Element {
 
   return (
     <div className="space-y-5">
+      {/* Diagnóstico: onde e quando esta pessoa rende mais. */}
+      <MonthlyDiagnosis />
+
       <div className="grid grid-cols-2 gap-3 lg:grid-cols-4">
         <MetricCard label="Livros no acervo" value={stats.total} color="#3b82f6" />
         <MetricCard label="Lidos" value={stats.lidoCount} color="#10b981" />
