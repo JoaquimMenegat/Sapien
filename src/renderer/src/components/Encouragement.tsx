@@ -9,8 +9,10 @@ import {
   computeEncouragements,
   bestPool,
   allPositive,
+  computeStreak,
   type Encouragements
 } from '../lib/encouragement'
+import { loadCoachAnswers, coachMessages, EMPTY_COACH, type CoachAnswers } from '../lib/coaching'
 
 function useEncouragements(): { enc: Encouragements; ready: boolean } {
   const books = useBooks((s) => s.books)
@@ -36,12 +38,36 @@ function useEncouragements(): { enc: Encouragements; ready: boolean } {
 }
 
 // Linha compacta para os indicadores (Biblioteca): uma frase, escolhida ao acaso.
+// As respostas do onboarding entram aqui: quando existe uma frase que responde à
+// barreira/objetivo declarado, ela tem preferência sobre a mensagem genérica.
 export function EncouragementLine(): JSX.Element | null {
   const { enc, ready } = useEncouragements()
+  const books = useBooks((s) => s.books)
+  const pace = useSessions((s) => s.pace)
+  const today = useSessions((s) => s.today)
   const [seed] = useState(() => Math.random())
+  const [coach, setCoach] = useState<CoachAnswers>(EMPTY_COACH)
+  const [daily, setDaily] = useState<DailyStat[]>([])
+
+  useEffect(() => {
+    void loadCoachAnswers().then(setCoach)
+    void window.readdeck.sessions.daily(30).then(setDaily)
+  }, [])
+
+  const personal = useMemo(
+    () =>
+      coachMessages(coach, {
+        books,
+        pace,
+        streak: computeStreak(daily),
+        readToday: (today?.sessions ?? 0) > 0
+      }),
+    [coach, books, pace, daily, today]
+  )
+
   if (!ready) return null
   // Prioriza mensagens de evolução (evergreen só se não houver nada guiado por dados).
-  const pool = bestPool(enc)
+  const pool = personal.length ? personal.map((text) => ({ text })) : bestPool(enc)
   if (!pool.length) return null
   const msg = pool[Math.floor(seed * pool.length) % pool.length]
   return (
