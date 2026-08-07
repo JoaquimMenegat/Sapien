@@ -109,7 +109,9 @@ export function MetasView(): JSX.Element {
     void loadBooks()
     void refreshSessions()
     void load()
-    void window.readdeck.sessions.daily(14).then(setDaily)
+    // 120 dias: os quadradinhos usam só os últimos 14, mas a sequência e o recorde
+    // precisam de histórico para serem justos.
+    void window.readdeck.sessions.daily(120).then(setDaily)
   }, [loadBooks, refreshSessions, load])
 
   const current = useMemo(() => {
@@ -127,6 +129,18 @@ export function MetasView(): JSX.Element {
   }, [books, today, daily])
 
   const streak = useMemo(() => computeStreak(daily), [daily])
+  // Melhor sequência já alcançada — nunca é perdida, mesmo depois de uma pausa.
+  const best = useMemo(() => {
+    let max = 0
+    let cur = 0
+    for (const d of daily) {
+      if (d.pages > 0 || d.sessions > 0) {
+        cur++
+        max = Math.max(max, cur)
+      } else cur = 0
+    }
+    return max
+  }, [daily])
   const lidosAno = current.livros_ano
   const annualGoal = goals.find((g) => g.type === 'livros_ano')?.target ?? 0
 
@@ -177,8 +191,12 @@ export function MetasView(): JSX.Element {
           <div className="card anim-fadeUp p-6" style={{ animationDelay: '240ms' }}>
             <div className="flex items-baseline justify-between">
               <div className="text-sm font-extrabold text-ink">Sequência de leitura</div>
-              <div className="flex items-center gap-1.5 text-xs font-bold text-emerald-400">
-                <Flame size={13} /> {streak} dias
+              <div className="flex items-center gap-3 text-xs font-bold">
+                <span className="flex items-center gap-1.5 text-emerald-400">
+                  <Flame size={13} /> {streak} dias
+                </span>
+                {/* O recorde é conquista permanente: uma pausa não apaga o que já foi feito. */}
+                {best > 0 && <span className="text-ink-faint">recorde: {best}</span>}
               </div>
             </div>
             <div className="mt-4 flex gap-1.5">

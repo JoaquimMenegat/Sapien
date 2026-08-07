@@ -10,6 +10,7 @@ import { BookCover, StatusBadge, StarRating, ReadingProgress } from './BookBits'
 import { AddBookModal } from './AddBookModal'
 import { BookDetailModal } from './BookDetailModal'
 import { EncouragementLine } from '../Encouragement'
+import { ComebackCard } from '../Comeback'
 
 const IN_PROGRESS: Book['status'][] = ['lendo', 'pausado', 'abandonado']
 
@@ -209,6 +210,9 @@ export function LibraryView(): JSX.Element {
 
   return (
     <div className="space-y-6">
+      {/* Quem volta depois de uma pausa é acolhido antes de qualquer métrica. */}
+      <ComebackCard />
+
       <EncouragementLine />
 
       {/* ── KPIs ── */}

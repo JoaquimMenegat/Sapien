@@ -36,7 +36,11 @@ chamadas de hora em hora. Então:
 
 ---
 
-## 2. Usar as respostas do onboarding 🎯
+## 2. Usar as respostas do onboarding 🎯 ✅ FEITO (2026-08-07)
+
+> Implementado em `lib/coaching.ts`, ligado à `EncouragementLine` da Biblioteca.
+> No máximo 2 barreiras viram frase; contas sem onboarding seguem na mensagem genérica.
+> Ainda não usado: `mayIncreaseGoals` (quando houver sugestão automática de meta).
 
 Hoje as respostas dormem no banco. O plano é cada resposta virar **comportamento
 concreto** do app.
@@ -78,7 +82,12 @@ sugestão de metas e na duração padrão das sessões.
 
 ---
 
-## 3. Retorno sem culpa 💚
+## 3. Retorno sem culpa 💚 ✅ FEITO (in-app) — e-mail de retorno pendente
+
+> Implementado: `components/Comeback.tsx` (cartão de boas-vindas na Biblioteca após 7+
+> dias de ausência, com páginas já lidas, melhor sequência, contagem de retomadas e o
+> botão "Recomeçar com 10 minutos") e o **recorde de sequência** nas Metas.
+> **Falta:** o e-mail único de retorno (~7 dias sem ler).
 
 **O momento que define o produto.** Todo hábito quebra. O que separa um treinador de um
 fiscal é o que acontece quando a pessoa some por 5 dias.
