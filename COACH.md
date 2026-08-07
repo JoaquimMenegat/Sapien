@@ -6,7 +6,12 @@ do jeito certo.**
 
 ---
 
-## 1. Lembretes — a agenda que toca 🔔
+## 1. Lembretes — a agenda que toca 🔔 ✅ FEITO (2026-08-07)
+
+> **Testado em produção:** e-mail entregue com a leitura do dia (22:00 · 30 min).
+> Infra: `api/reminders.ts` + `api/_email.ts` (Resend), cron diário no `vercel.json`,
+> interruptor em Personalização → Lembretes. Segredos: `CRON_SECRET` + `RESEND_API_KEY`
+> (variáveis **do projeto**, ASCII puro — a Vercel valida o segredo no header do cron).
 
 **Problema:** o onboarding pergunta se o usuário "esquece de ler", e o app não tem
 como lembrar. A agenda é um calendário mudo.
